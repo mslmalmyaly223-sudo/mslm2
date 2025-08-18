@@ -46,11 +46,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-direction: row-reverse;
         }
 
         .logo {
             display: flex;
             align-items: center;
+            margin-right: auto;
         }
 
         .logo h1 {
@@ -64,11 +66,13 @@
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 8px 15px;
-            font-size: 14px;
+            padding: 6px 10px;
+            font-size: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
+            order: -1;
+            margin-left: 10px;
         }
 
         .refresh-container {
@@ -230,16 +234,20 @@
             background: var(--dark-gray);
         }
 
+        .admin-btn.unban {
+            background: var(--secondary-color);
+        }
+
         .admin-btn.verify {
             background: var(--secondary-color);
         }
 
-        .admin-btn.unpin {
-            background: var(--warning-color);
-        }
-
         .admin-btn.unverify {
             background: #666;
+        }
+
+        .admin-btn.unpin {
+            background: var(--warning-color);
         }
 
         .comments-modal {
@@ -478,7 +486,7 @@
 
         .profile-section {
             background-color: white;
-            padding: 20px;
+            padding: 0;
             border-radius: 8px;
             margin-top: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -487,9 +495,9 @@
         .profile-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 0;
+            padding: 20px;
+            border-bottom: none;
         }
 
         .profile-avatar {
@@ -525,10 +533,11 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 12px;
-            margin-top: 20px;
-            border: 1px solid #eee;
+            margin-top: 0;
+            border: none;
+            border-top: 1px solid #eee;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 0;
         }
 
         .profile-action-btn {
@@ -607,6 +616,48 @@
             margin-top: 10px;
             font-size: 14px;
             text-align: center;
+        }
+
+        /* أنماط جديدة للإبلاغ والنقاط الثلاث */
+        .post-menu {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .report-menu {
+            position: absolute;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 5px;
+            z-index: 10;
+            display: none;
+            left: 0;
+            top: 30px;
+            min-width: 120px;
+        }
+
+        .report-menu.show {
+            display: block;
+        }
+
+        .report-btn {
+            padding: 8px 12px;
+            color: var(--danger-color);
+            cursor: pointer;
+            display: block;
+            text-align: right;
+            width: 100%;
+            border: none;
+            background: none;
+            font-size: 14px;
+        }
+
+        .report-btn:hover {
+            background-color: #f5f5f5;
         }
 
         @media (max-width: 768px) {
@@ -690,7 +741,7 @@
             }
             
             .add-book-btn {
-                width: 100%;
+                width: auto;
                 justify-content: center;
             }
         }
@@ -808,6 +859,10 @@
                         <button id="pin-post-btn" class="profile-action-btn">
                             <span>تثبيت منشور (1$)</span>
                             <span class="material-icons">push_pin</span>
+                        </button>
+                        <button id="reports-btn" class="profile-action-btn hidden">
+                            <span>الإبلاغات الواردة</span>
+                            <span class="material-icons">report</span>
                         </button>
                         <a href="https://t.me/IbnalKufa" target="_blank" class="profile-action-btn">
                             <span>قناة ابن الكوفة</span>
@@ -993,6 +1048,7 @@
         const navProfile = document.getElementById('nav-profile');
         const myBooksBtn = document.getElementById('my-books-btn');
         const editNameBtn = document.getElementById('edit-name-btn');
+        const reportsBtn = document.getElementById('reports-btn');
 
         // Constants
         const ADMIN_EMAIL = "mslmalmyaly223@gmail.com";
@@ -1029,6 +1085,14 @@
         navProfile.addEventListener('click', showProfile);
         myBooksBtn.addEventListener('click', loadMyBooks);
         editNameBtn.addEventListener('click', editUserName);
+        reportsBtn.addEventListener('click', showReports);
+
+        // إغلاق قوائم الإبلاغ عند النقر في أي مكان
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.report-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
 
         // Initialize the app
         init();
@@ -1215,6 +1279,16 @@
                 if (userData.isVerified) {
                     verifiedBadge.classList.remove('hidden');
                 }
+                
+                // التحقق من وجود إبلاغات واردة
+                const reportsQuery = query(
+                    collection(db, 'reports'),
+                    where('sellerId', '==', currentUser.uid)
+                );
+                const reportsSnapshot = await getDocs(reportsQuery);
+                
+                // إظهار زر الإبلاغات فقط إذا كان هناك إبلاغات
+                reportsBtn.classList.toggle('hidden', reportsSnapshot.empty);
             }
         }
 
@@ -1284,6 +1358,12 @@
             }
             
             bookElement.innerHTML += `
+                <div class="post-menu" onclick="toggleReportMenu(this)">
+                    <span class="material-icons">more_vert</span>
+                    <div class="report-menu">
+                        <button class="report-btn" onclick="reportPost('${book.id}', '${book.sellerId}')">إبلاغ</button>
+                    </div>
+                </div>
                 <div class="post-header">
                     <div class="post-avatar">
                         <span class="material-icons">person</span>
@@ -1312,7 +1392,7 @@
                         ` : ''}
                         
                         ${book.contactMethod === 'telegram' ? `
-                        <button class="btn btn-primary" onclick="window.open('https://t.me/${book.contactInfo.replace('@', '').replace('https://t.me/', '')}', '_blank')">
+                        <button class="btn btn-primary" onclick="window.open('https://t.me/${book.contactInfo.replace('@', '').replace('https://t.me/', '').replace('t.me/', '')}', '_blank')">
                             <span class="material-icons">telegram</span>
                             تواصل عبر تليجرام
                         </button>
@@ -1345,9 +1425,15 @@
                             onclick="window.verifyUser('${book.sellerId}', ${!book.isVerified})">
                         <span class="material-icons">${book.isVerified ? 'cancel' : 'verified'}</span>
                     </button>
+                    ${book.isBanned ? `
+                    <button class="admin-btn unban" onclick="window.unbanUser('${book.sellerId}')">
+                        <span class="material-icons">lock_open</span>
+                    </button>
+                    ` : `
                     <button class="admin-btn ban" onclick="window.banUser('${book.sellerId}')">
                         <span class="material-icons">block</span>
                     </button>
+                    `}
                     <button class="admin-btn delete" onclick="window.deletePost('${book.id}')">
                         <span class="material-icons">delete</span>
                     </button>
@@ -1363,17 +1449,26 @@
             
             showLoading();
             try {
-                const q = query(collection(db, 'books'), where('sellerId', '==', currentUser.uid));
+                const q = query(
+                    collection(db, 'books'),
+                    where('sellerId', '==', currentUser.uid),
+                    orderBy('createdAt', 'desc')
+                );
                 const snapshot = await getDocs(q);
                 
-                booksList.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const book = doc.data();
-                    book.id = doc.id;
-                    renderBook(book);
-                });
+                booksList.innerHTML = '<h2>ملازمي المعروضة</h2>';
+                
+                if (snapshot.empty) {
+                    booksList.innerHTML += '<p>لا توجد ملازم معروضة</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const book = doc.data();
+                        book.id = doc.id;
+                        renderBook(book);
+                    });
+                }
+                
                 hideLoading();
-                showHome();
             } catch (error) {
                 hideLoading();
                 console.error("Error loading user books:", error);
@@ -1385,6 +1480,7 @@
             document.getElementById('books-feed').classList.remove('hidden');
             addBookSection.classList.add('hidden');
             profileSection.classList.add('hidden');
+            addBookBtn.classList.remove('hidden');
             navHome.classList.add('active');
             navProfile.classList.remove('active');
             loadAllBooks();
@@ -1394,6 +1490,7 @@
             document.getElementById('books-feed').classList.add('hidden');
             addBookSection.classList.add('hidden');
             profileSection.classList.remove('hidden');
+            addBookBtn.classList.add('hidden');
             navHome.classList.remove('active');
             navProfile.classList.add('active');
         }
@@ -1461,6 +1558,7 @@
                     sold: false,
                     isPinned: false,
                     isVerified: userData.isVerified || false,
+                    isBanned: false,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 };
@@ -1624,6 +1722,7 @@
                             ` : ''}
                             
                             ${book.sold ? '<div style="color: red; font-weight: bold; margin-top: 15px;">هذه الملزمة تم بيعها</div>' : ''}
+                            ${book.isBanned ? '<div style="color: red; font-weight: bold; margin-top: 15px;">هذا المنشور محظور</div>' : ''}
                         </div>
                     </div>
                 `;
@@ -1697,11 +1796,58 @@
                     isBanned: true,
                     updatedAt: serverTimestamp()
                 });
+                
+                // تحديث جميع منشورات المستخدم المحظور
+                const q = query(collection(db, 'books'), where('sellerId', '==', userId));
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => {
+                    batch.update(doc.ref, {
+                        isBanned: true,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+                await batch.commit();
+                
+                hideLoading();
                 alert("تم حظر المستخدم بنجاح");
+                loadAllBooks();
             } catch (error) {
                 hideLoading();
                 console.error("Error banning user:", error);
                 alert("حدث خطأ أثناء حظر المستخدم: " + error.message);
+            }
+        }
+
+        async function unbanUser(userId) {
+            if (!confirm('هل تريد رفع الحظر عن هذا المستخدم؟')) return;
+            
+            showLoading();
+            try {
+                await updateDoc(doc(db, 'users', userId), {
+                    isBanned: false,
+                    updatedAt: serverTimestamp()
+                });
+                
+                // تحديث جميع منشورات المستخدم
+                const q = query(collection(db, 'books'), where('sellerId', '==', userId));
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => {
+                    batch.update(doc.ref, {
+                        isBanned: false,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+                await batch.commit();
+                
+                hideLoading();
+                alert("تم رفع الحظر عن المستخدم بنجاح");
+                loadAllBooks();
+            } catch (error) {
+                hideLoading();
+                console.error("Error unbanning user:", error);
+                alert("حدث خطأ أثناء رفع الحظر عن المستخدم: " + error.message);
             }
         }
 
@@ -1731,14 +1877,123 @@
             return date.toLocaleString('ar-EG');
         }
 
+        // نظام الإبلاغ
+        function toggleReportMenu(element) {
+            const menu = element.querySelector('.report-menu');
+            menu.classList.toggle('show');
+            event.stopPropagation();
+        }
+
+        async function reportPost(postId, sellerId) {
+            const reason = prompt("الرجاء كتابة سبب الإبلاغ:");
+            if (!reason || reason.trim() === '') return;
+            
+            try {
+                showLoading();
+                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                const userData = userDoc.data();
+                
+                // التحقق من عدم وجود إبلاغ سابق لنفس المنشور من نفس المستخدم
+                const existingReportQuery = query(
+                    collection(db, 'reports'),
+                    where('postId', '==', postId),
+                    where('reporterId', '==', currentUser.uid)
+                );
+                const existingReport = await getDocs(existingReportQuery);
+                
+                if (!existingReport.empty) {
+                    hideLoading();
+                    alert("لقد قمت بالإبلاغ عن هذا المنشور مسبقاً");
+                    return;
+                }
+                
+                await addDoc(collection(db, 'reports'), {
+                    postId: postId,
+                    reporterId: currentUser.uid,
+                    reporterName: userData.name,
+                    sellerId: sellerId,
+                    reason: reason.trim(),
+                    createdAt: serverTimestamp(),
+                    status: 'pending',
+                    viewed: false
+                });
+                
+                hideLoading();
+                alert("تم الإبلاغ عن المنشور بنجاح");
+            } catch (error) {
+                hideLoading();
+                console.error("Error reporting post:", error);
+                alert("حدث خطأ أثناء الإبلاغ عن المنشور");
+            }
+        }
+
+        async function showReports() {
+            if (!currentUser) return;
+            
+            showLoading();
+            try {
+                const q = query(
+                    collection(db, 'reports'),
+                    where('sellerId', '==', currentUser.uid),
+                    orderBy('createdAt', 'desc')
+                );
+                const snapshot = await getDocs(q);
+                
+                bookDetailsTitle.textContent = "الإبلاغات الواردة";
+                let content = '<div style="padding:15px;">';
+                
+                if (snapshot.empty) {
+                    content += '<p>لا توجد إبلاغات واردة</p>';
+                } else {
+                    content += '<div style="max-height:60vh;overflow-y:auto;">';
+                    
+                    const batch = writeBatch(db);
+                    snapshot.forEach(doc => {
+                        const report = doc.data();
+                        content += `
+                            <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                                <div><strong>رقم المنشور:</strong> ${report.postId}</div>
+                                <div><strong>السبب:</strong> ${report.reason}</div>
+                                <div><strong>المبلغ:</strong> ${report.reporterName}</div>
+                                <div><strong>التاريخ:</strong> ${formatDate(report.createdAt?.toDate())}</div>
+                                <div><strong>الحالة:</strong> ${report.status === 'pending' ? 'قيد المراجعة' : 'تمت معالجته'}</div>
+                            </div>
+                        `;
+                        
+                        // تحديث حالة الإبلاغ إلى "تمت مشاهدته"
+                        if (!report.viewed) {
+                            batch.update(doc.ref, {
+                                viewed: true,
+                                updatedAt: serverTimestamp()
+                            });
+                        }
+                    });
+                    
+                    await batch.commit();
+                    content += '</div>';
+                }
+                content += '</div>';
+                
+                bookDetailsContent.innerHTML = content;
+                bookDetailsModal.style.display = 'flex';
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                console.error("Error loading reports:", error);
+                alert("حدث خطأ أثناء تحميل الإبلاغات");
+            }
+        }
+
         // Make functions available globally
         window.showCommentsModal = showCommentsModal;
         window.pinPost = pinPost;
         window.verifyUser = verifyUser;
         window.banUser = banUser;
+        window.unbanUser = unbanUser;
         window.deletePost = deletePost;
         window.showBookDetails = showBookDetails;
+        window.toggleReportMenu = toggleReportMenu;
+        window.reportPost = reportPost;
     </script>
 </body>
-
 </html>
