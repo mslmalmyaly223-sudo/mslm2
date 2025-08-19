@@ -290,6 +290,7 @@
         .comment {
             display: flex;
             margin-bottom: 15px;
+            position: relative;
         }
 
         .comment-avatar {
@@ -658,6 +659,19 @@
 
         .report-btn:hover {
             background-color: #f5f5f5;
+        }
+
+        .banned-comment {
+            opacity: 0.6;
+            background-color: #ffeeee;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .banned-label {
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 5px;
         }
 
         @media (max-width: 768px) {
@@ -1058,6 +1072,7 @@
         let currentBookForComments = null;
         let isAdmin = false;
         let isRefreshing = false;
+        let bannedUsers = {}; // تخزين المستخدمين المحظورين لكل منشور
 
         // Event Listeners
         showAuthBtn.addEventListener('click', showAuthOptions);
@@ -1287,8 +1302,8 @@
                 );
                 const reportsSnapshot = await getDocs(reportsQuery);
                 
-                // إظهار زر الإبلاغات فقط إذا كان هناك إبلاغات
-                reportsBtn.classList.toggle('hidden', reportsSnapshot.empty);
+                // إظهار زر الإبلاغات فقط إذا كان هناك إبلاغات أو إذا كان المالك
+                reportsBtn.classList.toggle('hidden', reportsSnapshot.empty && !isAdmin);
             }
         }
 
@@ -1358,7 +1373,7 @@
             }
             
             bookElement.innerHTML += `
-                <div class="post-menu" onclick="toggleReportMenu(this)">
+                <div class="post-menu" onclick="event.stopPropagation(); toggleReportMenu(this)">
                     <span class="material-icons">more_vert</span>
                     <div class="report-menu">
                         <button class="report-btn" onclick="reportPost('${book.id}', '${book.sellerId}')">إبلاغ</button>
@@ -1569,7 +1584,7 @@
             } catch (error) {
                 hideLoading();
                 console.error("Error adding book:", error);
-                alert("حدث خطأ أثناء إضافة الملزمة");
+                alert("حدث خطأ أثناء إضافة الملزمة: " + error.message);
             }
         }
 
@@ -1590,7 +1605,7 @@
         async function showCommentsModal(bookId) {
             currentBookForComments = bookId;
             commentsModal.style.display = 'flex';
-            loadComments(bookId);
+            await loadComments(bookId);
             newComment.focus();
         }
 
@@ -1604,6 +1619,16 @@
         async function loadComments(bookId) {
             showLoading();
             try {
+                // تحميل قائمة المستخدمين المحظورين لهذا المنشور
+                const bannedUsersRef = doc(db, 'bannedUsers', bookId);
+                const bannedUsersDoc = await getDoc(bannedUsersRef);
+                
+                if (bannedUsersDoc.exists()) {
+                    bannedUsers[bookId] = bannedUsersDoc.data().users || {};
+                } else {
+                    bannedUsers[bookId] = {};
+                }
+                
                 const q = query(
                     collection(db, 'books', bookId, 'comments'),
                     orderBy('createdAt', 'desc')
@@ -1613,7 +1638,8 @@
                 commentsList.innerHTML = '';
                 snapshot.forEach(doc => {
                     const comment = doc.data();
-                    renderComment(comment);
+                    comment.id = doc.id;
+                    renderComment(comment, bookId);
                 });
                 hideLoading();
             } catch (error) {
@@ -1623,23 +1649,111 @@
             }
         }
 
-        function renderComment(comment) {
+        function renderComment(comment, bookId) {
             const commentElement = document.createElement('div');
             commentElement.className = 'comment';
+            
+            // التحقق مما إذا كان المستخدم محظورًا
+            const isBanned = bannedUsers[bookId] && bannedUsers[bookId][comment.userId];
+            
             commentElement.innerHTML = `
                 <div class="comment-avatar">
                     <span class="material-icons">person</span>
                 </div>
-                <div class="comment-content">
+                <div class="comment-content ${isBanned ? 'banned-comment' : ''}">
                     <div class="comment-user">
                         ${comment.userName}
                         ${comment.isVerified ? '<span class="verified-badge material-icons">verified</span>' : ''}
                     </div>
                     <div class="comment-text">${comment.text}</div>
                     <div class="comment-time">${formatDate(comment.createdAt?.toDate())}</div>
+                    ${isBanned ? '<div class="banned-label">هذا المستخدم محظور من التعليق</div>' : ''}
                 </div>
             `;
+            
+            // إضافة إمكانية الحظر/رفع الحظر للمالك فقط
+            if (currentUser && currentBookForComments) {
+                const bookRef = doc(db, 'books', currentBookForComments);
+                getDoc(bookRef).then(bookDoc => {
+                    if (bookDoc.exists() && bookDoc.data().sellerId === currentUser.uid) {
+                        commentElement.style.cursor = 'pointer';
+                        commentElement.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            handleCommentContextMenu(comment, bookId, isBanned);
+                        });
+                    }
+                });
+            }
+            
             commentsList.appendChild(commentElement);
+        }
+
+        function handleCommentContextMenu(comment, bookId, isBanned) {
+            const action = isBanned ? 'رفع الحظر' : 'حظر';
+            
+            if (confirm(`هل تريد ${action} المستخدم ${comment.userName}؟`)) {
+                if (isBanned) {
+                    unbanCommenter(comment.userId, bookId);
+                } else {
+                    banCommenter(comment.userId, bookId, comment.userName);
+                }
+            }
+        }
+
+        async function banCommenter(userId, bookId, userName) {
+            try {
+                showLoading();
+                
+                const bannedUsersRef = doc(db, 'bannedUsers', bookId);
+                const bannedUsersDoc = await getDoc(bannedUsersRef);
+                
+                const bannedUsersData = bannedUsersDoc.exists() ? bannedUsersDoc.data().users || {} : {};
+                bannedUsersData[userId] = {
+                    name: userName,
+                    bannedAt: serverTimestamp(),
+                    bannedBy: currentUser.uid
+                };
+                
+                await setDoc(bannedUsersRef, {
+                    users: bannedUsersData
+                }, { merge: true });
+                
+                bannedUsers[bookId] = bannedUsersData;
+                await loadComments(bookId);
+                hideLoading();
+                alert("تم حظر المستخدم من التعليق بنجاح");
+            } catch (error) {
+                hideLoading();
+                console.error("Error banning commenter:", error);
+                alert("حدث خطأ أثناء حظر المستخدم");
+            }
+        }
+
+        async function unbanCommenter(userId, bookId) {
+            try {
+                showLoading();
+                
+                const bannedUsersRef = doc(db, 'bannedUsers', bookId);
+                const bannedUsersDoc = await getDoc(bannedUsersRef);
+                
+                if (bannedUsersDoc.exists()) {
+                    const bannedUsersData = bannedUsersDoc.data().users || {};
+                    delete bannedUsersData[userId];
+                    
+                    await setDoc(bannedUsersRef, {
+                        users: bannedUsersData
+                    }, { merge: true });
+                    
+                    bannedUsers[bookId] = bannedUsersData;
+                    await loadComments(bookId);
+                    hideLoading();
+                    alert("تم رفع الحظر عن المستخدم بنجاح");
+                }
+            } catch (error) {
+                hideLoading();
+                console.error("Error unbanning commenter:", error);
+                alert("حدث خطأ أثناء رفع الحظر عن المستخدم");
+            }
         }
 
         async function addComment() {
@@ -1653,6 +1767,13 @@
                 
                 if (userData.isBanned) {
                     alert('تم حظرك من إضافة التعليقات');
+                    hideLoading();
+                    return;
+                }
+                
+                // التحقق مما إذا كان المستخدم محظورًا من التعليق على هذا المنشور
+                if (bannedUsers[currentBookForComments] && bannedUsers[currentBookForComments][currentUser.uid]) {
+                    alert('تم حظرك من التعليق على هذا المنشور');
                     hideLoading();
                     return;
                 }
@@ -1856,14 +1977,21 @@
             
             showLoading();
             try {
+                // حذف التعليقات المرتبطة بالمنشور
                 const commentsSnapshot = await getDocs(collection(db, 'books', postId, 'comments'));
                 const batch = writeBatch(db);
                 commentsSnapshot.forEach(doc => {
                     batch.delete(doc.ref);
                 });
-                await batch.commit();
                 
-                await deleteDoc(doc(db, 'books', postId));
+                // حذف بيانات المستخدمين المحظورين لهذا المنشور
+                const bannedUsersRef = doc(db, 'bannedUsers', postId);
+                batch.delete(bannedUsersRef);
+                
+                // حذف المنشور نفسه
+                batch.delete(doc(db, 'books', postId));
+                
+                await batch.commit();
                 loadAllBooks();
             } catch (error) {
                 hideLoading();
@@ -1920,10 +2048,23 @@
                 
                 hideLoading();
                 alert("تم الإبلاغ عن المنشور بنجاح");
+                
+                // إرسال إشعار للمالك إذا كان مسجلاً
+                if (isAdmin) {
+                    const notification = {
+                        type: 'new_report',
+                        message: `تم الإبلاغ عن منشور جديد بواسطة ${userData.name}`,
+                        postId: postId,
+                        createdAt: serverTimestamp(),
+                        read: false
+                    };
+                    
+                    await addDoc(collection(db, 'notifications'), notification);
+                }
             } catch (error) {
                 hideLoading();
                 console.error("Error reporting post:", error);
-                alert("حدث خطأ أثناء الإبلاغ عن المنشور");
+                alert("حدث خطأ أثناء الإبلاغ عن المنشور: " + error.message);
             }
         }
 
@@ -1932,11 +2073,23 @@
             
             showLoading();
             try {
-                const q = query(
-                    collection(db, 'reports'),
-                    where('sellerId', '==', currentUser.uid),
-                    orderBy('createdAt', 'desc')
-                );
+                let q;
+                
+                if (isAdmin) {
+                    // للمالك: عرض جميع الإبلاغات
+                    q = query(
+                        collection(db, 'reports'),
+                        orderBy('createdAt', 'desc')
+                    );
+                } else {
+                    // للمستخدم العادي: عرض الإبلاغات الخاصة به فقط
+                    q = query(
+                        collection(db, 'reports'),
+                        where('sellerId', '==', currentUser.uid),
+                        orderBy('createdAt', 'desc')
+                    );
+                }
+                
                 const snapshot = await getDocs(q);
                 
                 bookDetailsTitle.textContent = "الإبلاغات الواردة";
@@ -1957,6 +2110,18 @@
                                 <div><strong>المبلغ:</strong> ${report.reporterName}</div>
                                 <div><strong>التاريخ:</strong> ${formatDate(report.createdAt?.toDate())}</div>
                                 <div><strong>الحالة:</strong> ${report.status === 'pending' ? 'قيد المراجعة' : 'تمت معالجته'}</div>
+                                ${isAdmin ? `
+                                <div style="margin-top:10px;">
+                                    <button onclick="handleReportAction('${doc.id}', '${report.postId}', '${report.sellerId}', 'approve')" 
+                                            class="btn btn-secondary" style="padding:5px 10px;font-size:12px;">
+                                        قبول الإبلاغ
+                                    </button>
+                                    <button onclick="handleReportAction('${doc.id}', '${report.postId}', '${report.sellerId}', 'reject')" 
+                                            class="btn btn-danger" style="padding:5px 10px;font-size:12px;">
+                                        رفض الإبلاغ
+                                    </button>
+                                </div>
+                                ` : ''}
                             </div>
                         `;
                         
@@ -1984,6 +2149,38 @@
             }
         }
 
+        async function handleReportAction(reportId, postId, sellerId, action) {
+            try {
+                showLoading();
+                
+                if (action === 'approve') {
+                    // قبول الإبلاغ وحظر المستخدم
+                    await banUser(sellerId);
+                    
+                    await updateDoc(doc(db, 'reports', reportId), {
+                        status: 'approved',
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    alert("تم قبول الإبلاغ وحظر المستخدم");
+                } else {
+                    // رفض الإبلاغ
+                    await updateDoc(doc(db, 'reports', reportId), {
+                        status: 'rejected',
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    alert("تم رفض الإبلاغ");
+                }
+                
+                await showReports();
+            } catch (error) {
+                hideLoading();
+                console.error("Error handling report action:", error);
+                alert("حدث خطأ أثناء معالجة الإبلاغ");
+            }
+        }
+
         // Make functions available globally
         window.showCommentsModal = showCommentsModal;
         window.pinPost = pinPost;
@@ -1994,6 +2191,7 @@
         window.showBookDetails = showBookDetails;
         window.toggleReportMenu = toggleReportMenu;
         window.reportPost = reportPost;
+        window.handleReportAction = handleReportAction;
     </script>
 </body>
 </html>
