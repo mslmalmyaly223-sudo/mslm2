@@ -466,42 +466,76 @@ $("#btnGoGoogle").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق ع
 $("#btnGoPw").onclick   =()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageLoginPw"); };
 $("#btnGoSignup").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageSignup"); };
 
-/* Google Auth — اكتشاف WebView واستخدام Redirect مباشرة */
+/* Google Auth - إصلاح كامل */
 $("#googleBtn").onclick=async ()=>{
-  if (location.protocol==='file:') { $("#gErr").textContent="Google لا يعمل من file://. استضف الصفحة على HTTPS."; return; }
   const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
   btn.disabled=true; t.classList.add("hidden"); s.classList.remove("hidden");
-  try{
-    const provider=new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
+  
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({
+      prompt: 'select_account',
+      display: 'popup'
+    });
 
-    // اكتشاف WebView (Telegram/InApp browsers)
+    // اكتشاف WebView والبيئات المحدودة
     const isWebView = /Telegram|Twitter|Facebook|Line|KAKAOTALK|Instagram|Snapchat|WebView|FBAN|FBAV/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    if (isWebView) {
-      // في WebView استخدم Redirect مباشرة
+    let result;
+    
+    if (isWebView || isMobile) {
+      // في WebView أو الجوال استخدم Redirect مباشرة
+      $("#gErr").textContent = "جاري التوجيه إلى صفحة تسجيل الدخول...";
       await auth.signInWithRedirect(provider);
-      return;
+      return; // الخروج هنا لأن التوجيه سيفتح صفحة جديدة
+    } else {
+      // في المتصفح العادي استخدم Popup
+      try {
+        result = await auth.signInWithPopup(provider);
+        // إذا نجح Popup، onAuthStateChanged سيتعامل مع الباقي
+      } catch (popupErr) {
+        console.log('Popup failed, trying redirect:', popupErr);
+        // إذا فشل Popup، جرب Redirect
+        await auth.signInWithRedirect(provider);
+        return;
+      }
     }
-
-    // محاولة Popup أولاً ثم Redirect كاحتياطي
-    try{
-      await auth.signInWithPopup(provider);
-    }catch(popupErr){
-      // إذا فشل Popup استخدم Redirect
-      await auth.signInWithRedirect(provider);
+    
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
+    
+    if (error.code === 'auth/unauthorized-domain') {
+      errorMessage = "النطاق غير مصرح به. يرجى استضافة التطبيق على نطاق مصرح به في Firebase Console.";
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = "تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.";
+    } else if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = "تم إغلاق نافذة التسجيل. يرجى المحاولة مرة أخرى.";
+    } else {
+      errorMessage = error.message || "تعذر تسجيل الدخول باستخدام Google";
     }
-  }catch(e){
-    $("#gErr").textContent=e.message||"تعذر فتح مُنتقي الحسابات.";
-    btn.disabled=false; t.classList.remove("hidden"); s.classList.add("hidden");
+    
+    $("#gErr").textContent = errorMessage;
+    btn.disabled = false;
+    t.classList.remove("hidden");
+    s.classList.add("hidden");
   }
 };
 
-// معالجة نتيجة Redirect
+// معالجة نتيجة Redirect عند تحميل الصفحة
 auth.getRedirectResult().then((result) => {
-  // تم التعامل مع النتيجة في onAuthStateChanged
+  if (result.user) {
+    // تم تسجيل الدخول بنجاح عبر Redirect
+    console.log('Redirect login successful:', result.user.email);
+  }
 }).catch((error) => {
-  console.log('Redirect error:', error);
+  console.log('Redirect result error:', error);
+  if (error.code !== 'auth/unknown') {
+    $("#gErr").textContent = "فشل تسجيل الدخول: " + (error.message || "خطأ غير معروف");
+  }
 });
 
 /* Password Login — فوري */
@@ -573,35 +607,27 @@ function fastAfterAuth(note){
     if(note) toast(note);
     if(!initStarted){ 
       initStarted=true; 
-      setTimeout(() => initApp(), 100); // تأخير بسيط لضمان استقرار الواجهة
+      setTimeout(() => initApp(), 100);
     }
   }catch(e){console.error('fastAfterAuth error:', e)}
 }
 
 async function initApp(){
   try{
-    // انتظر إنشاء/تحديث مستند المستخدم أولاً
     await ensureUserDoc();
-    
-    // شغّل المهام بالتوازي بعد التأكد من وجود المستخدم
     unsubProfile = watchUserProfileCountdown();
     bindChatList();
-    
-    // حمّل المعرفة بالخلفية
     setTimeout(() => loadKnowledgeFromDB().catch(()=>{}), 500);
-    
-    // تأكد من وجود محادثة أولية
     await ensureFirstChat();
   }catch(e){console.error('initApp error:', e)}
 }
 
-/* إنشاء/تحديث مستند المستخدم - مع تحسين الأداء */
+/* إنشاء/تحديث مستند المستخدم */
 async function ensureUserDoc(){
   const ref=db.collection("users").doc(me.uid);
   const userDoc = await ref.get();
   
   if (!userDoc.exists) {
-    // إنشاء مستخدم جديد
     await ref.set({
       email: me.email||null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -612,7 +638,6 @@ async function ensureUserDoc(){
       lastActive: firebase.firestore.FieldValue.serverTimestamp()
     });
   } else {
-    // تحديث النشاط فقط للمستخدم الموجود
     await ref.update({
       lastActive: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -668,7 +693,6 @@ function bindChatList(){
       cacheSet(arr);
       setActiveChatItem(currentChatId);
     }, ()=>{
-      // Fallback to cache on error
       if($("#chatList").children.length===0){
         CHAT_CACHE.forEach(c=>insertChatRowDom(c.id, c.title));
       }
@@ -723,7 +747,7 @@ async function deleteChat(id){
     if(currentChatId===id){
       currentChatId=null; msgs.innerHTML="";
       if(CHAT_CACHE[0]) loadChat(CHAT_CACHE[0].id);
-      else await newChat(); // إنشاء محادثة جديدة إذا لم توجد محادثات
+      else await newChat();
     }
   }catch(e){ alert(e.message||e); }
 }
@@ -898,7 +922,6 @@ async function onSend(){
   const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
   const problem = isProblemLike(finalPrompt);
 
-  // تأجيل تحميل المعرفة لأول رسالة إذا لسا ما بُنِي الفهرس
   if(!index){ try{ await loadKnowledgeFromDB(); }catch{} }
 
   const ctxPieces=retrieve(finalPrompt,6);
@@ -1084,11 +1107,9 @@ $("#addDays").onclick=async ()=>{
   const ref=q.docs[0].ref; const doc=await ref.get(); const d=doc.data();
   const now=new Date();
   
-  // إصلاح: التأكد من حفظ تاريخ الاشتراك بشكل صحيح
   let curEnd = now;
   if (d.subscribed && d.subscriptionEnd?.toDate) {
     curEnd = d.subscriptionEnd.toDate();
-    // إذا انتهى الاشتراك السابق، ابدأ من الآن
     if (curEnd < now) curEnd = now;
   }
   
@@ -1098,7 +1119,7 @@ $("#addDays").onclick=async ()=>{
     subscribed: true,
     subscriptionEnd: firebase.firestore.Timestamp.fromDate(newEnd),
     blocked: false,
-    trialStart: firebase.firestore.FieldValue.serverTimestamp() // إعادة تعيين التجربة
+    trialStart: firebase.firestore.FieldValue.serverTimestamp()
   });
   
   $("#subMsg").textContent=`تمت إضافة ${days} يوم. النهاية: ${newEnd.toLocaleDateString('ar-SA')}`;
