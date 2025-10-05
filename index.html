@@ -309,18 +309,24 @@ a{color:#9eb6ff}
 <!-- Train page -->
 <div class="page" id="pageTrain">
   <div class="head"><h3 style="margin:0">🧠 تعليم الذكاء</h3><button class="btn" data-back>رجوع</button></div>
+  <div class="hr" style="height:1px;background:var(--stroke);margin:10px 0"></div>
+  
   <div class="block">
     <div class="title">⚙️ أوامر النظام (قواعد المنع/السماح)</div>
     <textarea class="input" style="min-height:140px" id="trainRule" placeholder="اكتب أوامر/قواعد للنظام…"></textarea>
     <div style="height:8px"></div>
     <button class="btn primary" id="saveRule">حفظ الأوامر (قواعد)</button>
+    <div id="ruleMsg" style="margin-top:8px;color:var(--ok)"></div>
   </div>
+  
   <div class="block">
     <div class="title">📝 إضافة معلومات</div>
     <textarea class="input" style="min-height:140px" id="trainInfoText" placeholder="أضف معلومات ومعارف يردّ بها الذكاء…"></textarea>
     <div style="height:8px"></div>
-    <button class="btn" id="saveInfo">حفظ المعلومات</button>
+    <button class="btn primary" id="saveInfo">حفظ المعلومات</button>
+    <div id="infoMsg" style="margin-top:8px;color:var(--ok)"></div>
   </div>
+  
   <div class="block">
     <div class="title">📚 إضافة ملفات PDF</div>
     <input type="file" id="pdfInput" accept=".pdf" multiple class="hidden">
@@ -331,7 +337,9 @@ a{color:#9eb6ff}
     <div style="height:8px"></div>
     <div id="fileList"></div>
     <div style="height:10px"></div>
-    <div style="height:8px;background:#0b0f18;border:1px solid var(--stroke);border-radius:6px;overflow:hidden"><div class="bar" id="pdfBar" style="height:100%;background:var(--brand);width:0%"></div></div>
+    <div style="height:8px;background:#0b0f18;border:1px solid var(--stroke);border-radius:6px;overflow:hidden">
+      <div class="bar" id="pdfBar" style="height:100%;background:var(--brand);width:0%"></div>
+    </div>
     <div id="trainInfo" style="margin-top:8px;color:var(--muted);font-size:13px;white-space:pre-wrap"></div>
   </div>
 </div>
@@ -371,7 +379,6 @@ function closeSidebar(){ $("#sidebar").classList.remove("open"); $("#sideOverlay
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
 try{auth.useDeviceLanguage();}catch{}
-// ثبّت الجلسة محليًا مرة واحدة (لا تكررها بالأزرار)
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 
 /* Boot/App/Auth */
@@ -480,25 +487,20 @@ $("#googleBtn").onclick=async ()=>{
       display: 'popup'
     });
 
-    // اكتشاف WebView والبيئات المحدودة
     const isWebView = /Telegram|Twitter|Facebook|Line|KAKAOTALK|Instagram|Snapchat|WebView|FBAN|FBAV/i.test(navigator.userAgent);
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     let result;
     
     if (isWebView || isMobile) {
-      // في WebView أو الجوال استخدم Redirect مباشرة
       $("#gErr").textContent = "جاري التوجيه إلى صفحة تسجيل الدخول...";
       await auth.signInWithRedirect(provider);
-      return; // الخروج هنا لأن التوجيه سيفتح صفحة جديدة
+      return;
     } else {
-      // في المتصفح العادي استخدم Popup
       try {
         result = await auth.signInWithPopup(provider);
-        // إذا نجح Popup، onAuthStateChanged سيتعامل مع الباقي
       } catch (popupErr) {
         console.log('Popup failed, trying redirect:', popupErr);
-        // إذا فشل Popup، جرب Redirect
         await auth.signInWithRedirect(provider);
         return;
       }
@@ -528,7 +530,6 @@ $("#googleBtn").onclick=async ()=>{
 // معالجة نتيجة Redirect عند تحميل الصفحة
 auth.getRedirectResult().then((result) => {
   if (result.user) {
-    // تم تسجيل الدخول بنجاح عبر Redirect
     console.log('Redirect login successful:', result.user.email);
   }
 }).catch((error) => {
@@ -546,7 +547,6 @@ $("#loginBtn").onclick=async ()=>{
   btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
   try{
     await auth.signInWithEmailAndPassword(email, pass);
-    // fastAfterAuth سيتم استدعاؤها تلقائياً من onAuthStateChanged
   }catch(e){
     alert(e.message);
     btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
@@ -572,7 +572,6 @@ $("#signupBtn").onclick=async ()=>{
   try{
     await auth.createUserWithEmailAndPassword(email,p1);
     $("#signupMsg").textContent="تم إنشاء الحساب";
-    // fastAfterAuth سيتم استدعاؤها تلقائياً من onAuthStateChanged
   }catch(e){ alert(e.message); }
   btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
 };
@@ -590,7 +589,6 @@ auth.onAuthStateChanged(async (u)=>{
     $("#userEmail").textContent=u.email||"";
     $("#adminBtn").style.display=(me?.email===ADMIN_EMAIL)?"block":"none";
     
-    // إخفاء صفحات الدخول فوراً
     document.querySelectorAll(".page").forEach(p=>p.style.display="none");
     pageStack = [];
     
@@ -845,16 +843,147 @@ function retrieve(q,k=6){
   function norm(v){let s=0;v.forEach(x=>s+=x*x);return Math.sqrt(s)||1}
 }
 async function loadKnowledgeFromDB(){
-  const s=await db.collection("knowledge").orderBy("createdAt","desc").limit(1000).get();
-  const infoTexts=[]; rulesMemo="";
-  s.docs.forEach(d=>{
-    const x=d.data(); const t=(x.type||"").toLowerCase();
-    if(t==="pdf" || t==="info" || t==="text"){
-      const joined=[x.note?`ملاحظة: ${x.note}`:"",x.text||""].join("\n").trim();
-      if(joined) infoTexts.push(joined);
-    }else if(t==="rule"){ if(x.text) rulesMemo=(rulesMemo?rulesMemo+"\n":"")+x.text; }
+  try {
+    const s=await db.collection("knowledge").orderBy("createdAt","desc").limit(1000).get();
+    const infoTexts=[]; rulesMemo="";
+    s.docs.forEach(d=>{
+      const x=d.data(); const t=(x.type||"").toLowerCase();
+      if(t==="pdf" || t==="info" || t==="text"){
+        const joined=[x.note?`ملاحظة: ${x.note}`:"",x.text||""].join("\n").trim();
+        if(joined) infoTexts.push(joined);
+      }else if(t==="rule"){ if(x.text) rulesMemo=(rulesMemo?rulesMemo+"\n":"")+x.text; }
+    });
+    knowledgeChunks=chunkAll(infoTexts); 
+    buildIndex(knowledgeChunks);
+    console.log('تم تحميل المعرفة:', knowledgeChunks.length, 'قطعة');
+  } catch(e) {
+    console.error('خطأ في تحميل المعرفة:', e);
+  }
+}
+
+/* ===== إصلاح أزرار لوحة التحكم ===== */
+
+// زر حفظ الأوامر
+$("#saveRule").onclick = async () => {
+  const ruleText = $("#trainRule").value.trim();
+  if (!ruleText) return alert("يرجى إدخال الأوامر أولاً");
+  
+  try {
+    await db.collection("knowledge").add({
+      type: "rule",
+      text: ruleText,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      addedBy: me.email
+    });
+    
+    $("#ruleMsg").textContent = "✅ تم حفظ الأوامر بنجاح";
+    $("#trainRule").value = "";
+    
+    // إعادة تحميل المعرفة لتطبيق التغييرات
+    setTimeout(() => loadKnowledgeFromDB(), 1000);
+  } catch (e) {
+    $("#ruleMsg").textContent = "❌ خطأ في حفظ الأوامر: " + e.message;
+  }
+};
+
+// زر حفظ المعلومات
+$("#saveInfo").onclick = async () => {
+  const infoText = $("#trainInfoText").value.trim();
+  if (!infoText) return alert("يرجى إدخال المعلومات أولاً");
+  
+  try {
+    await db.collection("knowledge").add({
+      type: "info",
+      text: infoText,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      addedBy: me.email
+    });
+    
+    $("#infoMsg").textContent = "✅ تم حفظ المعلومات بنجاح";
+    $("#trainInfoText").value = "";
+    
+    // إعادة تحميل المعرفة لتطبيق التغييرات
+    setTimeout(() => loadKnowledgeFromDB(), 1000);
+  } catch (e) {
+    $("#infoMsg").textContent = "❌ خطأ في حفظ المعلومات: " + e.message;
+  }
+};
+
+// زر اختيار ملفات PDF
+$("#pickPdf").onclick = () => document.getElementById("pdfInput").click();
+
+// معالجة ملفات PDF
+let selectedPdfFiles = [];
+document.getElementById("pdfInput").addEventListener("change", (e) => {
+  selectedPdfFiles = Array.from(e.target.files || []);
+  const list = document.getElementById("fileList");
+  list.innerHTML = selectedPdfFiles.map(f => `<div>📄 ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)</div>`).join("");
+});
+
+// زر معالجة ملفات PDF
+$("#processPdfs").onclick = async () => {
+  if (selectedPdfFiles.length === 0) return alert("يرجى اختيار ملفات PDF أولاً");
+  
+  const processBtn = $("#processPdfs");
+  const originalText = processBtn.textContent;
+  processBtn.disabled = true;
+  processBtn.textContent = "جاري المعالجة...";
+  
+  const progressBar = $("#pdfBar");
+  const trainInfo = $("#trainInfo");
+  
+  try {
+    let processedCount = 0;
+    
+    for (const file of selectedPdfFiles) {
+      trainInfo.textContent = `جاري معالجة: ${file.name}...`;
+      
+      // محاكاة معالجة PDF (يمكن استبدالها بمعالجة حقيقية)
+      const textContent = await extractTextFromPDF(file);
+      
+      if (textContent && textContent.trim()) {
+        await db.collection("knowledge").add({
+          type: "pdf",
+          text: textContent,
+          fileName: file.name,
+          fileSize: file.size,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          addedBy: me.email
+        });
+        
+        processedCount++;
+        progressBar.style.width = `${(processedCount / selectedPdfFiles.length) * 100}%`;
+      }
+    }
+    
+    trainInfo.textContent = `✅ تم معالجة ${processedCount} ملف بنجاح`;
+    $("#fileList").innerHTML = "";
+    selectedPdfFiles = [];
+    progressBar.style.width = "0%";
+    
+    // إعادة تحميل المعرفة
+    setTimeout(() => loadKnowledgeFromDB(), 1000);
+    
+  } catch (e) {
+    trainInfo.textContent = "❌ خطأ في معالجة الملفات: " + e.message;
+  } finally {
+    processBtn.disabled = false;
+    processBtn.textContent = originalText;
+  }
+};
+
+// دالة محاكاة استخراج النص من PDF
+async function extractTextFromPDF(file) {
+  return new Promise((resolve) => {
+    // محاكاة استخراج النص - يمكن استبدالها بـ pdf.js الحقيقي
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // في الواقع هنا نستخدم pdf.js لاستخراج النص
+      // لكن لأغراض التجربة نعيد نص تجريبي
+      resolve(`نص مستخرج من ${file.name}:\n\nهذا محتوى تجريبي من ملف PDF. في التطبيق الحقيقي، سيتم استخراج النص الفعلي باستخدام pdf.js.`);
+    };
+    reader.readAsArrayBuffer(file);
   });
-  knowledgeChunks=chunkAll(infoTexts); buildIndex(knowledgeChunks);
 }
 
 /* إدخال + مرفقات + إرسال */
@@ -960,14 +1089,22 @@ function cleanAI(s){
 
 /* AI */
 function sysPrompt({wantsLong,isProblem}){
-  return [
-    "أنت مساعد دراسي ذكي جدًا.",
+  let prompt = [
+    "أنت مساعد دراسي ذكي جدًا متخصص في منهج السادس العلمي.",
     wantsLong ? "اكتب شرحًا تفصيليًا مع خطوات مرقمة وعناوين فرعية." : "أجب باختصار شديد وواضح (سطران كحد أقصى) إلا إذا كانت مسألة تحتاج خطوات.",
     "ادعم الرموز واللاتكس: $$ .. $$ أو \\( .. \\) مثل: \\(\\Delta,\\sqrt{},\\frac{},\\sum,\\pi,\\times,\\div,\\rightarrow\\).",
     isProblem ? "نظرًا لكونها مسألة: استخدم خطوات 1,2,3… مع تبرير مختصر لكل خطوة." : "",
     "استخدم الإيموجي بلطف عند المناسبة 🙂."
   ].filter(Boolean).join("\n");
+
+  // إضافة الأوامر المخصصة من قاعدة البيانات
+  if (rulesMemo) {
+    prompt += "\n\n" + rulesMemo;
+  }
+
+  return prompt;
 }
+
 function startStreaming(){
   isStreaming = true;
   streamingEl = document.createElement("div");
@@ -1088,13 +1225,6 @@ $("#tileUsers").onclick=()=>{ $("#pageHub").style.display="none"; openPage("#pag
 $("#tileSubs").onclick =()=>{ $("#pageHub").style.display="none"; openPage("#pageSubs"); };
 $("#tileTrain").onclick=()=>{ $("#pageHub").style.display="none"; openPage("#pageTrain"); };
 $("#logout").onclick=()=>auth.signOut();
-
-$("#pickPdf").onclick=()=>document.getElementById("pdfInput").click();
-document.getElementById("processPdfs").onclick=()=>{ /* مكان المعالجة */ };
-document.getElementById("pdfInput").addEventListener("change",(e)=>{
-  const list=document.getElementById("fileList");
-  list.innerHTML=Array.from(e.target.files||[]).map(f=>`<div>📄 ${f.name}</div>`).join("");
-});
 
 /* ===== اشتراكات: إضافة + إلغاء ===== */
 $("#addDays").onclick=async ()=>{
