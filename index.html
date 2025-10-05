@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>المساعد في السادس | Sixth Assistant</title>
 
 <!-- Firebase v9 (compat) -->
@@ -86,7 +86,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 /* Input row */
 .inputRow{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--stroke);background:#0e1016;position:sticky;bottom:0}
 :root.light .inputRow{background:#ffffff}
-.input{flex:1;height:48px;border-radius:22px;border:1px solid transparent;background:#0b0e16;color:var(--text);padding:0 14px;outline:none}
+.input{flex:1;height:48px;border-radius:22px;border:1px solid transparent;background:#0b0e16;color:var(--text);padding:0 14px;outline:none;-webkit-user-select:text;user-select:text}
 :root.light .input{background:#f8faff;color:#0b1220}
 .send,.attach{width:52px;min-width:52px;border-radius:50%;border:1px solid var(--stroke)}
 .send{background:var(--brand);color:#fff;font-weight:900}
@@ -104,12 +104,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .block{padding:10px;border-bottom:1px solid var(--stroke)}
 .block .title{font-weight:800;margin-bottom:6px}
 
+/* Admin cards */
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cardStat{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:14px}
 .cardStat .name{font-weight:800;font-size:14px;color:var(--muted);margin-bottom:8px}
 .cardStat .num{font-weight:900;font-size:26px}
 
-/* Auth */
+/* AUTH (Home with 3 buttons) */
 .auth{display:none;align-items:center;justify-content:center;position:fixed;inset:0}
 .authCard{width:92%;max-width:520px;background:var(--panel);border:1px solid var(--stroke);border-radius:16px;padding:16px;text-align:center}
 .authBtns{display:flex;flex-direction:column;gap:10px;margin-top:12px}
@@ -124,7 +125,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 
 a{color:#9eb6ff}
 
-/* Responsive */
+/* Mobile */
 @media (max-width:900px){
   #root{grid-template-columns:0 1fr}
   .sidebar{transform:translateX(100%);transition:transform .25s}
@@ -140,24 +141,17 @@ a{color:#9eb6ff}
   <div class="dot"></div><div class="dot"></div><div class="dot"></div>
 </div>
 
-<!-- AUTH HOME (3 Buttons like screenshots) -->
+<!-- AUTH HOME -->
 <section class="auth" id="auth">
   <div class="authCard">
     <div class="logoRow">
-      <!-- NEW LOGO (cap + ai nodes) -->
+      <!-- شعار جديد -->
       <svg class="logoMark" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo">
-        <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6d83ff"/><stop offset="1" stop-color="#3b57ff"/>
-          </linearGradient>
-        </defs>
-        <!-- Graduation cap -->
+        <defs><linearGradient id="g" x1="0" y1="0" x2="128" y2="128"><stop stop-color="#6d83ff"/><stop offset="1" stop-color="#3b57ff"/></linearGradient></defs>
         <path d="M16 46L64 26l48 20-48 20-48-20Z" fill="url(#g)"/>
         <path d="M32 58l32 14 32-14v14c0 10-14 18-32 18s-32-8-32-18V58Z" fill="#2a2f43"/>
         <circle cx="104" cy="73" r="6" fill="#4a6bff"/>
-        <!-- AI nodes -->
-        <circle cx="42" cy="94" r="6" fill="#7ea0ff"/>
-        <circle cx="86" cy="94" r="6" fill="#7ea0ff"/>
+        <circle cx="42" cy="94" r="6" fill="#7ea0ff"/><circle cx="86" cy="94" r="6" fill="#7ea0ff"/>
         <path d="M42 94h44" stroke="#9fb3ff" stroke-width="3" stroke-linecap="round"/>
       </svg>
       <div class="brandName">المساعد في السادس</div>
@@ -165,8 +159,8 @@ a{color:#9eb6ff}
 
     <div class="authBtns">
       <button class="btn" id="btnGoGoogle">المتابعة باستخدام Google 🌐</button>
-      <button class="btn" id="btnGoPw">المتابعة بكلمة المرور 🔐</button>
-      <button class="btn" id="btnGoSignup">تسجيل حساب جديد 📝</button>
+      <button class="btn" id="btnGoPw">تسجيل الدخول 🔐</button>
+      <button class="btn" id="btnGoSignup">إنشاء حساب جديد 📝</button>
     </div>
 
     <label class="tosRow"><input type="checkbox" id="tos"> <span>أوافق على الشروط والخصوصية</span></label>
@@ -174,7 +168,7 @@ a{color:#9eb6ff}
   </div>
 </section>
 
-<!-- Dedicated Google page (explainer + direct open selector) -->
+<!-- Google page -->
 <div class="page" id="pageGoogle">
   <div class="head">
     <h3 style="margin:0">تسجيل الدخول باستخدام Google</h3>
@@ -182,55 +176,53 @@ a{color:#9eb6ff}
   </div>
   <div class="block">
     <div class="title">اختر حسابًا من جهازك</div>
-    <p style="color:var(--muted)">بالضغط على الزر التالي سيتم فتح نافذة اختيار الحسابات المحفوظة على هاتفك.</p>
-    <button class="btn primary" id="googleBtn">فتح مُنتقي حسابات Google</button>
+    <p style="color:var(--muted)">سيُفتح مُنتقي حسابات Google.</p>
+    <button class="btn primary" id="googleBtn">
+      <span id="gTxt">فتح مُنتقي حسابات Google</span>
+      <span id="gSpin" class="hidden">… جارٍ الفتح</span>
+    </button>
+    <div id="gErr" style="color:var(--err);margin-top:8px;font-size:13px"></div>
   </div>
 </div>
 
-<!-- Password Login page -->
+<!-- Password Login -->
 <div class="page" id="pageLoginPw">
   <div class="head">
     <h3 style="margin:0">تسجيل الدخول باستخدام كلمة المرور</h3>
     <button class="btn flat" data-back>رجوع</button>
   </div>
   <div class="block">
-    <input class="input" id="emailLogin" placeholder="البريد الإلكتروني / رقم الهاتف +86">
+    <input class="input" id="emailLogin" placeholder="البريد الإلكتروني" autocomplete="email" inputmode="email">
     <div style="height:8px"></div>
-    <input class="input" id="passLogin" type="password" placeholder="كلمة السر">
+    <input class="input" id="passLogin" type="password" placeholder="كلمة السر" autocomplete="current-password">
     <div style="height:12px"></div>
-    <button class="btn primary" id="loginBtn">تسجيل الدخول</button>
+    <button class="btn primary" id="loginBtn"><span id="loginTxt">تسجيل الدخول</span><span id="loginSpin" class="hidden">… جاري تسجيل الدخول</span></button>
     <div style="margin-top:8px"><a href="#" id="reset">هل نسيت كلمة السر؟</a></div>
   </div>
 </div>
 
-<!-- Signup page -->
+<!-- Signup -->
 <div class="page" id="pageSignup">
   <div class="head">
-    <h3 style="margin:0">اشتراك</h3>
+    <h3 style="margin:0">إنشاء حساب</h3>
     <button class="btn flat" data-back>رجوع</button>
   </div>
   <div class="block">
-    <input class="input" id="emailSignup" placeholder="البريد الإلكتروني">
+    <input class="input" id="emailSignup" placeholder="البريد الإلكتروني" autocomplete="email" inputmode="email">
     <div style="height:8px"></div>
-    <input class="input" id="passSignup" type="password" placeholder="كلمة السر">
+    <input class="input" id="passSignup" type="password" placeholder="كلمة السر" autocomplete="new-password">
     <div style="height:8px"></div>
-    <input class="input" id="passSignup2" type="password" placeholder="تأكيد كلمة المرور">
-    <div style="height:8px"></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input class="input" id="signupCode" placeholder="رمز">
-      <button class="btn" id="sendCode">إرسال الرمز</button>
-    </div>
+    <input class="input" id="passSignup2" type="password" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
     <div style="height:12px"></div>
-    <button class="btn primary" id="signupBtn">تسجيل الدخول</button>
+    <button class="btn primary" id="signupBtn"><span id="signupTxt">إنشاء حساب</span><span id="signupSpin" class="hidden">… جاري إنشاء الحساب</span></button>
     <div id="signupMsg" style="margin-top:8px;color:var(--ok)"></div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- App -->
 <section id="root">
   <div id="sideOverlay"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="side-head">
       <button class="toggle" id="closeSide" title="إغلاق">✕</button>
@@ -244,19 +236,16 @@ a{color:#9eb6ff}
     </div>
   </aside>
 
-  <!-- Main -->
   <main class="main">
     <div class="topbar">
       <div class="left"><button class="toggle" id="openSide" title="القائمة">☰</button></div>
       <div class="right"><button class="btn primary" id="startChatTop">+ محادثة جديدة</button></div>
     </div>
 
-    <div class="msgs" id="msgs">
-      <!-- سيتم عرض بطل الترحيب تلقائيًا إذا لا توجد رسائل -->
-    </div>
+    <div class="msgs" id="msgs"></div>
 
     <div class="inputRow" id="inputRow">
-      <input class="input" id="input" placeholder="اكتب سؤالك هنا… (إذا أرفقت صورة اكتب ملاحظة قصيرة)">
+      <input class="input" id="input" placeholder="اكتب سؤالك هنا…" autocomplete="off" inputmode="text">
       <button class="attach" id="attach" title="إضافة">+</button>
       <button class="send" id="send">➤</button>
       <input id="imgFile" type="file" class="hidden" accept="image/*">
@@ -265,14 +254,16 @@ a{color:#9eb6ff}
   </main>
 </section>
 
-<!-- Admin pages (كما هي) -->
+<!-- Admin Hub -->
 <div class="page" id="pageHub">
   <div class="head"><h3 style="margin:0">لوحة تحكم المالك</h3><button class="btn" data-back>رجوع</button></div>
   <div class="hr" style="height:1px;background:var(--stroke);margin:10px 0"></div>
   <div class="block"><button class="btn" id="tileUsers">👥 إحصاءات المستخدمين</button></div>
-  <div class="block"><button class="btn" id="tileSubs">⏰ إضافة/تمديد اشتراك</button></div>
+  <div class="block"><button class="btn" id="tileSubs">⏰ إدارة الاشتراكات</button></div>
   <div class="block"><button class="btn" id="tileTrain">🧠 تعليم الذكاء</button></div>
 </div>
+
+<!-- Users page -->
 <div class="page" id="pageUsers">
   <div class="head"><h3 style="margin:0">👥 إحصاءات المستخدمين</h3><button class="btn" data-back>رجوع</button></div>
   <div class="hr" style="height:1px;background:var(--stroke);margin:10px 0"></div>
@@ -283,9 +274,12 @@ a{color:#9eb6ff}
     <div class="cardStat"><div class="name">رسائل اليوم</div><div class="num" id="statMsgsToday">—</div></div>
   </div>
 </div>
+
+<!-- Subs page -->
 <div class="page" id="pageSubs">
   <div class="head"><h3 style="margin:0">⏰ إدارة الاشتراكات</h3><button class="btn" data-back>رجوع</button></div>
   <div class="hr" style="height:1px;background:var(--stroke);margin:10px 0"></div>
+
   <div class="block">
     <div class="title">➕ زيادة مدة الاشتراك</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -295,18 +289,18 @@ a{color:#9eb6ff}
     </div>
     <div id="subMsg" style="margin-top:8px;color:var(--ok)"></div>
   </div>
+
   <div class="block">
-    <div class="title">➖ تقليل مدة الاشتراك</div>
+    <div class="title">🛑 إلغاء الاشتراك فورًا</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="input" id="subEmailDec" placeholder="بريد المستخدم">
-      <input class="input" id="decDays" type="number" placeholder="أيام" style="width:130px">
-      <input class="input" id="decHours" type="number" placeholder="ساعات" style="width:130px">
-      <input class="input" id="decMins" type="number" placeholder="دقائق" style="width:130px">
-      <button class="btn" id="subReduce">تقليل المدة</button>
+      <input class="input" id="cancelEmail" placeholder="بريد المستخدم">
+      <button class="btn" id="cancelSub">إلغاء الاشتراك</button>
     </div>
-    <div id="subMsgDec" style="margin-top:8px;color:var(--ok)"></div>
+    <div id="cancelMsg" style="margin-top:8px;color:var(--ok)"></div>
   </div>
 </div>
+
+<!-- Train page -->
 <div class="page" id="pageTrain">
   <div class="head"><h3 style="margin:0">🧠 تعليم الذكاء</h3><button class="btn" data-back>رجوع</button></div>
   <div class="block">
@@ -322,7 +316,7 @@ a{color:#9eb6ff}
     <button class="btn" id="saveInfo">حفظ المعلومات</button>
   </div>
   <div class="block">
-    <div class="title">📚 إضافة ملفات PDF (مع ملاحظة لكل ملف)</div>
+    <div class="title">📚 إضافة ملفات PDF</div>
     <input type="file" id="pdfInput" accept=".pdf" multiple class="hidden">
     <div style="display:flex; gap:8px; flex-wrap:wrap">
       <button class="btn" id="pickPdf">اختيار ملفات PDF</button>
@@ -339,7 +333,7 @@ a{color:#9eb6ff}
 <!-- Paywall -->
 <div class="paywall" id="paywall">
   <div class="paybox">
-    <h3 style="margin:0 0 6px 0">انتهت تجربتك المجانية</h3>
+    <h3 style="margin:0 0 6px 0">انتهت تجربتك/اشتراكك</h3>
     <p>لاستمرار استخدام الذكاء الاصطناعي، يرجى الاشتراك.</p>
     <a class="tg" href="https://t.me/MSLM_ALMYALY" target="_blank">📨 اضغط للاشتراك</a>
     <div class="hr" style="height:1px;background:var(--stroke);margin:12px 0"></div>
@@ -348,9 +342,7 @@ a{color:#9eb6ff}
 </div>
 
 <script>
-/* =========================
-   إعدادات عامة
-   ========================= */
+/* ===== أدوات عامة ===== */
 const $=(s)=>document.querySelector(s);
 const saveLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 const loadLocal=(k,d=null)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}};
@@ -371,8 +363,9 @@ function closeSidebar(){ $("#sidebar").classList.remove("open"); $("#sideOverlay
 /* Firebase */
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
+auth.useDeviceLanguage?.();
 
-/* عرض/إخفاء */
+/* Boot/App/Auth */
 const boot=$("#boot"), app=$("#root"), authView=$("#auth");
 function showBoot(){ boot.style.display="flex"; app.style.display="none"; authView.style.display="none"; }
 function showApp(){ boot.style.display="none"; app.style.display="grid"; authView.style.display="none"; }
@@ -385,10 +378,20 @@ let index=null,knowledgeChunks=[],rulesMemo="";
 const msgs=$("#msgs"),input=$("#input"),inputRow=$("#inputRow");
 let pageStack=[];
 let attachedImage=null;
+let attachToken=0; // لمنع تحديثات OCR المتأخرة
 const attachWrap=$("#attachWrap");
 const ENABLE_OCR=true;
 
-/* Streaming state */
+/* ===== اصلاحات التركيز/الكتابة على الجوال ===== */
+function scrollIntoViewIfNeeded(el){ try{ el.scrollIntoView({block:"center", behavior:"smooth"}); }catch{} }
+["focusin","click","touchend"].forEach(ev=>{
+  document.addEventListener(ev,(e)=>{
+    const t=e.target;
+    if(t && (t.tagName==="INPUT"||t.tagName==="TEXTAREA")) setTimeout(()=>scrollIntoViewIfNeeded(t),60);
+  },{passive:true});
+});
+msgs.addEventListener("click",()=>input.focus(),{passive:true});
+
 let streamingEl=null, streamedText="";
 let isStreaming=false;
 let currentStream={id:null,chatId:null,controller:null};
@@ -398,11 +401,11 @@ function cancelCurrentStream(){
   isStreaming=false; streamingEl=null; streamedText="";
 }
 
-/* Msgs padding */
+/* ضبط ارتفاع الرسائل */
 function adjustMsgsPadding(){ const h=inputRow.getBoundingClientRect().height; msgs.style.paddingBottom=(h+16)+"px"; }
 new ResizeObserver(adjustMsgsPadding).observe(inputRow);
 
-/* اشتراك وتجربة */
+/* ===== اشتراك وتجربة ===== */
 let userProfileCache=null,timerId=null;
 function watchUserProfileCountdown(){
   db.collection("users").doc(me.uid).onSnapshot(s=>{
@@ -415,6 +418,12 @@ function watchUserProfileCountdown(){
 function renderDaysBadge(){
   try{
     const p=userProfileCache||{};
+    // اذا كان محظور (الغاء اشتراك) — نوقف كلشي فوراً
+    if (p.blocked === true) {
+      $("#subBadge").textContent="تم إلغاء اشتراكك";
+      canChat=false; $("#paywall").style.display="flex"; return;
+    }
+
     const start=p.trialStart?.toDate?p.trialStart.toDate():new Date();
     const endTrial=new Date(start.getTime()+3*24*60*60*1000);
     const subEnd=p.subscriptionEnd?.toDate?p.subscriptionEnd.toDate():null;
@@ -444,33 +453,40 @@ function renderDaysBadge(){
 }
 $("#closePaywall").onclick=()=>$("#paywall").style.display="none";
 
-/* ========= AUTH HOME BUTTONS ========= */
+/* ===== صفحات الدخول ===== */
 function mustAcceptTOS(){ return $("#tos").checked; }
 function showErr(t){ $("#authError").textContent=t; setTimeout(()=>$("#authError").textContent="",5000); }
 $("#btnGoGoogle").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageGoogle"); };
 $("#btnGoPw").onclick   =()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageLoginPw"); };
 $("#btnGoSignup").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageSignup"); };
 
-/* Google Auth (force account chooser) */
+/* Google Auth */
 $("#googleBtn").onclick=async ()=>{
-  if (location.protocol==='file:') return alert("تسجيل Google غير مدعوم داخل file:// أو بعض WebView.");
+  if (location.protocol==='file:') { $("#gErr").textContent="Google لا يعمل من file://. استضف الصفحة على HTTPS."; return; }
+  const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
+  btn.disabled=true; t.classList.add("hidden"); s.classList.remove("hidden");
   try{
     const provider=new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
-    // نستخدم Redirect لضمان عمله على الهواتف/الويب
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithRedirect(provider);
   }catch(e){
-    alert(e.message||"تعذر فتح مُنتقي الحسابات.");
+    $("#gErr").textContent=e.message||"تعذر فتح مُنتقي الحسابات.";
+    btn.disabled=false; t.classList.remove("hidden"); s.classList.add("hidden");
   }
 };
+auth.getRedirectResult().catch(()=>{});
 
-/* Password Login */
+/* Password Login (مع حالة تحميل) */
 $("#loginBtn").onclick=async ()=>{
   const email=$("#emailLogin").value.trim(), pass=$("#passLogin").value.trim();
   if(!email||!pass) return alert("أدخل البريد وكلمة السر.");
+  const btn=$("#loginBtn"), txt=$("#loginTxt"), spin=$("#loginSpin");
+  btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
   try{
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, pass);
-  }catch(e){ alert(e.message); }
+  }catch(e){ alert(e.message); btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden"); }
 };
 
 /* Reset password */
@@ -480,21 +496,27 @@ $("#reset").onclick=async (e)=>{
   if(email){ try{ await auth.sendPasswordResetEmail(email); alert("تم الإرسال."); }catch(err){ alert(err.message);} }
 };
 
-/* Signup */
-$("#sendCode").onclick=()=>{ alert("ميزة الرمز اختيارية حالياً (للتحقق/الروابط السحرية)، أضفتها تجهيزًا مستقبلاً)."); };
+/* Signup (مع حالة تحميل) */
 $("#signupBtn").onclick=async ()=>{
   const email=$("#emailSignup").value.trim();
   const p1=$("#passSignup").value.trim();
   const p2=$("#passSignup2").value.trim();
   if(!email||!p1||!p2) return alert("أكمل الحقول المطلوبة.");
   if(p1!==p2) return alert("كلمتا السر غير متطابقتين.");
+  const btn=$("#signupBtn"), txt=$("#signupTxt"), spin=$("#signupSpin");
+  btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
   try{
     await auth.createUserWithEmailAndPassword(email,p1);
+    $("#signupMsg").textContent="تم إنشاء الحساب وتسجيل الدخول.";
   }catch(e){ alert(e.message); }
+  btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
 };
 
 /* حالة المصادقة */
 auth.onAuthStateChanged(async (u)=>{
+  const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
+  if(btn){ btn.disabled=false; t?.classList.remove("hidden"); s?.classList.add("hidden"); }
+
   if(u){
     me=u;
     $("#userEmail").textContent=u.email||"";
@@ -523,6 +545,7 @@ async function ensureUserDoc(){
         trialStart: firebase.firestore.FieldValue.serverTimestamp(),
         subscribed:false,
         subscriptionEnd:null,
+        blocked:false, // مهم للإلغاء الفوري
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
       });
     }else{
@@ -531,7 +554,7 @@ async function ensureUserDoc(){
   });
 }
 
-/* قائمة المحادثات */
+/* ===== قائمة المحادثات ===== */
 let unSubMsgs=null;
 let CHAT_CACHE = loadLocal("CHAT_CACHE", []);
 function cacheSet(list){ CHAT_CACHE=list; saveLocal("CHAT_CACHE", list); }
@@ -636,7 +659,7 @@ async function deleteChat(id){
   }catch(e){ alert(e.message||e); }
 }
 
-/* HERO (empty state) */
+/* حالة محادثة فارغة */
 function renderEmptyHero(){
   msgs.innerHTML="";
   const wrap=document.createElement("div");
@@ -655,21 +678,16 @@ function renderEmptyHero(){
   `;
   msgs.appendChild(wrap);
 }
-
 function watchMessages(chatId){
   return db.collection("chats").doc(chatId).collection("messages").orderBy("clientTs","asc")
     .onSnapshot(snap=>{
       if(isStreaming) return;
       if(snap.empty){ renderEmptyHero(); return; }
       msgs.innerHTML="";
-      snap.forEach(doc=>{
-        const m=doc.data(), id=doc.id;
-        renderMsg(id, m);
-      });
+      snap.forEach(doc=>{ renderMsg(doc.id, doc.data()); });
       msgs.scrollTo({top:msgs.scrollHeight+1000});
     });
 }
-
 async function loadChat(id){
   cancelCurrentStream();
   currentChatId=id; setActiveChatItem(id);
@@ -704,7 +722,7 @@ async function appendMessageStore(role,text,imageDataURL=null, forceChatId=null)
   try{ await db.collection("users").doc(me.uid).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() }); }catch{}
 }
 
-/* ===== فهرسة المعرفة (كما هي) ===== */
+/* ===== معرفة ===== */
 function arNormalize(s){ return (s||"").replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ة/g,'ه').replace(/[ـ]+/g,'').toLowerCase(); }
 function chunkAll(texts){ const arr=[]; texts.forEach(t=>{ const clean=(t||"").replace(/(\.|\!|\؟|\?|؛)/g,'$1\n'); const parts=clean.split(/\n+/).map(x=>x.trim()).filter(Boolean); let buf=""; for(const line of parts){ if((buf+" "+line).length<=700) buf=(buf?buf+" ":"")+line; else { if(buf) arr.push(buf); buf=line; } } if(buf) arr.push(buf); }); return arr.slice(-1500); }
 function buildIndex(chunks){
@@ -750,10 +768,16 @@ $("#input").addEventListener("keydown",e=>{if(e.key==="Enter")onSend();});
 $("#attach").onclick=()=>$("#imgFile").click();
 $("#imgFile").addEventListener("change", async (e)=>{
   const f=e.target.files?.[0]; if(!f) return;
+  const myTok=++attachToken;
   const r=new FileReader();
-  r.onload=()=>{ const dataURL=r.result; attachedImage={name:(f.name||"image").replace(/\.\w+$/,"")+".jpg", sizeKB:Math.round(f.size/1024), dataURL}; showAttachChip(); };
+  r.onload=()=>{ if(myTok!==attachToken) return; const dataURL=r.result; attachedImage={name:(f.name||"image").replace(/\.\w+$/,"")+".jpg", sizeKB:Math.round(f.size/1024), dataURL}; showAttachChip(); input.focus(); };
   r.readAsDataURL(f);
-  try{ if(ENABLE_OCR){ const {data:{text}}=await Tesseract.recognize(f,'ara+eng'); attachedImage.ocrText=(text||"").trim(); } }catch{}
+  try{
+    if(ENABLE_OCR){
+      const {data:{text}}=await Tesseract.recognize(f,'ara+eng');
+      if(myTok===attachToken && attachedImage) attachedImage.ocrText=(text||"").trim();
+    }
+  }catch{}
   e.target.value="";
 });
 function showAttachChip(){
@@ -766,7 +790,7 @@ function showAttachChip(){
       <div class="x" id="removeAttach">✕</div>
     </div>`;
   attachWrap.classList.remove("hidden");
-  $("#removeAttach").onclick=()=>{ attachedImage=null; showAttachChip(); };
+  $("#removeAttach").onclick=()=>{ attachedImage=null; ++attachToken; showAttachChip(); input.focus(); };
 }
 
 function wantsLongExplain(t){ return /(اشرح|شرح|فسر|وضح|فسرلي|شرحلي|حل بالتفصيل|تفصيل|افهمني)/i.test(t||""); }
@@ -798,7 +822,7 @@ async function onSend(){
     finalPrompt=userTxt;
   }
   $("#input").value="";
-  attachedImage=null; showAttachChip();
+  attachedImage=null; ++attachToken; showAttachChip(); // إزالة فورية ونهائية
 
   const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
   const problem = isProblemLike(finalPrompt);
@@ -924,7 +948,7 @@ async function callAIOnce(context, user, {wantsLong,isProblem}){
   await appendMessageStore("bot", out, null, currentChatId);
 }
 
-/* لوحة المستخدمين/الإداري كما هي */
+/* ===== احصاءات ===== */
 async function refreshUserStats(){
   if(me?.email!==ADMIN_EMAIL){
     $("#statTotal").textContent="—";
@@ -954,7 +978,7 @@ async function refreshUserStats(){
   $("#statMsgsToday").textContent=msgsToday;
 }
 
-/* صفحات */
+/* ===== صفحات ===== */
 function openPage(id){ const el=$(id); if(!el) return; el.style.display="block"; pageStack.push(id); }
 function goBack(){
   if(pageStack.length<=1){ pageStack=[]; document.querySelectorAll(".page").forEach(p=>p.style.display="none"); return; }
@@ -967,7 +991,7 @@ $("#tileSubs").onclick =()=>{ $("#pageHub").style.display="none"; openPage("#pag
 $("#tileTrain").onclick=()=>{ $("#pageHub").style.display="none"; openPage("#pageTrain"); };
 $("#logout").onclick=()=>auth.signOut();
 
-/* اشتراكات */
+/* ===== اشتراكات: إضافة + إلغاء ===== */
 $("#addDays").onclick=async ()=>{
   if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
   const email=($("#subEmail").value||"").trim();
@@ -980,29 +1004,20 @@ $("#addDays").onclick=async ()=>{
   const curEnd=(d.subscribed && d.subscriptionEnd?.toDate)? d.subscriptionEnd.toDate():now;
   const base=Math.max(curEnd.getTime(), now.getTime());
   const newEnd=new Date(base + days*24*60*60*1000);
-  await ref.update({subscribed:true,subscriptionEnd:firebase.firestore.Timestamp.fromDate(newEnd)});
+  await ref.update({subscribed:true,subscriptionEnd:firebase.firestore.Timestamp.fromDate(newEnd),blocked:false});
   $("#subMsg").textContent=`تمت إضافة ${days} يوم. النهاية: ${newEnd.toLocaleString()}`;
 };
-$("#subReduce").onclick=async ()=>{
+$("#cancelSub").onclick=async ()=>{
   if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
-  const email=($("#subEmailDec").value||"").trim();
-  const dDays=parseInt($("#decDays").value||"0",10)||0;
-  const dHours=parseInt($("#decHours").value||"0",10)||0;
-  const dMins=parseInt($("#decMins").value||"0",10)||0;
-  const delta=(dDays*24*60 + dHours*60 + dMins)*60*1000;
-  if(!email || delta<=0) return alert("أدخل البريد ومدة صالحة للتقليل.");
+  const email=($("#cancelEmail").value||"").trim();
+  if(!email) return alert("اكتب بريد المستخدم.");
   const q=await db.collection("users").where("email","==",email).limit(1).get();
-  if(q.empty) return $("#subMsgDec").textContent="المستخدم غير موجود.";
-  const ref=q.docs[0].ref; const doc=await ref.get(); const d=doc.data();
-  const now=new Date();
-  const curEnd=(d.subscribed && d.subscriptionEnd?.toDate)? d.subscriptionEnd.toDate():now;
-  let newTs = curEnd.getTime() - delta;
-  const stillSubscribed = newTs > now.getTime();
-  await ref.update({subscribed:stillSubscribed,subscriptionEnd: stillSubscribed? firebase.firestore.Timestamp.fromDate(new Date(newTs)) : null});
-  $("#subMsgDec").textContent = stillSubscribed ? `تم تقليل المدة. النهاية: ${new Date(newTs).toLocaleString()}` : "أُلغي الاشتراك.";
+  if(q.empty) return $("#cancelMsg").textContent="المستخدم غير موجود.";
+  const ref=q.docs[0].ref;
+  await ref.update({subscribed:false,subscriptionEnd:null,blocked:true,canceledAt:firebase.firestore.FieldValue.serverTimestamp()});
+  $("#cancelMsg").textContent="تم إلغاء الاشتراك فورًا. سيظهر للمستخدم Paywall حتى يعيد الاشتراك.";
 };
 
-/* ثيم وتهيئة */
 window.addEventListener("load",()=>{ applyTheme(); adjustMsgsPadding(); });
 </script>
 </body>
