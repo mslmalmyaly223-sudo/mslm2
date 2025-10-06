@@ -73,7 +73,18 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 /* Messages */
 .msgs{overflow:auto;-webkit-overflow-scrolling:touch;min-height:0;background:#0a0c11;padding:16px;padding-bottom:88px}
 :root.light .msgs{background:#f6f7fb}
-.msg{max-width:92%;padding:12px 14px;border-radius:16px;margin:8px 0;border:1px solid var(--stroke);line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
+.msg {
+    max-width: 92%;
+    padding: 12px 14px;
+    border-radius: 16px;
+    margin: 8px 0;
+    border: 1px solid var(--stroke);
+    line-height: 1.0;  /* صار 1.5 بدل 1.6 */
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,"Tajawal",sans-serif;
+    font-size: 12px;  /* زيد هذا السطر */
+}
 .msg.user{margin-right:auto;background:var(--user-dark);color:#e9ecf1}
 .msg.bot{margin-left:auto;background:var(--bot-dark);border-color:#283047}
 :root.light .msg.user{background:var(--user-light);color:#fff}
@@ -85,12 +96,12 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 
 /* Math messages */
 .msg.math{direction:ltr;text-align:left;max-width:98%}
-.msg.math .mjx-container{font-size:110%}
+.msg.math .mjx-container{font-size:10%}
 
 /* Input row */
 .inputRow{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--stroke);background:#0e1016;position:sticky;bottom:0}
 :root.light .inputRow{background:#ffffff}
-.input{flex:1;height:48px;border-radius:22px;border:1px solid transparent;background:#0b0e16;color:var(--text);padding:0 14px;outline:none;-webkit-user-select:text;user-select:text}
+.input{flex:1;height:48px;border-radius:22px;border:1px solid transparent;background:#0b0e16;color:var(--text);padding:0 14px;outline:none;-webkit-user-select:text;user-select:text;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Tajawal",sans-serif}
 :root.light .input{background:#f8faff;color:#0b1220}
 .send,.attach{width:52px;min-width:52px;border-radius:50%;border:1px solid var(--stroke)}
 .send{background:var(--brand);color:#fff;font-weight:900}
@@ -135,9 +146,17 @@ a{color:#9eb6ff}
   .sidebar{transform:translateX(100%);transition:transform .25s}
   .sidebar.open{transform:translateX(0)}
 }
+
+/* Theme Toggle */
+.theme-toggle{position:fixed;top:12px;left:12px;z-index:1000}
+.theme-btn{width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
 </style>
 </head>
 <body>
+
+<div class="theme-toggle">
+  <button class="theme-btn" id="themeToggle">🌙</button>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -235,11 +254,15 @@ a{color:#9eb6ff}
       <div id="subBadge" class="sub-badge">—</div>
     </div>
     <div class="list" id="chatList"></div>
-    <div class="side-foot">
-      <div class="small" id="userEmail">—</div>
-      <button class="btn" id="adminBtn" title="لوحة التحكم" style="display:none">👑 لوحة التحكم</button>
-      <button class="btn" id="logout">🚪 تسجيل الخروج</button>
-    </div>
+<div class="side-foot">
+  <div class="small" id="userEmail">—</div>
+  <button class="btn" id="adminBtn" title="لوحة التحكم" style="display:none">👑 لوحة التحكم</button>
+  
+  <!-- زيد هالزر هنا -->
+  <button class="btn" id="themeToggleSidebar">🌙 تبديل السمة</button>
+  
+  <button class="btn" id="logout">🚪 تسجيل الخروج</button>
+</div>
   </aside>
 
   <main class="main">
@@ -365,18 +388,40 @@ const toast=(t)=>{const el=document.getElementById('toast');el.textContent=t;el.
 
 const ADMIN_EMAIL="mslmalmyaly223@gmail.com";
 const firebaseConfig={apiKey:"AIzaSyD915Zh1Gzl60Z9Y5SBlls1S4tedgzU6hE",authDomain:"student-market-5940e.firebaseapp.com",projectId:"student-market-5940e",storageBucket:"student-market-5940e.appspot.com"};
-const AI_ENDPOINT="https://api.deepseek.com/v1/chat/completions";
-const AI_KEY="sk-235e2c7845b146ff8da73040e8c9e3b0";
+const AI_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
+const AI_KEY = "sk-ff429bca45194b3c87dacda66d63bfb5";
 
 let THEME=loadLocal("THEME","dark");
-function applyTheme(){ if(THEME==="light") document.documentElement.classList.add("light"); else document.documentElement.classList.remove("light"); }
+function applyTheme(){ 
+    if(THEME==="light") {
+        document.documentElement.classList.add("light");
+        $("#themeToggle").textContent="☀️";
+    } else {
+        document.documentElement.classList.remove("light");
+        $("#themeToggle").textContent="🌙";
+    } 
+}
+
+// تبديل السمة
+$("#themeToggle").onclick = () => {
+    THEME = THEME === "dark" ? "light" : "dark";
+    saveLocal("THEME", THEME);
+    applyTheme();
+};
+
 $("#openSide")?.addEventListener("click",()=>{ $("#sidebar").classList.add("open"); $("#sideOverlay").style.display="block"; });
 $("#closeSide")?.addEventListener("click",closeSidebar);
 $("#sideOverlay")?.addEventListener("click",closeSidebar);
 function closeSidebar(){ $("#sidebar").classList.remove("open"); $("#sideOverlay").style.display="none"; }
 
 /* Firebase */
-firebase.initializeApp(firebaseConfig);
+try {
+    firebase.initializeApp(firebaseConfig);
+} catch (error) {
+    if (!/already exists/.test(error.message)) {
+        console.error('خطأ في تهيئة Firebase:', error);
+    }
+}
 const auth=firebase.auth(), db=firebase.firestore();
 try{auth.useDeviceLanguage();}catch{}
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
@@ -398,23 +443,49 @@ let attachToken=0;
 const attachWrap=$("#attachWrap");
 const ENABLE_OCR=true;
 
-/* ===== اصلاحات التركيز/الكتابة على الجوال ===== */
-function scrollIntoViewIfNeeded(el){ try{ el.scrollIntoView({block:"center", behavior:"smooth"}); }catch{} }
-["focusin","click","touchend"].forEach(ev=>{
-  document.addEventListener(ev,(e)=>{
-    const t=e.target;
-    if(t && (t.tagName==="INPUT"||t.tagName==="TEXTAREA")) setTimeout(()=>scrollIntoViewIfNeeded(t),60);
-  },{passive:true});
+// تخزين تاريخ المحادثة الحالية
+let currentChatHistory = [];
+
+/* ===== إصلاح التركيز/الكتابة على الجوال ===== */
+function scrollIntoViewIfNeeded(el){ 
+    try{ 
+        el.scrollIntoView({block:"nearest", behavior:"smooth"}); 
+    }catch{} 
+}
+
+// إصلاح التمرير - السماح بالتمرير للخلف
+msgs.addEventListener('scroll', function() {
+    // السماح بالتمرير الطبيعي
 });
-msgs.addEventListener("click",()=>input.focus(),{passive:true});
+
+// إصلاح التركيز على الإدخال
+["focusin","click","touchend"].forEach(ev=>{
+    document.addEventListener(ev,(e)=>{
+        const t=e.target;
+        if(t && (t.tagName==="INPUT"||t.tagName==="TEXTAREA")) {
+            setTimeout(()=>{
+                if(document.activeElement === t) {
+                    scrollIntoViewIfNeeded(t);
+                }
+            },100);
+        }
+    },{passive:true});
+});
+
+// إصلاح النقر على الرسائل - لا يسرق التركيز
+msgs.addEventListener("click",(e)=>{
+    if(e.target.classList.contains('msg')) {
+        setTimeout(() => input.focus(), 50);
+    }
+},{passive:true});
 
 let streamingEl=null, streamedText="";
 let isStreaming=false;
 let currentStream={id:null,chatId:null,controller:null};
 function cancelCurrentStream(){
-  if(currentStream.controller){ try{ currentStream.controller.abort(); }catch{} }
-  currentStream={id:null,chatId:null,controller:null};
-  isStreaming=false; streamingEl=null; streamedText="";
+    if(currentStream.controller){ try{ currentStream.controller.abort(); }catch{} }
+    currentStream={id:null,chatId:null,controller:null};
+    isStreaming=false; streamingEl=null; streamedText="";
 }
 
 /* ضبط ارتفاع الرسائل */
@@ -424,566 +495,730 @@ new ResizeObserver(adjustMsgsPadding).observe(inputRow);
 /* ===== اشتراك وتجربة ===== */
 let userProfileCache=null,timerId=null;
 function watchUserProfileCountdown(){
-  return db.collection("users").doc(me.uid).onSnapshot(s=>{
-    userProfileCache=s.data()||{};
-    renderDaysBadge();
-    if(timerId) clearInterval(timerId);
-    timerId=setInterval(renderDaysBadge,1000);
-  });
+    return db.collection("users").doc(me.uid).onSnapshot(s=>{
+        userProfileCache=s.data()||{};
+        renderDaysBadge();
+        if(timerId) clearInterval(timerId);
+        timerId=setInterval(renderDaysBadge,1000);
+    });
 }
-function renderDaysBadge(){
-  try{
-    const p=userProfileCache||{};
-    if (p.blocked === true) {
-      $("#subBadge").textContent="تم إلغاء اشتراكك";
-      canChat=false; $("#paywall").style.display="flex"; return;
-    }
-    const start=p.trialStart?.toDate?p.trialStart.toDate():new Date();
-    const endTrial=new Date(start.getTime()+3*24*60*60*1000);
-    const subEnd=p.subscriptionEnd?.toDate?p.subscriptionEnd.toDate():null;
-    const now=new Date();
-    const end=(p.subscribed&&subEnd)?subEnd:endTrial;
-    const left=end-now;
-    const badge=$("#subBadge");
-    if(left<=0){
-      badge.textContent="متبقي لانتهاء اشتراكك (0 يوم)";
-      canChat=false;
-      $("#paywall").style.display="flex";
-      return;
-    }
-    canChat=true; $("#paywall").style.display="none";
 
-    const days=Math.floor(left/(24*60*60*1000));
-    if(days>=1){ badge.textContent=`متبقي لانتهاء اشتراكك (${days} يوم)`; }
-    else{
-      const h=Math.floor((left%(24*60*60*1000))/(60*60*1000));
-      const m=Math.floor((left%(60*60*1000))/(60*1000));
-      const s=Math.floor((left%(60*1000))/1000);
-      const pad=n=>String(n).padStart(2,"0");
-      badge.textContent=`متبقي لانتهاء اشتراكك (${pad(h)}:${pad(m)}:${pad(s)})`;
-    }
-  }catch{ $("#subBadge").textContent="—"; }
+function renderDaysBadge(){
+    try{
+        const p=userProfileCache||{};
+        if (p.blocked === true) {
+            $("#subBadge").textContent="تم إلغاء اشتراكك";
+            canChat=false; $("#paywall").style.display="flex"; return;
+        }
+        const start=p.trialStart?.toDate?p.trialStart.toDate():new Date();
+        const endTrial=new Date(start.getTime()+3*24*60*60*1000);
+        const subEnd=p.subscriptionEnd?.toDate?p.subscriptionEnd.toDate():null;
+        const now=new Date();
+        const end=(p.subscribed&&subEnd)?subEnd:endTrial;
+        const left=end-now;
+        const badge=$("#subBadge");
+        if(left<=0){
+            badge.textContent="متبقي لانتهاء اشتراكك (0 يوم)";
+            canChat=false;
+            $("#paywall").style.display="flex";
+            return;
+        }
+        canChat=true; $("#paywall").style.display="none";
+
+        const days=Math.floor(left/(24*60*60*1000));
+        if(days>1){
+            badge.textContent=`متبقي لانتهاء اشتراكك (${days} يوم)`; 
+        } else if(days===1){
+            badge.textContent=`متبقي لانتهاء اشتراكك (1 يوم)`;
+        } else {
+            // أقل من يوم - تحويل إلى ساعات ودقائق وثواني
+            const hours=Math.floor((left%(24*60*60*1000))/(60*60*1000));
+            const minutes=Math.floor((left%(60*60*1000))/(60*1000));
+            const seconds=Math.floor((left%(60*1000))/1000);
+            const pad=n=>String(n).padStart(2,"0");
+            badge.textContent=`متبقي لانتهاء اشتراكك (${pad(hours)}:${pad(minutes)}:${pad(seconds)})`;
+        }
+    }catch{ $("#subBadge").textContent="—"; }
 }
 $("#closePaywall").onclick=()=>$("#paywall").style.display="none";
 
-/* ===== صفحات الدخول ===== */
+/* ===== إصلاح كامل لتسجيل الدخول بـ Google ===== */
 function mustAcceptTOS(){ return $("#tos").checked; }
 function showErr(t){ $("#authError").textContent=t; setTimeout(()=>$("#authError").textContent="",5000); }
 $("#btnGoGoogle").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageGoogle"); };
 $("#btnGoPw").onclick   =()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageLoginPw"); };
 $("#btnGoSignup").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageSignup"); };
 
-/* Google Auth - إصلاح كامل */
 $("#googleBtn").onclick=async ()=>{
-  const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
-  btn.disabled=true; t.classList.add("hidden"); s.classList.remove("hidden");
-  
-  try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.addScope('email');
-    provider.addScope('profile');
-    provider.setCustomParameters({
-      prompt: 'select_account',
-      display: 'popup'
-    });
+    const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
+    btn.disabled=true; t.classList.add("hidden"); s.classList.remove("hidden");
+    
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('profile');
+        
+        // إعدادات محسنة للتطبيقات المضمنة
+        provider.setCustomParameters({
+            prompt: 'select_account',
+            display: 'popup'
+        });
 
-    const isWebView = /Telegram|Twitter|Facebook|Line|KAKAOTALK|Instagram|Snapchat|WebView|FBAN|FBAV/i.test(navigator.userAgent);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    let result;
-    
-    if (isWebView || isMobile) {
-      $("#gErr").textContent = "جاري التوجيه إلى صفحة تسجيل الدخول...";
-      await auth.signInWithRedirect(provider);
-      return;
-    } else {
-      try {
-        result = await auth.signInWithPopup(provider);
-      } catch (popupErr) {
-        console.log('Popup failed, trying redirect:', popupErr);
-        await auth.signInWithRedirect(provider);
-        return;
-      }
+        const isWebView = /Telegram|Twitter|Facebook|Line|KAKAOTALK|Instagram|Snapchat|WebView|FBAN|FBAV/i.test(navigator.userAgent);
+        
+        if (isWebView) {
+            // للتطبيقات المضمنة مثل Telegram
+            await auth.signInWithRedirect(provider);
+            return;
+        } else {
+            // للمتصفحات العادية
+            try {
+                await auth.signInWithPopup(provider);
+            } catch (popupErr) {
+                console.log('Popup failed, trying redirect:', popupErr);
+                await auth.signInWithRedirect(provider);
+                return;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Google Auth Error:', error);
+        let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
+        
+        if (error.code === 'auth/unauthorized-domain') {
+            errorMessage = "النطاق غير مصرح به. يرجى فتح التطبيق في متصفح عادي.";
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMessage = "تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.";
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = "تم إغلاق نافذة التسجيل. يرجى المحاولة مرة أخرى.";
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = "خطأ في الشبكة. يرجى التحقق من اتصال الإنترنت.";
+        } else {
+            errorMessage = error.message || "تعذر تسجيل الدخول باستخدام Google";
+        }
+        
+        $("#gErr").textContent = errorMessage;
+        btn.disabled = false;
+        t.classList.remove("hidden");
+        s.classList.add("hidden");
     }
-    
-  } catch (error) {
-    console.error('Google Auth Error:', error);
-    let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
-    
-    if (error.code === 'auth/unauthorized-domain') {
-      errorMessage = "النطاق غير مصرح به. يرجى استضافة التطبيق على نطاق مصرح به في Firebase Console.";
-    } else if (error.code === 'auth/popup-blocked') {
-      errorMessage = "تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.";
-    } else if (error.code === 'auth/popup-closed-by-user') {
-      errorMessage = "تم إغلاق نافذة التسجيل. يرجى المحاولة مرة أخرى.";
-    } else {
-      errorMessage = error.message || "تعذر تسجيل الدخول باستخدام Google";
-    }
-    
-    $("#gErr").textContent = errorMessage;
-    btn.disabled = false;
-    t.classList.remove("hidden");
-    s.classList.add("hidden");
-  }
 };
 
-// معالجة نتيجة Redirect عند تحميل الصفحة
+// معالجة نتيجة Redirect
 auth.getRedirectResult().then((result) => {
-  if (result.user) {
-    console.log('Redirect login successful:', result.user.email);
-  }
+    if (result.user) {
+        console.log('Redirect login successful:', result.user.email);
+        fastAfterAuth("تم تسجيل الدخول بنجاح!");
+    }
 }).catch((error) => {
-  console.log('Redirect result error:', error);
-  if (error.code !== 'auth/unknown') {
-    $("#gErr").textContent = "فشل تسجيل الدخول: " + (error.message || "خطأ غير معروف");
-  }
+    console.log('Redirect result error:', error);
+    if (error.code !== 'auth/unknown') {
+        $("#gErr").textContent = "فشل تسجيل الدخول: " + (error.message || "خطأ غير معروف");
+    }
 });
 
-/* Password Login — فوري */
+/* Password Login */
 $("#loginBtn").onclick=async ()=>{
-  const email=$("#emailLogin").value.trim(), pass=$("#passLogin").value.trim();
-  if(!email||!pass) return alert("أدخل البريد وكلمة السر.");
-  const btn=$("#loginBtn"), txt=$("#loginTxt"), spin=$("#loginSpin");
-  btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
-  try{
-    await auth.signInWithEmailAndPassword(email, pass);
-  }catch(e){
-    alert(e.message);
-    btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
-  }
+    const email=$("#emailLogin").value.trim(), pass=$("#passLogin").value.trim();
+    if(!email||!pass) return alert("أدخل البريد وكلمة السر.");
+    const btn=$("#loginBtn"), txt=$("#loginTxt"), spin=$("#loginSpin");
+    btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
+    try{
+        await auth.signInWithEmailAndPassword(email, pass);
+    }catch(e){
+        alert(e.message);
+        btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
+    }
 };
 
 /* Reset password */
 $("#reset").onclick=async (e)=>{
-  e.preventDefault();
-  const email=prompt("أدخل بريدك:");
-  if(email){ try{ await auth.sendPasswordResetEmail(email); alert("تم الإرسال."); }catch(err){ alert(err.message);} }
+    e.preventDefault();
+    const email=prompt("أدخل بريدك:");
+    if(email){ try{ await auth.sendPasswordResetEmail(email); alert("تم الإرسال."); }catch(err){ alert(err.message);} }
 };
 
-/* Signup — فوري */
+/* Signup */
 $("#signupBtn").onclick=async ()=>{
-  const email=$("#emailSignup").value.trim();
-  const p1=$("#passSignup").value.trim();
-  const p2=$("#passSignup2").value.trim();
-  if(!email||!p1||!p2) return alert("أكمل الحقول المطلوبة.");
-  if(p1!==p2) return alert("كلمتا السر غير متطابقتين.");
-  const btn=$("#signupBtn"), txt=$("#signupTxt"), spin=$("#signupSpin");
-  btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
-  try{
-    await auth.createUserWithEmailAndPassword(email,p1);
-    $("#signupMsg").textContent="تم إنشاء الحساب";
-  }catch(e){ alert(e.message); }
-  btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
+    const email=$("#emailSignup").value.trim();
+    const p1=$("#passSignup").value.trim();
+    const p2=$("#passSignup2").value.trim();
+    if(!email||!p1||!p2) return alert("أكمل الحقول المطلوبة.");
+    if(p1!==p2) return alert("كلمتا السر غير متطابقتين.");
+    const btn=$("#signupBtn"), txt=$("#signupTxt"), spin=$("#signupSpin");
+    btn.disabled=true; txt.classList.add("hidden"); spin.classList.remove("hidden");
+    try{
+        await auth.createUserWithEmailAndPassword(email,p1);
+        $("#signupMsg").textContent="تم إنشاء الحساب";
+    }catch(e){ alert(e.message); }
+    btn.disabled=false; txt.classList.remove("hidden"); spin.classList.add("hidden");
 };
 
-/* onAuthStateChanged — مع تحسينات الأداء */
+/* onAuthStateChanged */
 let initStarted=false, unsubProfile=null, unSubMsgs=null;
 let CHAT_CACHE = loadLocal("CHAT_CACHE", []);
 
 auth.onAuthStateChanged(async (u)=>{
-  const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
-  if(btn){ btn.disabled=false; t?.classList.remove("hidden"); s?.classList.add("hidden"); }
+    const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
+    if(btn){ btn.disabled=false; t?.classList.remove("hidden"); s?.classList.add("hidden"); }
 
-  if(u){
-    me=u;
-    $("#userEmail").textContent=u.email||"";
-    $("#adminBtn").style.display=(me?.email===ADMIN_EMAIL)?"block":"none";
-    
-    document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-    pageStack = [];
-    
-    fastAfterAuth();
-  }else{
-    showAuth();
-  }
+    if(u){
+        me=u;
+        $("#userEmail").textContent=u.email||"";
+        $("#adminBtn").style.display=(me?.email===ADMIN_EMAIL)?"block":"none";
+        
+        document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+        pageStack = [];
+        
+        fastAfterAuth();
+    }else{
+        showAuth();
+    }
 });
 
-// عرض التطبيق فورًا ثم شغّل التهيئة الثقيلة بالخلفية
 function fastAfterAuth(note){
-  try{
-    applyTheme(); adjustMsgsPadding(); showApp();
-    if(note) toast(note);
-    if(!initStarted){ 
-      initStarted=true; 
-      setTimeout(() => initApp(), 100);
-    }
-  }catch(e){console.error('fastAfterAuth error:', e)}
+    try{
+        applyTheme(); adjustMsgsPadding(); showApp();
+        if(note) toast(note);
+        if(!initStarted){ 
+            initStarted=true; 
+            setTimeout(() => initApp(), 100);
+        }
+    }catch(e){console.error('fastAfterAuth error:', e)}
 }
 
 async function initApp(){
-  try{
-    await ensureUserDoc();
-    unsubProfile = watchUserProfileCountdown();
-    bindChatList();
-    setTimeout(() => loadKnowledgeFromDB().catch(()=>{}), 500);
-    await ensureFirstChat();
-  }catch(e){console.error('initApp error:', e)}
+    try{
+        await ensureUserDoc();
+        unsubProfile = watchUserProfileCountdown();
+        bindChatList();
+        setTimeout(() => loadKnowledgeFromDB().catch(()=>{}), 500);
+        await ensureFirstChat();
+    }catch(e){console.error('initApp error:', e)}
 }
 
 /* إنشاء/تحديث مستند المستخدم */
 async function ensureUserDoc(){
-  const ref=db.collection("users").doc(me.uid);
-  const userDoc = await ref.get();
-  
-  if (!userDoc.exists) {
-    await ref.set({
-      email: me.email||null,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      trialStart: firebase.firestore.FieldValue.serverTimestamp(),
-      subscribed: false,
-      subscriptionEnd: null,
-      blocked: false,
-      lastActive: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } else {
-    await ref.update({
-      lastActive: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }
+    const ref=db.collection("users").doc(me.uid);
+    const userDoc = await ref.get();
+    
+    if (!userDoc.exists) {
+        await ref.set({
+            email: me.email||null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            trialStart: firebase.firestore.FieldValue.serverTimestamp(),
+            subscribed: false,
+            subscriptionEnd: null,
+            blocked: false,
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } else {
+        await ref.update({
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
 }
 
-/* ===== قائمة المحادثات ===== */
+/* ===== قائمة المحادثات المحسنة ===== */
 function cacheSet(list){ CHAT_CACHE=list; saveLocal("CHAT_CACHE", list); }
 
 function insertChatRowDom(id, title){
-  const list=$("#chatList");
-  if(list.querySelector(`.item[data-id="${id}"]`)) return;
-  const row=document.createElement("div");
-  row.className="item"+(id===currentChatId?" active":"");
-  row.dataset.id=id;
+    const list=$("#chatList");
+    if(list.querySelector(`.item[data-id="${id}"]`)) return;
+    const row=document.createElement("div");
+    row.className="item"+(id===currentChatId?" active":"");
+    row.dataset.id=id;
 
-  const t=document.createElement("div"); t.className="item-title"; t.textContent=title||"—";
-  const ops=document.createElement("div"); ops.className="item-ops";
+    const t=document.createElement("div"); t.className="item-title"; t.textContent=title||"—";
+    const ops=document.createElement("div"); ops.className="item-ops";
 
-  const edit=document.createElement("button"); edit.className="btn"; edit.textContent="✏️";
-  edit.onclick=async (e)=>{
-    e.stopPropagation();
-    const nt=prompt("اسم جديد:", (t.textContent||"").trim() || "محادثة");
-    if(nt && nt!==t.textContent){
-      t.textContent = nt;
-      try{ await db.collection("chats").doc(id).update({title:nt, clientUpdated:Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}); }catch{}
-      const arr = [{id, title:nt}, ...CHAT_CACHE.filter(x=>x.id!==id)];
-      cacheSet(arr);
-    }
-  };
-  const del=document.createElement("button"); del.className="btn"; del.textContent="🗑️";
-  del.onclick=async (e)=>{ e.stopPropagation(); if(confirm("حذف المحادثة؟")) await deleteChat(id); };
+    const edit=document.createElement("button"); edit.className="btn"; edit.textContent="✏️";
+    edit.onclick=async (e)=>{
+        e.stopPropagation();
+        const nt=prompt("اسم جديد:", (t.textContent||"").trim() || "محادثة");
+        if(nt && nt!==t.textContent){
+            t.textContent = nt;
+            try{ await db.collection("chats").doc(id).update({title:nt, clientUpdated:Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}); }catch{}
+            const arr = [{id, title:nt}, ...CHAT_CACHE.filter(x=>x.id!==id)];
+            cacheSet(arr);
+        }
+    };
+    const del=document.createElement("button"); del.className="btn"; del.textContent="🗑️";
+    del.onclick=async (e)=>{ e.stopPropagation(); if(confirm("حذف المحادثة؟")) await deleteChat(id); };
 
-  ops.appendChild(edit); ops.appendChild(del);
-  row.appendChild(t); row.appendChild(ops);
-  row.onclick=()=>{ loadChat(id); closeSidebar(); };
-  list.prepend(row);
+    ops.appendChild(edit); ops.appendChild(del);
+    row.appendChild(t); row.appendChild(ops);
+    row.onclick=()=>{ loadChat(id); closeSidebar(); };
+    list.prepend(row);
 }
 
 function bindChatList(){
-  $("#chatList").innerHTML="";
-  CHAT_CACHE.forEach(c=>insertChatRowDom(c.id, c.title));
+    $("#chatList").innerHTML="";
+    CHAT_CACHE.forEach(c=>insertChatRowDom(c.id, c.title));
 
-  db.collection("chats").where("uid","==",me.uid).orderBy("clientUpdated","desc")
-    .onSnapshot(snap=>{
-      const list=$("#chatList"); 
-      const arr=[];
-      snap.forEach(doc=>{
-        const c=doc.data(); const id=doc.id;
-        arr.push({id, title:c.title||"محادثة"});
-        insertChatRowDom(id, c.title||"محادثة");
-      });
-      cacheSet(arr);
-      setActiveChatItem(currentChatId);
-    }, ()=>{
-      if($("#chatList").children.length===0){
-        CHAT_CACHE.forEach(c=>insertChatRowDom(c.id, c.title));
-      }
-    });
+    db.collection("chats").where("uid","==",me.uid).orderBy("clientUpdated","desc")
+        .onSnapshot(snap=>{
+            const list=$("#chatList"); 
+            const arr=[];
+            snap.forEach(doc=>{
+                const c=doc.data(); const id=doc.id;
+                arr.push({id, title:c.title||"محادثة"});
+                insertChatRowDom(id, c.title||"محادثة");
+            });
+            cacheSet(arr);
+            setActiveChatItem(currentChatId);
+        }, ()=>{
+            if($("#chatList").children.length===0){
+                CHAT_CACHE.forEach(c=>insertChatRowDom(c.id, c.title));
+            }
+        });
 }
 
 // إصلاح زر المحادثة الجديدة
 $("#startChatTop").onclick = () => newChat();
 
 function setActiveChatItem(id){
-  document.querySelectorAll("#chatList .item").forEach(x=>x.classList.toggle("active", x.dataset.id===id));
+    document.querySelectorAll("#chatList .item").forEach(x=>x.classList.toggle("active", x.dataset.id===id));
 }
 
 async function ensureFirstChat(){
-  const existing = await db.collection("chats").where("uid","==",me.uid).limit(1).get();
-  if(!existing.empty){
-    currentChatId = existing.docs[0].id;
-    loadChat(currentChatId);
-  }else{
-    await newChat();
-  }
+    const existing = await db.collection("chats").where("uid","==",me.uid).limit(1).get();
+    if(!existing.empty){
+        currentChatId = existing.docs[0].id;
+        loadChat(currentChatId);
+    }else{
+        await newChat();
+    }
+}
+
+// تحديث تلقائي لأسماء المحادثات
+async function updateChatTitle(chatId, firstMessage) {
+    if (!firstMessage || firstMessage.length < 3) return;
+    
+    const title = firstMessage.length > 30 ? firstMessage.substring(0, 30) + '...' : firstMessage;
+    
+    try {
+        await db.collection("chats").doc(chatId).update({
+            title: title,
+            clientUpdated: Date.now(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // تحديث الكاش المحلي
+        const updatedCache = CHAT_CACHE.map(chat => 
+            chat.id === chatId ? {...chat, title} : chat
+        );
+        cacheSet(updatedCache);
+        
+        // تحديث الواجهة
+        const chatItem = document.querySelector(`.item[data-id="${chatId}"] .item-title`);
+        if (chatItem) {
+            chatItem.textContent = title;
+        }
+    } catch (error) {
+        console.error('Error updating chat title:', error);
+    }
 }
 
 async function newChat(){
-  cancelCurrentStream();
-  const ref=await db.collection("chats").add({
-    uid:me.uid, 
-    title:"محادثة جديدة",
-    clientUpdated: Date.now(),
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  currentChatId=ref.id;
-  insertChatRowDom(ref.id, "محادثة جديدة");
-  const arr=[{id:ref.id, title:"محادثة جديدة"}, ...CHAT_CACHE.filter(x=>x.id!==ref.id)];
-  cacheSet(arr);
-  setActiveChatItem(ref.id);
-  loadChat(ref.id);
+    cancelCurrentStream();
+    currentChatHistory = [];
+    
+    const ref=await db.collection("chats").add({
+        uid:me.uid, 
+        title:"محادثة جديدة",
+        clientUpdated: Date.now(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentChatId=ref.id;
+    insertChatRowDom(ref.id, "محادثة جديدة");
+    const arr=[{id:ref.id, title:"محادثة جديدة"}, ...CHAT_CACHE.filter(x=>x.id!==ref.id)];
+    cacheSet(arr);
+    setActiveChatItem(ref.id);
+    loadChat(ref.id);
+    return ref.id;
 }
 
 async function deleteChat(id){
-  try{
-    if(unSubMsgs && currentChatId===id){ unSubMsgs(); unSubMsgs=null; }
-    const row=document.querySelector(`#chatList .item[data-id="${id}"]`); if(row) row.remove();
-    cacheSet(CHAT_CACHE.filter(x=>x.id!==id));
+    try{
+        if(unSubMsgs && currentChatId===id){ unSubMsgs(); unSubMsgs=null; }
+        const row=document.querySelector(`#chatList .item[data-id="${id}"]`); if(row) row.remove();
+        cacheSet(CHAT_CACHE.filter(x=>x.id!==id));
 
-    const ref=db.collection("chats").doc(id);
-    const msgsSnap=await ref.collection("messages").get();
-    const batch=db.batch(); msgsSnap.forEach(d=>batch.delete(ref.collection("messages").doc(d.id))); await batch.commit();
-    await ref.delete();
+        const ref=db.collection("chats").doc(id);
+        const msgsSnap=await ref.collection("messages").get();
+        const batch=db.batch(); msgsSnap.forEach(d=>batch.delete(ref.collection("messages").doc(d.id))); await batch.commit();
+        await ref.delete();
 
-    if(currentChatId===id){
-      currentChatId=null; msgs.innerHTML="";
-      if(CHAT_CACHE[0]) loadChat(CHAT_CACHE[0].id);
-      else await newChat();
-    }
-  }catch(e){ alert(e.message||e); }
+        if(currentChatId===id){
+            currentChatId=null; 
+            currentChatHistory = [];
+            msgs.innerHTML="";
+            if(CHAT_CACHE[0]) loadChat(CHAT_CACHE[0].id);
+            else await newChat();
+        }
+    }catch(e){ alert(e.message||e); }
 }
 
 /* حالة محادثة فارغة */
 function renderEmptyHero(){
-  msgs.innerHTML="";
-  const wrap=document.createElement("div");
-  wrap.className="empty-hero";
-  wrap.innerHTML=`
-    <svg class="logoMark" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="gh" x1="0" y1="0" x2="128" y2="128"><stop stop-color="#6d83ff"/><stop offset="1" stop-color="#3b57ff"/></linearGradient></defs>
-      <path d="M16 46L64 26l48 20-48 20-48-20Z" fill="url(#gh)"/>
-      <path d="M32 58l32 14 32-14v14c0 10-14 18-32 18s-32-8-32-18V58Z" fill="#2a2f43"/>
-      <circle cx="104" cy="73" r="6" fill="#4a6bff"/>
-      <circle cx="42" cy="94" r="6" fill="#7ea0ff"/><circle cx="86" cy="94" r="6" fill="#7ea0ff"/>
-      <path d="M42 94h44" stroke="#9fb3ff" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-    <div class="name">مرحبًا، أنا المساعد في السادس.</div>
-    <div class="sub">كيف يمكنني مساعدتك اليوم؟</div>
-  `;
-  msgs.appendChild(wrap);
+    msgs.innerHTML="";
+    const wrap=document.createElement("div");
+    wrap.className="empty-hero";
+    wrap.innerHTML=`
+        <svg class="logoMark" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="gh" x1="0" y1="0" x2="128" y2="128"><stop stop-color="#6d83ff"/><stop offset="1" stop-color="#3b57ff"/></linearGradient></defs>
+            <path d="M16 46L64 26l48 20-48 20-48-20Z" fill="url(#gh)"/>
+            <path d="M32 58l32 14 32-14v14c0 10-14 18-32 18s-32-8-32-18V58Z" fill="#2a2f43"/>
+            <circle cx="104" cy="73" r="6" fill="#4a6bff"/>
+            <circle cx="42" cy="94" r="6" fill="#7ea0ff"/><circle cx="86" cy="94" r="6" fill="#7ea0ff"/>
+            <path d="M42 94h44" stroke="#9fb3ff" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="name">مرحبًا، أنا المساعد في السادس</div>
+        <div class="sub">كيف يمكنني مساعدتك اليوم؟</div>
+    `;
+    msgs.appendChild(wrap);
 }
 
 function watchMessages(chatId){
-  return db.collection("chats").doc(chatId).collection("messages").orderBy("clientTs","asc")
-    .onSnapshot(snap=>{
-      if(isStreaming) return;
-      if(snap.empty){ renderEmptyHero(); return; }
-      msgs.innerHTML="";
-      snap.forEach(doc=>{ renderMsg(doc.id, doc.data()); });
-      msgs.scrollTo({top:msgs.scrollHeight+1000});
-    });
+    return db.collection("chats").doc(chatId).collection("messages").orderBy("clientTs","asc")
+        .onSnapshot(snap=>{
+            if(isStreaming) return;
+            
+            currentChatHistory = [];
+            let firstUserMessage = null;
+            
+            snap.forEach(doc=>{
+                const msg = doc.data();
+                currentChatHistory.push({
+                    role: msg.role,
+                    content: msg.text || ""
+                });
+                
+                // الحصول على أول رسالة من المستخدم لتحديث العنوان
+                if (msg.role === "user" && !firstUserMessage) {
+                    firstUserMessage = msg.text;
+                }
+            });
+            
+            // تحديث عنوان المحادثة إذا كانت جديدة
+            if (firstUserMessage && snap.size === 1) {
+                updateChatTitle(chatId, firstUserMessage);
+            }
+            
+            if(snap.empty){ 
+                renderEmptyHero(); 
+                return; 
+            }
+            msgs.innerHTML="";
+            snap.forEach(doc=>{ renderMsg(doc.id, doc.data()); });
+            msgs.scrollTo({top:msgs.scrollHeight+1000});
+        });
 }
 
 async function loadChat(id){
-  cancelCurrentStream();
-  currentChatId=id; setActiveChatItem(id);
-  msgs.innerHTML="";
-  if(unSubMsgs) unSubMsgs();
-  unSubMsgs=watchMessages(id);
+    cancelCurrentStream();
+    currentChatId=id; 
+    currentChatHistory = [];
+    setActiveChatItem(id);
+    msgs.innerHTML="";
+    if(unSubMsgs) unSubMsgs();
+    unSubMsgs=watchMessages(id);
 }
 
-/* عرض رسالة */
+/* عرض رسالة محسنة */
 function renderMsg(id, m){
-  const isMath=/\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right)|\$\$/.test(m.text||"");
-  const who=m.role==="user"?"user":"bot";
-  const img=m.imageDataURL||null;
-  const html=(m.text||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  const el=document.createElement("div");
-  el.className=`msg ${who}`+(isMath?" math":"");
-  if(id) el.dataset.mid=id;
-  el.dataset.role=m.role;
-  if(img){ const im=new Image(); im.className="attachment"; im.src=img; el.appendChild(im); }
-  const box=document.createElement("div"); box.innerHTML=html; el.appendChild(box);
-  msgs.appendChild(el);
-  if(window.MathJax) MathJax.typesetPromise([el]).catch(()=>{});
+    const isMath=/\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|hbar|partial|nabla|infty|cdot|pm|mp|times|div|leq|geq|neq|approx|equiv|propto|perp|parallel|angle|circ|degree|vec|hat|tilde|dot|ddot|prime|int|oint|sum|prod|lim|exp|log|ln|sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|sinh|cosh|tanh|coth|sech|csch|det|dim|gcd|hom|ker|lg|ln|log|max|min|Pr|sup)|\$\$|H_2O|CO_2|CH_4|NaCl|H_2SO_4|NaOH|HCl/i.test(m.text||"");
+    const who=m.role==="user"?"user":"bot";
+    const img=m.imageDataURL||null;
+    const html=(m.text||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const el=document.createElement("div");
+    el.className=`msg ${who}`+(isMath?" math":"");
+    if(id) el.dataset.mid=id;
+    el.dataset.role=m.role;
+    if(img){ 
+        const im=new Image(); 
+        im.className="attachment"; 
+        im.src=img; 
+        im.style.maxWidth="200px";
+        im.style.borderRadius="8px";
+        el.appendChild(im); 
+    }
+    const box=document.createElement("div"); 
+    box.style.cssText = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif; line-height: 1.6; word-wrap: break-word;";
+    box.innerHTML=html; 
+    el.appendChild(box);
+    msgs.appendChild(el);
+    if(isMath && window.MathJax) {
+        MathJax.typesetPromise([el]).catch(()=>{});
+    }
 }
 
 /* حفظ رسالة */
 async function appendMessageStore(role,text,imageDataURL=null, forceChatId=null){
-  const chatId = forceChatId || currentChatId;
-  if(!chatId) return;
-  const ref=db.collection("chats").doc(chatId).collection("messages");
-  await ref.add({ role, text, imageDataURL, clientTs: Date.now(), ts: firebase.firestore.FieldValue.serverTimestamp() });
-  await db.collection("chats").doc(chatId).update({ clientUpdated: Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
-  try{ await db.collection("users").doc(me.uid).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() }); }catch{}
+    const chatId = forceChatId || currentChatId;
+    if(!chatId) return;
+    const ref=db.collection("chats").doc(chatId).collection("messages");
+    await ref.add({ role, text, imageDataURL, clientTs: Date.now(), ts: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection("chats").doc(chatId).update({ clientUpdated: Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
+    try{ await db.collection("users").doc(me.uid).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() }); }catch{}
 }
 
-/* ===== معرفة ===== */
+/* ===== نظام المعرفة المحسن ===== */
 function arNormalize(s){ return (s||"").replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ة/g,'ه').replace(/[ـ]+/g,'').toLowerCase(); }
-function chunkAll(texts){ const arr=[]; texts.forEach(t=>{ const clean=(t||"").replace(/(\.|\!|\؟|\?|؛)/g,'$1\n'); const parts=clean.split(/\n+/).map(x=>x.trim()).filter(Boolean); let buf=""; for(const line of parts){ if((buf+" "+line).length<=700) buf=(buf?buf+" ":"")+line; else { if(buf) arr.push(buf); buf=line; } } if(buf) arr.push(buf); }); return arr.slice(-1500); }
+function chunkAll(texts){ 
+    const arr=[]; 
+    texts.forEach(t=>{ 
+        const clean=(t||"").replace(/(\.|\!|\؟|\?|؛)/g,'$1\n'); 
+        const parts=clean.split(/\n+/).map(x=>x.trim()).filter(Boolean); 
+        let buf=""; 
+        for(const line of parts){ 
+            if((buf+" "+line).length<=700) buf=(buf?buf+" ":"")+line; 
+            else { if(buf) arr.push(buf); buf=line; } 
+        } 
+        if(buf) arr.push(buf); 
+    }); 
+    return arr.slice(-2000); // زيادة السعة
+}
+
 function buildIndex(chunks){
-  const tokenize=s=>arNormalize(s).replace(SAFE_TOKENS," ").split(/\s+/).filter(w=>w.length>1);
-  const docs=chunks.map(c=>({text:c,toks:tokenize(c)}));
-  const df=new Map(); docs.forEach(d=>{[...new Set(d.toks)].forEach(w=>df.set(w,(df.get(w)||0)+1));});
-  const N=docs.length||1;
-  docs.forEach(d=>{
-    const tf=new Map(); d.toks.forEach(w=>tf.set(w,(tf.get(w)||0)+1));
-    d.vec=new Map();
-    tf.forEach((f,w)=>{ const idf=Math.log((N+1)/((df.get(w)||1)+1))+1; d.vec.set(w,(f/d.toks.length)*idf);});
-    delete d.toks;
-  });
-  index={docs,df:N?df:new Map(),N,tokenize};
-}
-function retrieve(q,k=6){
-  if(!index||!index.docs.length) return [];
-  const qT=index.tokenize(q);
-  const tf=new Map(); qT.forEach(w=>tf.set(w,(tf.get(w)||0)+1));
-  const qV=new Map(); tf.forEach((f,w)=>{ const idf=Math.log((index.N+1)/((index.df.get(w)||1)+1))+1; qV.set(w,(f/qT.length)*idf);});
-  const qn=norm(qV);
-  const scored=index.docs.map(d=>({text:d.text,score:dot(qV,d.vec)/(qn*norm(d.vec))})).sort((a,b)=>b.score-a.score).slice(0,k);
-  return scored.filter(s=>s.score>0.01).map(s=>s.text);
-  function dot(a,b){let s=0;a.forEach((va,wa)=>{s+=va*(b.get(wa)||0)});return s}
-  function norm(v){let s=0;v.forEach(x=>s+=x*x);return Math.sqrt(s)||1}
-}
-async function loadKnowledgeFromDB(){
-  try {
-    const s=await db.collection("knowledge").orderBy("createdAt","desc").limit(1000).get();
-    const infoTexts=[]; rulesMemo="";
-    s.docs.forEach(d=>{
-      const x=d.data(); const t=(x.type||"").toLowerCase();
-      if(t==="pdf" || t==="info" || t==="text"){
-        const joined=[x.note?`ملاحظة: ${x.note}`:"",x.text||""].join("\n").trim();
-        if(joined) infoTexts.push(joined);
-      }else if(t==="rule"){ if(x.text) rulesMemo=(rulesMemo?rulesMemo+"\n":"")+x.text; }
+    const tokenize=s=>arNormalize(s).replace(SAFE_TOKENS," ").split(/\s+/).filter(w=>w.length>1);
+    const docs=chunks.map(c=>({text:c,toks:tokenize(c)}));
+    const df=new Map(); docs.forEach(d=>{[...new Set(d.toks)].forEach(w=>df.set(w,(df.get(w)||0)+1));});
+    const N=docs.length||1;
+    docs.forEach(d=>{
+        const tf=new Map(); d.toks.forEach(w=>tf.set(w,(tf.get(w)||0)+1));
+        d.vec=new Map();
+        tf.forEach((f,w)=>{ const idf=Math.log((N+1)/((df.get(w)||1)+1))+1; d.vec.set(w,(f/d.toks.length)*idf);});
+        delete d.toks;
     });
-    knowledgeChunks=chunkAll(infoTexts); 
-    buildIndex(knowledgeChunks);
-    console.log('تم تحميل المعرفة:', knowledgeChunks.length, 'قطعة');
-  } catch(e) {
-    console.error('خطأ في تحميل المعرفة:', e);
-  }
+    index={docs,df:N?df:new Map(),N,tokenize};
+}
+
+function retrieve(q,k=8){ // زيادة عدد النتائج
+    if(!index||!index.docs.length) return [];
+    const qT=index.tokenize(q);
+    const tf=new Map(); qT.forEach(w=>tf.set(w,(tf.get(w)||0)+1));
+    const qV=new Map(); tf.forEach((f,w)=>{ const idf=Math.log((index.N+1)/((index.df.get(w)||1)+1))+1; qV.set(w,(f/qT.length)*idf);});
+    const qn=norm(qV);
+    const scored=index.docs.map(d=>({text:d.text,score:dot(qV,d.vec)/(qn*norm(d.vec))})).sort((a,b)=>b.score-a.score).slice(0,k);
+    return scored.filter(s=>s.score>0.01).map(s=>s.text);
+    function dot(a,b){let s=0;a.forEach((va,wa)=>{s+=va*(b.get(wa)||0)});return s}
+    function norm(v){let s=0;v.forEach(x=>s+=x*x);return Math.sqrt(s)||1}
+}
+
+async function loadKnowledgeFromDB(){
+    try {
+        const s=await db.collection("knowledge").orderBy("createdAt","desc").limit(2000).get(); // زيادة الحد
+        const infoTexts=[]; 
+        rulesMemo="";
+        s.docs.forEach(d=>{
+            const x=d.data(); 
+            const t=(x.type||"").toLowerCase();
+            if(t==="pdf" || t==="info" || t==="text"){
+                const joined=[x.note?`ملاحظة: ${x.note}`:"",x.text||""].join("\n").trim();
+                if(joined) infoTexts.push(joined);
+            }else if(t==="rule"){ 
+                if(x.text) rulesMemo=(rulesMemo?rulesMemo+"\n":"")+x.text; 
+            }
+        });
+        knowledgeChunks=chunkAll(infoTexts); 
+        buildIndex(knowledgeChunks);
+        console.log('تم تحميل المعرفة:', knowledgeChunks.length, 'قطعة، الأوامر:', rulesMemo.length, 'حرف');
+    } catch(e) {
+        console.error('خطأ في تحميل المعرفة:', e);
+    }
 }
 
 /* ===== إصلاح أزرار لوحة التحكم ===== */
-
-// زر حفظ الأوامر
 $("#saveRule").onclick = async () => {
-  const ruleText = $("#trainRule").value.trim();
-  if (!ruleText) return alert("يرجى إدخال الأوامر أولاً");
-  
-  try {
-    await db.collection("knowledge").add({
-      type: "rule",
-      text: ruleText,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      addedBy: me.email
-    });
+    const ruleText = $("#trainRule").value.trim();
+    if (!ruleText) return alert("يرجى إدخال الأوامر أولاً");
     
-    $("#ruleMsg").textContent = "✅ تم حفظ الأوامر بنجاح";
-    $("#trainRule").value = "";
-    
-    // إعادة تحميل المعرفة لتطبيق التغييرات
-    setTimeout(() => loadKnowledgeFromDB(), 1000);
-  } catch (e) {
-    $("#ruleMsg").textContent = "❌ خطأ في حفظ الأوامر: " + e.message;
-  }
-};
-
-// زر حفظ المعلومات
-$("#saveInfo").onclick = async () => {
-  const infoText = $("#trainInfoText").value.trim();
-  if (!infoText) return alert("يرجى إدخال المعلومات أولاً");
-  
-  try {
-    await db.collection("knowledge").add({
-      type: "info",
-      text: infoText,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      addedBy: me.email
-    });
-    
-    $("#infoMsg").textContent = "✅ تم حفظ المعلومات بنجاح";
-    $("#trainInfoText").value = "";
-    
-    // إعادة تحميل المعرفة لتطبيق التغييرات
-    setTimeout(() => loadKnowledgeFromDB(), 1000);
-  } catch (e) {
-    $("#infoMsg").textContent = "❌ خطأ في حفظ المعلومات: " + e.message;
-  }
-};
-
-// زر اختيار ملفات PDF
-$("#pickPdf").onclick = () => document.getElementById("pdfInput").click();
-
-// معالجة ملفات PDF
-let selectedPdfFiles = [];
-document.getElementById("pdfInput").addEventListener("change", (e) => {
-  selectedPdfFiles = Array.from(e.target.files || []);
-  const list = document.getElementById("fileList");
-  list.innerHTML = selectedPdfFiles.map(f => `<div>📄 ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)</div>`).join("");
-});
-
-// زر معالجة ملفات PDF
-$("#processPdfs").onclick = async () => {
-  if (selectedPdfFiles.length === 0) return alert("يرجى اختيار ملفات PDF أولاً");
-  
-  const processBtn = $("#processPdfs");
-  const originalText = processBtn.textContent;
-  processBtn.disabled = true;
-  processBtn.textContent = "جاري المعالجة...";
-  
-  const progressBar = $("#pdfBar");
-  const trainInfo = $("#trainInfo");
-  
-  try {
-    let processedCount = 0;
-    
-    for (const file of selectedPdfFiles) {
-      trainInfo.textContent = `جاري معالجة: ${file.name}...`;
-      
-      // محاكاة معالجة PDF (يمكن استبدالها بمعالجة حقيقية)
-      const textContent = await extractTextFromPDF(file);
-      
-      if (textContent && textContent.trim()) {
+    try {
         await db.collection("knowledge").add({
-          type: "pdf",
-          text: textContent,
-          fileName: file.name,
-          fileSize: file.size,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          addedBy: me.email
+            type: "rule",
+            text: ruleText,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            addedBy: me.email
         });
         
-        processedCount++;
-        progressBar.style.width = `${(processedCount / selectedPdfFiles.length) * 100}%`;
-      }
+        $("#ruleMsg").textContent = "✅ تم حفظ الأوامر بنجاح";
+        $("#trainRule").value = "";
+        
+        setTimeout(() => loadKnowledgeFromDB(), 1000);
+    } catch (e) {
+        $("#ruleMsg").textContent = "❌ خطأ في حفظ الأوامر: " + e.message;
     }
-    
-    trainInfo.textContent = `✅ تم معالجة ${processedCount} ملف بنجاح`;
-    $("#fileList").innerHTML = "";
-    selectedPdfFiles = [];
-    progressBar.style.width = "0%";
-    
-    // إعادة تحميل المعرفة
-    setTimeout(() => loadKnowledgeFromDB(), 1000);
-    
-  } catch (e) {
-    trainInfo.textContent = "❌ خطأ في معالجة الملفات: " + e.message;
-  } finally {
-    processBtn.disabled = false;
-    processBtn.textContent = originalText;
-  }
 };
 
-// دالة محاكاة استخراج النص من PDF
+$("#saveInfo").onclick = async () => {
+    const infoText = $("#trainInfoText").value.trim();
+    if (!infoText) return alert("يرجى إدخال المعلومات أولاً");
+    
+    try {
+        await db.collection("knowledge").add({
+            type: "info",
+            text: infoText,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            addedBy: me.email
+        });
+        
+        $("#infoMsg").textContent = "✅ تم حفظ المعلومات بنجاح";
+        $("#trainInfoText").value = "";
+        
+        setTimeout(() => loadKnowledgeFromDB(), 1000);
+    } catch (e) {
+        $("#infoMsg").textContent = "❌ خطأ في حفظ المعلومات: " + e.message;
+    }
+};
+
+// معالجة PDF محسنة
+let selectedPdfFiles = [];
+$("#pickPdf").onclick = () => document.getElementById("pdfInput").click();
+
+document.getElementById("pdfInput").addEventListener("change", (e) => {
+    selectedPdfFiles = Array.from(e.target.files || []);
+    const list = document.getElementById("fileList");
+    list.innerHTML = selectedPdfFiles.map(f => `<div>📄 ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)</div>`).join("");
+});
+
+$("#processPdfs").onclick = async () => {
+    if (selectedPdfFiles.length === 0) return alert("يرجى اختيار ملفات PDF أولاً");
+    
+    const processBtn = $("#processPdfs");
+    const originalText = processBtn.textContent;
+    processBtn.disabled = true;
+    processBtn.textContent = "جاري المعالجة...";
+    
+    const progressBar = $("#pdfBar");
+    const trainInfo = $("#trainInfo");
+    
+    try {
+        let processedCount = 0;
+        let totalPages = 0;
+        progressBar.style.width = "0%";
+        
+        // حساب إجمالي الصفحات أولاً
+        for (const file of selectedPdfFiles) {
+            try {
+                const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+                totalPages += pdf.numPages;
+            } catch (e) {
+                console.error('Error counting pages:', e);
+            }
+        }
+        
+        let currentPage = 0;
+        
+        for (const file of selectedPdfFiles) {
+            trainInfo.textContent = `جاري معالجة: ${file.name}...`;
+            
+            try {
+                const textContent = await extractTextFromPDF(file);
+                
+                if (textContent && textContent.trim()) {
+                    // تقسيم النص إلى أجزاء أصغر
+                    const chunks = splitTextIntoChunks(textContent, 1500);
+                    
+                    for (const chunk of chunks) {
+                        if (chunk.trim()) {
+                            await db.collection("knowledge").add({
+                                type: "pdf",
+                                text: chunk,
+                                fileName: file.name,
+                                fileSize: file.size,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                addedBy: me.email
+                            });
+                        }
+                    }
+                    
+                    processedCount++;
+                    progressBar.style.width = `${(processedCount / selectedPdfFiles.length) * 100}%`;
+                    trainInfo.textContent = `✅ تم معالجة ${file.name} (${processedCount}/${selectedPdfFiles.length})`;
+                } else {
+                    trainInfo.textContent = `⚠️ لم يتم استخراج نص من ${file.name}`;
+                }
+            } catch (fileError) {
+                trainInfo.textContent = `❌ خطأ في معالجة ${file.name}: ${fileError.message}`;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        trainInfo.textContent = `✅ تم معالجة ${processedCount}/${selectedPdfFiles.length} ملف بنجاح`;
+        $("#fileList").innerHTML = "";
+        selectedPdfFiles = [];
+        
+        setTimeout(() => loadKnowledgeFromDB(), 1000);
+        
+    } catch (e) {
+        trainInfo.textContent = "❌ خطأ في معالجة الملفات: " + e.message;
+    } finally {
+        processBtn.disabled = false;
+        processBtn.textContent = originalText;
+    }
+};
+
+// دالة لتقسيم النص إلى أجزاء
+function splitTextIntoChunks(text, maxChunkSize) {
+    const chunks = [];
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    let currentChunk = "";
+    
+    for (const sentence of sentences) {
+        if ((currentChunk + sentence).length > maxChunkSize && currentChunk) {
+            chunks.push(currentChunk.trim());
+            currentChunk = sentence;
+        } else {
+            currentChunk += (currentChunk ? " " : "") + sentence;
+        }
+    }
+    
+    if (currentChunk.trim()) {
+        chunks.push(currentChunk.trim());
+    }
+    
+    return chunks;
+}
+
+// دالة استخراج النص من PDF محسنة
 async function extractTextFromPDF(file) {
-  return new Promise((resolve) => {
-    // محاكاة استخراج النص - يمكن استبدالها بـ pdf.js الحقيقي
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      // في الواقع هنا نستخدم pdf.js لاستخراج النص
-      // لكن لأغراض التجربة نعيد نص تجريبي
-      resolve(`نص مستخرج من ${file.name}:\n\nهذا محتوى تجريبي من ملف PDF. في التطبيق الحقيقي، سيتم استخراج النص الفعلي باستخدام pdf.js.`);
-    };
-    reader.readAsArrayBuffer(file);
-  });
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        
+        fileReader.onload = async function() {
+            try {
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let fullText = '';
+                
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    try {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n\n';
+                    } catch (pageError) {
+                        console.error(`Error extracting page ${i}:`, pageError);
+                        continue;
+                    }
+                }
+                
+                resolve(fullText.trim());
+            } catch (error) {
+                reject(new Error(`فشل استخراج النص: ${error.message}`));
+            }
+        };
+        
+        fileReader.onerror = function() {
+            reject(new Error('فشل قراءة الملف'));
+        };
+        
+        fileReader.readAsArrayBuffer(file);
+    });
 }
 
 /* إدخال + مرفقات + إرسال */
@@ -991,233 +1226,349 @@ $("#send").onclick=onSend;
 $("#input").addEventListener("keydown",e=>{if(e.key==="Enter")onSend();});
 $("#attach").onclick=()=>$("#imgFile").click();
 $("#imgFile").addEventListener("change", async (e)=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  const myTok=++attachToken;
-  const r=new FileReader();
-  r.onload=()=>{ if(myTok!==attachToken) return; const dataURL=r.result; attachedImage={name:(f.name||"image").replace(/\.\w+$/,"")+".jpg", sizeKB:Math.round(f.size/1024), dataURL}; showAttachChip(); input.focus(); };
-  r.readAsDataURL(f);
-  try{
-    if(ENABLE_OCR){
-      const {data:{text}}=await Tesseract.recognize(f,'ara+eng');
-      if(myTok===attachToken && attachedImage) attachedImage.ocrText=(text||"").trim();
+    const f=e.target.files?.[0]; if(!f) return;
+    const myTok=++attachToken;
+    const r=new FileReader();
+    r.onload=()=>{ 
+        if(myTok!==attachToken) return; 
+        const dataURL=r.result; 
+        attachedImage={
+            name:(f.name||"image").replace(/\.\w+$/,"")+".jpg", 
+            sizeKB:Math.round(f.size/1024), 
+            dataURL
+        }; 
+        showAttachChip(); 
+        input.focus(); 
+    };
+    r.readAsDataURL(f);
+    
+    try{
+        if(ENABLE_OCR){
+            toast("جاري قراءة الصورة...");
+            const {data:{text}}=await Tesseract.recognize(f,'ara+eng');
+            if(myTok===attachToken && attachedImage) {
+                attachedImage.ocrText=(text||"").trim();
+                toast("تم قراءة الصورة بنجاح");
+            }
+        }
+    }catch(ocrError){
+        console.log('OCR Error:', ocrError);
+        if(myTok===attachToken && attachedImage) {
+            attachedImage.ocrText = "";
+        }
     }
-  }catch{}
-  e.target.value="";
+    e.target.value="";
 });
+
 function showAttachChip(){
-  if(!attachedImage){ attachWrap.classList.add("hidden"); attachWrap.innerHTML=""; return; }
-  const {name,sizeKB,dataURL}=attachedImage;
-  attachWrap.innerHTML=`
-    <div class="attach-chip">
-      <div class="thumb"><img src="${dataURL}"></div>
-      <div class="name">${name} · ${sizeKB}KB</div>
-      <div class="x" id="removeAttach">✕</div>
-    </div>`;
-  attachWrap.classList.remove("hidden");
-  $("#removeAttach").onclick=()=>{ attachedImage=null; ++attachToken; showAttachChip(); input.focus(); };
+    if(!attachedImage){ 
+        attachWrap.classList.add("hidden"); 
+        attachWrap.innerHTML=""; 
+        return; 
+    }
+    const {name,sizeKB,dataURL}=attachedImage;
+    attachWrap.innerHTML=`
+        <div class="attach-chip">
+            <div class="thumb"><img src="${dataURL}"></div>
+            <div class="name">${name} · ${sizeKB}KB</div>
+            <div class="x" id="removeAttach">✕</div>
+        </div>`;
+    attachWrap.classList.remove("hidden");
+    $("#removeAttach").onclick=()=>{ 
+        attachedImage=null; 
+        ++attachToken; 
+        showAttachChip(); 
+        input.focus(); 
+    };
 }
 
 function wantsLongExplain(t){ return /(اشرح|شرح|فسر|وضح|فسرلي|شرحلي|حل بالتفصيل|تفصيل|افهمني)/i.test(t||""); }
-function isProblemLike(t){ return /(مساله|معادلة|احسب|حل|جد|مثال|قانون|مول|تركيز|معايره|اتزان|حركه|مجال)/i.test(t||""); }
+function isProblemLike(t){ return /(مساله|معادلة|احسب|حل|جد|مثال|قانون|مول|تركيز|معايره|اتزان|حركه|مجال|كيمياء|فيزياء|رياضيات|علم|سؤال)/i.test(t||""); }
 
 async function onSend(){
-  if(!canChat){ $("#paywall").style.display="flex"; return; }
-  const userTxt=$("#input").value.trim();
-  if(!userTxt && !attachedImage) return;
+    if(!canChat){ $("#paywall").style.display="flex"; return; }
+    const userTxt=$("#input").value.trim();
+    if(!userTxt && !attachedImage) return;
 
-  cancelCurrentStream();
+    cancelCurrentStream();
 
-  renderMsg(null,{role:"user",text:userTxt || "[صورة فقط]",imageDataURL:attachedImage?.dataURL || null});
-  if(!currentChatId) await newChat();
-  await db.collection("chats").doc(currentChatId).collection("messages")
-    .add({ role:"user", text:userTxt || "[صورة فقط]", imageDataURL:attachedImage?.dataURL||null, clientTs: Date.now(), ts: firebase.firestore.FieldValue.serverTimestamp() });
-  await db.collection("chats").doc(currentChatId).update({ clientUpdated: Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
+    renderMsg(null,{role:"user",text:userTxt || "[صورة فقط]",imageDataURL:attachedImage?.dataURL || null});
+    if(!currentChatId) await newChat();
+    await db.collection("chats").doc(currentChatId).collection("messages")
+        .add({ role:"user", text:userTxt || "[صورة فقط]", imageDataURL:attachedImage?.dataURL||null, clientTs: Date.now(), ts: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection("chats").doc(currentChatId).update({ clientUpdated: Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
 
-  let finalPrompt="";
-  if(attachedImage){
-    const ocr=attachedImage.ocrText && attachedImage.ocrText.trim()? attachedImage.ocrText.trim() : "";
-    finalPrompt=[
-      "هذه صورة مسألة/نص. حلّل الصورة بدقة:",
-      ocr?("— النص المستخرج (OCR):\n"+ocr):"",
-      userTxt?("— ملاحظتي/سؤالي:\n"+userTxt):"",
-      "رجاءً: اعرض الحل بخطوات مرقمة وبـ LaTeX داخل $$ .. $$ عند الحاجة."
-    ].filter(Boolean).join("\n\n");
-  }else{
-    finalPrompt=userTxt;
-  }
-  $("#input").value="";
-  attachedImage=null; ++attachToken; showAttachChip();
+    let finalPrompt="";
+    if(attachedImage){
+        const ocr=attachedImage.ocrText && attachedImage.ocrText.trim()? attachedImage.ocrText.trim() : "";
+        finalPrompt=[
+            "هذه صورة مسألة/نص. حلّل الصورة بدقة:",
+            ocr?("— النص المستخرج (OCR):\n"+ocr):"",
+            userTxt?("— ملاحظتي/سؤالي:\n"+userTxt):"",
+            "رجاءً: اعرض الحل بخطوات مرقمة وبـ LaTeX داخل $$ .. $$ عند الحاجة."
+        ].filter(Boolean).join("\n\n");
+    }else{
+        finalPrompt=userTxt;
+    }
+    $("#input").value="";
+    attachedImage=null; ++attachToken; showAttachChip();
 
-  const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
-  const problem = isProblemLike(finalPrompt);
+    const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
+    const problem = isProblemLike(finalPrompt);
 
-  if(!index){ try{ await loadKnowledgeFromDB(); }catch{} }
+    if(!index){ try{ await loadKnowledgeFromDB(); }catch{} }
 
-  const ctxPieces=retrieve(finalPrompt,6);
-  const ctx=ctxPieces.join("\n---\n");
+    const ctxPieces=retrieve(finalPrompt,8);
+    const ctx=ctxPieces.join("\n---\n");
 
-  const reqId=Math.random().toString(36).slice(2);
-  const controller=new AbortController();
-  currentStream={id:reqId,chatId:currentChatId,controller};
+    const reqId=Math.random().toString(36).slice(2);
+    const controller=new AbortController();
+    currentStream={id:reqId,chatId:currentChatId,controller};
 
-  startStreaming();
-  try{
-    await streamAI(ctx, finalPrompt, {wantsLong,isProblem:problem,signal:controller.signal,reqId});
-  }catch(e){
-    if(e.name==="AbortError") return;
-    endStreaming(reqId);
-    renderMsg(null,{role:"bot",text:"تعذّر البث، سأرسل الرد دفعة واحدة…"});
-    await callAIOnce(ctx, finalPrompt, {wantsLong,isProblem:problem});
-  }
+    startStreaming();
+    try{
+        await streamAI(ctx, finalPrompt, {wantsLong,isProblem:problem,signal:controller.signal,reqId});
+    }catch(e){
+        if(e.name==="AbortError") return;
+        endStreaming(reqId);
+        renderMsg(null,{role:"bot",text:"تعذّر البث، سأرسل الرد دفعة واحدة…"});
+        await callAIOnce(ctx, finalPrompt, {wantsLong,isProblem:problem});
+    }
 }
 
 /* تنظيف تكرارات الذكاء */
 function cleanAI(s){
-  if(!s) return s;
-  let x=(s||"").replace(/\r/g,"").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
-  const paras=x.split(/\n{2,}/).map(p=>p.trim()).filter(Boolean);
-  const out=[]; const seen=new Set();
-  for(const p of paras){ const key=p.replace(/\s+/g," "); if(!seen.has(key)){ out.push(p); seen.add(key);} }
-  x=out.join("\n\n");
-  if(x.length>120){
-    const mid=Math.floor(x.length/2);
-    const a=x.slice(0,mid).trim(), b=x.slice(mid).trim();
-    if(a===b) x=a;
-  }
-  return x;
+    if(!s) return s;
+    let x=(s||"").replace(/\r/g,"").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+    const paras=x.split(/\n{2,}/).map(p=>p.trim()).filter(Boolean);
+    const out=[]; const seen=new Set();
+    for(const p of paras){ const key=p.replace(/\s+/g," "); if(!seen.has(key)){ out.push(p); seen.add(key);} }
+    x=out.join("\n\n");
+    if(x.length>120){
+        const mid=Math.floor(x.length/2);
+        const a=x.slice(0,mid).trim(), b=x.slice(mid).trim();
+        if(a===b) x=a;
+    }
+    return x;
 }
 
-/* AI */
+/* AI - نظام محسن مع دعم كامل للرموز */
 function sysPrompt({wantsLong,isProblem}){
-  let prompt = [
-    "أنت مساعد دراسي ذكي جدًا متخصص في منهج السادس العلمي.",
-    wantsLong ? "اكتب شرحًا تفصيليًا مع خطوات مرقمة وعناوين فرعية." : "أجب باختصار شديد وواضح (سطران كحد أقصى) إلا إذا كانت مسألة تحتاج خطوات.",
-    "ادعم الرموز واللاتكس: $$ .. $$ أو \\( .. \\) مثل: \\(\\Delta,\\sqrt{},\\frac{},\\sum,\\pi,\\times,\\div,\\rightarrow\\).",
-    isProblem ? "نظرًا لكونها مسألة: استخدم خطوات 1,2,3… مع تبرير مختصر لكل خطوة." : "",
-    "استخدم الإيموجي بلطف عند المناسبة 🙂."
-  ].filter(Boolean).join("\n");
+    let prompt = [
+        "أنت مساعد دراسي ذكي جدًا متخصص في منهج السادس العلمي.",
+        "يجب أن تكون إجاباتك دقيقة ومفصلة ومناسبة لجميع المستويات.",
+        wantsLong ? "اكتب شرحًا تفصيليًا مع خطوات مرقمة وعناوين فرعية." : "أجب بوضوح وإيجاز مع الحفاظ على الدقة العلمية.",
+        "استخدم الرموز الرياضية والكيميائية والفيزيائية بشكل صحيح باستخدام LaTeX: $$ .. $$ أو \\( .. \\)",
+        "**الرموز الرياضية**: \\(\\alpha, \\beta, \\gamma, \\delta, \\Delta, \\pi, \\theta, \\lambda, \\mu, \\sigma, \\sum, \\prod, \\int, \\sqrt{}, \\frac{}{}, \\binom{}{}, \\times, \\div, \\pm, \\mp, \\leq, \\geq, \\neq, \\approx, \\equiv, \\propto, \\rightarrow, \\leftrightarrow, \\in, \\subset, \\cup, \\cap, \\forall, \\exists, \\therefore, \\because, \\angle, \\parallel, \\perp, \\circ, \\degree\\)",
+        "**الرموز الكيميائية**: \\(H_2O, CO_2, CH_4, NaCl, H_2SO_4, NaOH, HCl, CaCO_3, Fe_2O_3, Al_2O_3, Mg(OH)_2\\)",
+        "**الرموز الفيزيائية**: \\(F = ma, E = mc^2, v = \\frac{d}{t}, a = \\frac{\\Delta v}{\\Delta t}, P = \\frac{F}{A}, W = F \\cdot d, P = \\frac{W}{t}\\)",
+        isProblem ? "للمسائل: استخدم خطوات مرقمة 1,2,3… مع تبرير علمي موجز لكل خطوة." : "",
+        "قدم أمثلة توضيحية عند الحاجة.",
+        "استخدم الإيموجي المناسب بلطف 🧠✨📚🔍",
+        "تذكر السياق والمحادثة السابقة للإجابة بشكل مترابط.",
+        "استخدم الخطوات المنطقية والتبريرات العلمية.",
+        "**ترتيب الإجابة**: مقدمة ← خطوات الحل ← نتيجة ← ملخص."
+    ].filter(Boolean).join("\n");
 
-  // إضافة الأوامر المخصصة من قاعدة البيانات
-  if (rulesMemo) {
-    prompt += "\n\n" + rulesMemo;
-  }
+    if (rulesMemo) {
+        prompt += "\n\n### الأوامر والتعليمات:\n" + rulesMemo;
+    }
 
-  return prompt;
+    if (knowledgeChunks.length > 0) {
+        const recentKnowledge = knowledgeChunks.slice(0, 5).join("\n\n");
+        prompt += "\n\n### المعرفة المرجعية:\n" + recentKnowledge;
+    }
+
+    return prompt;
 }
 
 function startStreaming(){
-  isStreaming = true;
-  streamingEl = document.createElement("div");
-  streamingEl.className = "msg bot";
-  streamingEl.dataset.role = "bot";
-  streamingEl.textContent = "";
-  streamedText="";
-  msgs.appendChild(streamingEl);
-  msgs.scrollTo({top: msgs.scrollHeight + 1000, behavior: "smooth"});
+    isStreaming = true;
+    streamingEl = document.createElement("div");
+    streamingEl.className = "msg bot";
+    streamingEl.dataset.role = "bot";
+    streamingEl.textContent = "";
+    streamedText="";
+    msgs.appendChild(streamingEl);
+    msgs.scrollTo({top: msgs.scrollHeight + 1000, behavior: "smooth"});
 }
+
 function pushChunk(txt, reqId){
-  if(currentStream.id!==reqId) return;
-  if(!streamingEl) startStreaming();
-  streamingEl.textContent += txt;
-  streamedText += txt;
-  msgs.scrollTo({top: msgs.scrollHeight + 1000});
+    if(currentStream.id!==reqId) return;
+    if(!streamingEl) startStreaming();
+    streamingEl.textContent += txt;
+    streamedText += txt;
+    msgs.scrollTo({top: msgs.scrollHeight + 1000});
 }
+
 function endStreaming(reqId){
-  if(currentStream.id!==reqId) return;
-  if(!streamingEl){ isStreaming=false; streamedText=""; return; }
-  const cleaned = cleanAI(streamedText||"");
-  const html = cleaned.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  const isMath = /\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right)|\$\$/.test(cleaned);
-  const finalEl = document.createElement("div");
-  finalEl.className = `msg bot${isMath?" math":""}`;
-  finalEl.dataset.role="bot";
-  const box = document.createElement("div"); box.innerHTML = html; finalEl.appendChild(box);
-  streamingEl.replaceWith(finalEl);
-  if(window.MathJax) MathJax.typesetPromise([finalEl]).catch(()=>{});
-  streamingEl = null; isStreaming=false;
-  streamedText = cleaned;
+    if(currentStream.id!==reqId) return;
+    if(!streamingEl){ isStreaming=false; streamedText=""; return; }
+    const cleaned = cleanAI(streamedText||"");
+    const html = cleaned.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const isMath = /\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right|alpha|beta|gamma|delta)|\$\$|H_2O|CO_2/i.test(cleaned);
+    const finalEl = document.createElement("div");
+    finalEl.className = `msg bot${isMath?" math":""}`;
+    finalEl.dataset.role="bot";
+    const box = document.createElement("div"); 
+    box.style.cssText = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif; line-height: 1.6;";
+    box.innerHTML = html; 
+    finalEl.appendChild(box);
+    streamingEl.replaceWith(finalEl);
+    if(isMath && window.MathJax) MathJax.typesetPromise([finalEl]).catch(()=>{});
+    streamingEl = null; isStreaming=false;
+    streamedText = cleaned;
 }
+
 async function streamAI(context, user, {wantsLong,isProblem,signal,reqId}){
-  const msgsPayload=[
-    {role:"system",content:sysPrompt({wantsLong,isProblem})},
-    ...(context? [{role:"system",content:`ملاحظات مرجعية:\n${context}`}]: []),
-    {role:"user",content:user}
-  ];
-  const body={model:"deepseek-chat",messages:msgsPayload,temperature:isProblem?0.2:(wantsLong?0.25:0.15),top_p:0.95,max_tokens:1700,stream:true};
-  const res=await fetch(AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_KEY},body:JSON.stringify(body),signal});
-  if(!res.ok) throw new Error("HTTP "+res.status);
-  const reader=res.body.getReader(); const decoder=new TextDecoder("utf-8");
-  let buf="";
-  while(true){
-    const {value,done}=await reader.read(); if(done) break;
-    if(currentStream.id!==reqId) { try{reader.cancel();}catch{} return; }
-    buf+=decoder.decode(value,{stream:true});
-    const parts=buf.split("\n\n"); buf=parts.pop();
-    for(const part of parts){
-      const line=part.trim(); if(!line.startsWith("data:")) continue;
-      const payload=line.slice(5).trim(); if(payload==="[DONE]"){
+    try {
+        const messages = [
+            {
+                role: "system", 
+                content: sysPrompt({wantsLong, isProblem})
+            },
+            { role: "user", content: user }
+        ];
+
+        const body = {
+            model: "deepseek-chat",
+            messages: messages,
+            stream: true,
+            max_tokens: 2000
+        };
+
+        const res = await fetch(AI_ENDPOINT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${AI_KEY}`
+            },
+            body: JSON.stringify(body),
+            signal
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        const content = data.choices[0]?.delta?.content;
+                        if (content) {
+                            pushChunk(content, reqId);
+                        }
+                    } catch (e) {
+                        // تجاهل أخطاء الـ JSON
+                    }
+                }
+            }
+        }
+
         const finalText = cleanAI(streamedText);
         endStreaming(reqId);
         await appendMessageStore("bot", finalText, null, currentStream.chatId);
-        return;
-      }
-      try{ const obj=JSON.parse(payload); const delta=obj.choices?.[0]?.delta?.content||""; if(delta) pushChunk(delta,reqId); }catch{}
+
+    } catch (error) {
+        if (error.name !== "AbortError") {
+            throw error;
+        }
     }
-  }
 }
-async function callAIOnce(context, user, {wantsLong,isProblem}){
-  const msgs = [
-    {role:"system", content: sysPrompt({wantsLong,isProblem})},
-    ...(context? [{role:"system", content:`ملاحظات مرجعية:\n${context}`}]: []),
-    {role:"user", content: user}
-  ];
-  const res = await fetch(AI_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "Authorization":"Bearer "+AI_KEY },
-    body: JSON.stringify({ model:"deepseek-chat", messages: msgs, temperature:isProblem?0.2:(wantsLong?0.25:0.15), max_tokens:1700 })
-  });
-  if(!res.ok){ renderMsg(null,{role:"bot",text:`فشل طلب الذكاء (HTTP ${res.status}). جرّب لاحقًا.`}); return; }
-  const data = await res.json();
-  const out  = cleanAI(data?.choices?.[0]?.message?.content || "تعذّر الحصول على رد.");
-  renderMsg(null,{role:"bot",text:out});
-  await appendMessageStore("bot", out, null, currentChatId);
+
+// إضافة الدالة المفقودة callAIOnce
+async function callAIOnce(context, user, {wantsLong, isProblem}) {
+    try {
+        const messages = [
+            {
+                role: "system", 
+                content: sysPrompt({wantsLong, isProblem})
+            },
+            { role: "user", content: user }
+        ];
+
+        const body = {
+            model: "deepseek-chat",
+            messages: messages,
+            max_tokens: 2000
+        };
+
+        const res = await fetch(AI_ENDPOINT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${AI_KEY}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const responseText = data.choices[0]?.message?.content || "لا توجد إجابة";
+        
+        const cleaned = cleanAI(responseText);
+        renderMsg(null, {role: "bot", text: cleaned});
+        await appendMessageStore("bot", cleaned, null, currentChatId);
+        
+        return cleaned;
+    } catch (error) {
+        console.error('AI Error:', error);
+        const errorMsg = "عذرًا، حدث خطأ في الاتصال بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى.";
+        renderMsg(null, {role: "bot", text: errorMsg});
+        await appendMessageStore("bot", errorMsg, null, currentChatId);
+        throw error;
+    }
 }
 
 /* ===== احصاءات ===== */
 async function refreshUserStats(){
-  if(me?.email!==ADMIN_EMAIL){
-    $("#statTotal").textContent="—";
-    $("#statActiveNow").textContent="—";
-    $("#statUsersToday").textContent="—";
-    $("#statMsgsToday").textContent="—";
-    return alert("ليس لديك صلاحية.");
-  }
-  const now=new Date(); const startOfDay=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const usersSnap=await db.collection("users").get();
-  const totalUsers=usersSnap.size;
-  const fiveMinAgo=new Date(now.getTime()-5*60*1000);
-  let activeNow=0, usersToday=0;
-  usersSnap.forEach(d=>{
-    const u=d.data(); const la=u.lastActive?.toDate?u.lastActive.toDate():null;
-    if(la){ if(la>=fiveMinAgo) activeNow++; if(la>=startOfDay) usersToday++; }
-  });
-  let msgsToday=0;
-  const chatsSnap=await db.collection("chats").where("updatedAt",">=", firebase.firestore.Timestamp.fromDate(startOfDay)).get().catch(()=>({docs:[]}));
-  for(const ch of (chatsSnap.docs||[])){
-    const mSnap=await db.collection("chats").doc(ch.id).collection("messages").where("ts",">=", firebase.firestore.Timestamp.fromDate(startOfDay)).get().catch(()=>({size:0}));
-    msgsToday+=(mSnap.size||0);
-  }
-  $("#statTotal").textContent=totalUsers;
-  $("#statActiveNow").textContent=activeNow;
-  $("#statUsersToday").textContent=usersToday;
-  $("#statMsgsToday").textContent=msgsToday;
+    if(me?.email!==ADMIN_EMAIL){
+        $("#statTotal").textContent="—";
+        $("#statActiveNow").textContent="—";
+        $("#statUsersToday").textContent="—";
+        $("#statMsgsToday").textContent="—";
+        return alert("ليس لديك صلاحية.");
+    }
+    const now=new Date(); const startOfDay=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const usersSnap=await db.collection("users").get();
+    const totalUsers=usersSnap.size;
+    const fiveMinAgo=new Date(now.getTime()-5*60*1000);
+    let activeNow=0, usersToday=0;
+    usersSnap.forEach(d=>{
+        const u=d.data(); const la=u.lastActive?.toDate?u.lastActive.toDate():null;
+        if(la){ if(la>=fiveMinAgo) activeNow++; if(la>=startOfDay) usersToday++; }
+    });
+    let msgsToday=0;
+    const chatsSnap=await db.collection("chats").where("updatedAt",">=", firebase.firestore.Timestamp.fromDate(startOfDay)).get().catch(()=>({docs:[]}));
+    for(const ch of (chatsSnap.docs||[])){
+        const mSnap=await db.collection("chats").doc(ch.id).collection("messages").where("ts",">=", firebase.firestore.Timestamp.fromDate(startOfDay)).get().catch(()=>({size:0}));
+        msgsToday+=(mSnap.size||0);
+    }
+    $("#statTotal").textContent=totalUsers;
+    $("#statActiveNow").textContent=activeNow;
+    $("#statUsersToday").textContent=usersToday;
+    $("#statMsgsToday").textContent=msgsToday;
 }
 
 /* ===== صفحات ===== */
 function openPage(id){ const el=$(id); if(!el) return; el.style.display="block"; pageStack.push(id); }
 function goBack(){
-  if(pageStack.length<=1){ pageStack=[]; document.querySelectorAll(".page").forEach(p=>p.style.display="none"); return; }
-  const cur=pageStack.pop(); if(cur) $(cur).style.display="none"; const prev=pageStack[pageStack.length-1]; if(prev) $(prev).style.display="block";
+    if(pageStack.length<=1){ pageStack=[]; document.querySelectorAll(".page").forEach(p=>p.style.display="none"); return; }
+    const cur=pageStack.pop(); if(cur) $(cur).style.display="none"; const prev=pageStack[pageStack.length-1]; if(prev) $(prev).style.display="block";
 }
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",goBack));
 $("#adminBtn").onclick=()=>{ if(me?.email!==ADMIN_EMAIL){ alert("ليس لديك صلاحية."); return; } openPage("#pageHub"); };
@@ -1228,53 +1579,80 @@ $("#logout").onclick=()=>auth.signOut();
 
 /* ===== اشتراكات: إضافة + إلغاء ===== */
 $("#addDays").onclick=async ()=>{
-  if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
-  const email=($("#subEmail").value||"").trim();
-  const days=parseInt($("#subDays").value||"0",10);
-  if(!email || !days || days<=0) return alert("أدخل البريد وعدد الأيام (>0).");
-  const q=await db.collection("users").where("email","==",email).limit(1).get();
-  if(q.empty) return $("#subMsg").textContent="المستخدم غير موجود.";
-  const ref=q.docs[0].ref; const doc=await ref.get(); const d=doc.data();
-  const now=new Date();
-  
-  let curEnd = now;
-  if (d.subscribed && d.subscriptionEnd?.toDate) {
-    curEnd = d.subscriptionEnd.toDate();
-    if (curEnd < now) curEnd = now;
-  }
-  
-  const newEnd=new Date(curEnd.getTime() + days*24*60*60*1000);
-  
-  await ref.update({
-    subscribed: true,
-    subscriptionEnd: firebase.firestore.Timestamp.fromDate(newEnd),
-    blocked: false,
-    trialStart: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  
-  $("#subMsg").textContent=`تمت إضافة ${days} يوم. النهاية: ${newEnd.toLocaleDateString('ar-SA')}`;
-  $("#subEmail").value = "";
-  $("#subDays").value = "";
+    if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
+    const email=($("#subEmail").value||"").trim();
+    const days=parseInt($("#subDays").value||"0",10);
+    if(!email || !days || days<=0) return alert("أدخل البريد وعدد الأيام (>0).");
+    const q=await db.collection("users").where("email","==",email).limit(1).get();
+    if(q.empty) return $("#subMsg").textContent="المستخدم غير موجود.";
+    const ref=q.docs[0].ref; const doc=await ref.get(); const d=doc.data();
+    const now=new Date();
+    
+    let curEnd = now;
+    if (d.subscribed && d.subscriptionEnd?.toDate) {
+        curEnd = d.subscriptionEnd.toDate();
+        if (curEnd < now) curEnd = now;
+    }
+    
+    // إضافة الأيام بالضبط (الميلادي)
+    const newEnd=new Date(curEnd.getTime() + (days * 24 * 60 * 60 * 1000));
+    
+    await ref.update({
+        subscribed: true,
+        subscriptionEnd: firebase.firestore.Timestamp.fromDate(newEnd),
+        blocked: false
+    });
+    
+    $("#subMsg").textContent=`تمت إضافة ${days} يوم. النهاية: ${newEnd.toLocaleDateString('ar-SA')}`;
+    $("#subEmail").value = "";
+    $("#subDays").value = "";
 };
 
 $("#cancelSub").onclick=async ()=>{
-  if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
-  const email=($("#cancelEmail").value||"").trim();
-  if(!email) return alert("اكتب بريد المستخدم.");
-  const q=await db.collection("users").where("email","==",email).limit(1).get();
-  if(q.empty) return $("#cancelMsg").textContent="المستخدم غير موجود.";
-  const ref=q.docs[0].ref;
-  await ref.update({
-    subscribed: false,
-    subscriptionEnd: null,
-    blocked: true,
-    canceledAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  $("#cancelMsg").textContent="تم إلغاء الاشتراك فورًا. سيظهر للمستخدم Paywall حتى يعيد الاشتراك.";
-  $("#cancelEmail").value = "";
+    if(me?.email!==ADMIN_EMAIL) return alert("ليس لديك صلاحية.");
+    const email=($("#cancelEmail").value||"").trim();
+    if(!email) return alert("اكتب بريد المستخدم.");
+    const q=await db.collection("users").where("email","==",email).limit(1).get();
+    if(q.empty) return $("#cancelMsg").textContent="المستخدم غير موجود.";
+    const ref=q.docs[0].ref;
+    await ref.update({
+        subscribed: false,
+        subscriptionEnd: null,
+        blocked: true,
+        canceledAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    $("#cancelMsg").textContent="تم إلغاء الاشتراك فورًا. سيظهر للمستخدم Paywall حتى يعيد الاشتراك.";
+    $("#cancelEmail").value = "";
 };
 
+// إدارة الموارد
+function cleanup() {
+    if (unsubProfile) {
+        unsubProfile();
+        unsubProfile = null;
+    }
+    if (unSubMsgs) {
+        unSubMsgs();
+        unSubMsgs = null;
+    }
+    if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+    }
+    cancelCurrentStream();
+}
+
+window.addEventListener('beforeunload', cleanup);
 window.addEventListener("load",()=>{ applyTheme(); adjustMsgsPadding(); });
+
+// أضف هذا السطر في الآخر
+$("#themeToggleSidebar").onclick = () => {
+    THEME = THEME === "dark" ? "light" : "dark";
+    saveLocal("THEME", THEME);
+    applyTheme();
+    closeSidebar();
+};
+$(".theme-toggle").style.display = "none";
 </script>
 </body>
 </html>
