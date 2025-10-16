@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.deepseek.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
 <title>المساعد في السادس | Sixth Assistant</title>
 
 <!-- Firebase v9 (compat) -->
@@ -14,6 +15,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch{}</script>
 
+<link rel="manifest" href="manifest.json">
+	
 <!-- Tesseract.js -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -102,16 +105,16 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .topbar .left{display:flex;gap:8px;align-items:center}
 
 /* Intelligence Selector في الشريط العلوي */
-.intelligence-selector-top{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--stroke);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:600;margin:0 auto}
-.intelligence-option{display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 12px;border-radius:12px;transition:all 0.2s}
+.intelligence-selector{position:relative;display:flex;align-items:center;margin:0 auto}
+.intelligence-trigger{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--stroke);border-radius:20px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.intelligence-trigger:hover{background:var(--card)}
+.intelligence-dropdown{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;background:var(--panel);border:1px solid var(--stroke);border-radius:12px;padding:8px;min-width:120px;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:100;display:none}
+.intelligence-dropdown.show{display:block}
+.intelligence-option{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.intelligence-option:hover{background:var(--card)}
 .intelligence-option.active{background:var(--brand);color:#fff}
-.intelligence-option[disabled]{opacity:0.5;cursor:not-allowed}
-
-/* Intelligence Selector في الشريط الجانبي */
-.intelligence-selector-sidebar{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--stroke);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:600;margin-bottom:8px}
-.intelligence-option-sidebar{display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 12px;border-radius:12px;transition:all 0.2s;flex:1;justify-content:center}
-.intelligence-option-sidebar.active{background:var(--brand);color:#fff}
-.intelligence-option-sidebar[disabled]{opacity:0.5;cursor:not-allowed}
+.intelligence-option[disabled]{opacity:0.5;cursor:not-allowed;background:transparent}
+.intelligence-option[disabled]:hover{background:transparent}
 
 /* Messages */
 .msgs{overflow:auto;-webkit-overflow-scrolling:touch;min-height:0;background:#0a0c11;padding:16px;padding-bottom:88px}
@@ -138,10 +141,10 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .logoMark{width:84px;height:84px}
 
 /* Subscription Banner */
-.subscription-banner{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:white;padding:16px;border-radius:12px;margin:16px;text-align:center;border:1px solid #ff7675}
+.subscription-banner{background:linear-gradient(135deg,#4a6bff,#6d83ff);color:white;padding:16px;border-radius:12px;margin:16px;text-align:center;border:1px solid #5a7bff}
 .subscription-banner h3{margin:0 0 8px 0;font-size:18px}
 .subscription-banner p{margin:0 0 12px 0;font-size:14px;opacity:0.9}
-.subscription-banner .btn{background:white;color:#ee5a24;border:none;font-weight:700}
+.subscription-banner .btn{background:white;color:#4a6bff;border:none;font-weight:700}
 
 /* Math messages */
 .msg.math{direction:ltr;text-align:left;max-width:98%}
@@ -207,7 +210,6 @@ a{color:#9eb6ff}
   .sidebar.open{transform:translateX(0)}
   .subscription-plans{flex-direction:column}
   .plan-card{width:100%}
-  .intelligence-selector-top{display:none}
 }
 
 /* Theme Toggle */
@@ -286,7 +288,7 @@ a{color:#9eb6ff}
       <button class="btn" id="btnGoSignup">إنشاء حساب جديد 📝</button>
     </div>
 
-    <label class="tosRow"><input type="checkbox" id="tos"> <span>أوافق على الشروط والخصوصية</span></label>
+    <label class="tosRow"><input type="checkbox" id="tos"> <span>أوافق على <a href="#" id="privacyLink">سياسة الخصوصية</a></span></label>
     <div id="authError" style="color:var(--err);margin-top:6px;font-size:13px"></div>
   </div>
 </section>
@@ -342,6 +344,79 @@ a{color:#9eb6ff}
   </div>
 </div>
 
+<!-- Privacy Policy Page -->
+<div class="page" id="pagePrivacy">
+  <div class="head">
+    <h3 style="margin:0">سياسة الخصوصية</h3>
+    <button class="btn flat" data-back>رجوع</button>
+  </div>
+  <div class="block">
+    <div class="title">مقدمة</div>
+    <p>نحن في "المساعد في السادس" نحرص على حماية خصوصيتك وبياناتك الشخصية. هذه السياسة توضح كيفية جمع واستخدام وحماية معلوماتك.</p>
+    
+    <div class="title">البيانات التي نجمعها</div>
+    <p>• معلومات الحساب: البريد الإلكتروني فقط لأغراض المصادقة<br>
+    • بيانات المحادثات: المحادثات والملفات المرفوعة لأغراض التعليم فقط<br>
+    • بيانات الاستخدام: عدد المحادثات والرسائل لإدارة النظام</p>
+    
+    <div class="title">كيف نستخدم بياناتك</div>
+    <p>• تقديم خدمات المساعدة الدراسية<br>
+    • تحسين جودة الخدمة<br>
+    • التواصل معك عند الحاجة<br>
+    • الالتزام بالمتطلبات القانونية</p>
+    
+    <div class="title">حماية البيانات</div>
+    <p>• نستخدم تشفير البيانات أثناء النقل والتخزين<br>
+    • نلتزم بمعايير الأمان العالمية<br>
+    • لا نشارك بياناتك مع أطراف ثالثة</p>
+    
+    <div class="title">حقوقك</div>
+    <p>• الحق في الوصول لبياناتك<br>
+    • الحق في تصحيح البيانات<br>
+    • الحق في حذف حسابك وبياناتك<br>
+    • الحق في سحب الموافقة</p>
+    
+    <div class="title">اتصل بنا</div>
+    <p>لأي استفسارات حول الخصوصية، راسلنا على: <a href="mailto:privacy@sixth-assistant.com">privacy@sixth-assistant.com</a></p>
+  </div>
+</div>
+
+<!-- Delete Account Page -->
+<div class="page" id="pageDeleteAccount">
+  <div class="head">
+    <h3 style="margin:0">حذف الحساب والبيانات</h3>
+    <button class="btn flat" data-back>رجوع</button>
+  </div>
+  <div class="block">
+    <div class="title">⚠️ تحذير مهم</div>
+    <p>هذا الإجراء لا يمكن التراجع عنه. سيؤدي إلى:</p>
+    <ul style="color:var(--err);margin:10px 0;padding-right:20px">
+      <li>حذف جميع محادثاتك بشكل دائم</li>
+      <li>حذف جميع الملفات المرفوعة</li>
+      <li>حذف معلومات حسابك</li>
+      <li>فقدان جميع البيانات المرتبطة بحسابك</li>
+    </ul>
+    
+    <div style="margin:20px 0">
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input type="checkbox" id="confirmDelete1">
+        <span>أتفهم أن هذا الإجراء لا يمكن التراجع عنه</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input type="checkbox" id="confirmDelete2">
+        <span>أوافق على حذف جميع بياناتي بشكل دائم</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="confirmDelete3">
+        <span>أدرك أنني سأفقد الوصول إلى جميع محادثاتي</span>
+      </label>
+    </div>
+    
+    <button class="btn" id="deleteAccountBtn" style="background:var(--err);color:white;border:none" disabled>حذف الحساب والبيانات بشكل دائم</button>
+    <div id="deleteMsg" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <!-- App -->
 <section id="root">
   <div id="sideOverlay"></div>
@@ -355,14 +430,10 @@ a{color:#9eb6ff}
     <div class="side-foot">
       <div class="small" id="userEmail">—</div>
       
-      <!-- محدد مستوى الذكاء في الشريط الجانبي -->
-      <div class="intelligence-selector-sidebar" id="intelligenceSelectorSidebar">
-        <div class="intelligence-option-sidebar" data-level="50">50%</div>
-        <div class="intelligence-option-sidebar" data-level="100">100%</div>
-      </div>
-      
       <button class="btn" id="subscriptionBtn" title="الاشتراك المدفوع">💎 الاشتراك المدفوع</button>
       <button class="btn" id="themeToggleSidebar" title="تبديل السمة">ليلي</button>
+      <button class="btn" id="privacyBtn" title="سياسة الخصوصية">📄 سياسة الخصوصية</button>
+      <button class="btn" id="deleteAccountBtnSidebar" title="حذف الحساب" style="color:var(--err)">🗑️ حذف حسابي</button>
       <button class="btn" id="adminBtn" title="لوحة التحكم" style="display:none">👑 لوحة التحكم</button>
       <button class="btn" id="logout">🚪 تسجيل الخروج</button>
     </div>
@@ -375,9 +446,15 @@ a{color:#9eb6ff}
       </div>
       
       <!-- محدد مستوى الذكاء في الشريط العلوي (في الوسط) -->
-      <div class="intelligence-selector-top" id="intelligenceSelectorTop">
-        <div class="intelligence-option" data-level="50">50%</div>
-        <div class="intelligence-option" data-level="100">100%</div>
+      <div class="intelligence-selector" id="intelligenceSelector">
+        <div class="intelligence-trigger" id="intelligenceTrigger">
+          <span id="intelligenceDisplay">ذكاء 50%</span>
+          <span>▼</span>
+        </div>
+        <div class="intelligence-dropdown" id="intelligenceDropdown">
+          <div class="intelligence-option" data-level="50">ذكاء 50%</div>
+          <div class="intelligence-option" data-level="100">ذكاء 100%</div>
+        </div>
       </div>
       
       <div class="right"><button class="btn primary" id="startChatTop">+ محادثة جديدة</button></div>
@@ -455,7 +532,7 @@ a{color:#9eb6ff}
           <div class="feature">ذكاء 100% كامل</div>
           <div class="feature">دعم فوري</div>
         </div>
-        <button class="buy-btn" data-plan="5">شراء الآن</button>
+        <button class="buy-btn" data-plan="5">شراء من متجر التطبيقات</button>
       </div>
       
       <div class="plan-card featured">
@@ -468,7 +545,7 @@ a{color:#9eb6ff}
           <div class="feature">دعم فوري</div>
           <div class="feature">الأكثر شعبية</div>
         </div>
-        <button class="buy-btn" data-plan="10">شراء الآن</button>
+        <button class="buy-btn" data-plan="10">شراء من متجر التطبيقات</button>
       </div>
       
       <div class="plan-card">
@@ -480,7 +557,7 @@ a{color:#9eb6ff}
           <div class="feature">ذكاء 100% كامل</div>
           <div class="feature">دعم فوري</div>
         </div>
-        <button class="buy-btn" data-plan="15">شراء الآن</button>
+        <button class="buy-btn" data-plan="15">شراء من متجر التطبيقات</button>
       </div>
     </div>
   </div>
@@ -583,7 +660,7 @@ a{color:#9eb6ff}
       <div>📊 المستخدم: <span id="usedChats">0</span>/3 محادثات</div>
       <div>💬 الرسائل: <span id="usedMessages">0</span>/50 رسالة</div>
     </div>
-    <a class="tg" href="https://t.me/MSLM_ALMYALY" target="_blank">💎 اضغط للاشتراك</a>
+    <button class="btn primary" onclick="openPage('#pageSubscription')">💎 ترقية الآن</button>
     <div class="hr" style="height:1px;background:var(--stroke);margin:12px 0"></div>
     <button class="btn" id="closePaywall">حسنًا</button>
   </div>
@@ -600,7 +677,7 @@ const toast=(t)=>{const el=document.getElementById('toast');el.textContent=t;el.
 const ADMIN_EMAIL="mslmalmyaly223@gmail.com";
 const firebaseConfig={apiKey:"AIzaSyD915Zh1Gzl60Z9Y5SBlls1S4tedgzU6hE",authDomain:"student-market-5940e.firebaseapp.com",projectId:"student-market-5940e",storageBucket:"student-market-5940e.appspot.com"};
 const AI_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
-const AI_KEY = "sk-ff429bca45194b3c87dacda66d63bfb5";
+const AI_KEY = "sk-ff429bca45194b3c87dacda66d63bfb5"; // يجب نقل هذا للخادم في الإصدار النهائي
 
 let THEME=loadLocal("THEME","dark");
 let USER_INTELLIGENCE_LEVEL=loadLocal("USER_INTELLIGENCE_LEVEL",50);
@@ -615,59 +692,68 @@ function applyTheme(){
     } 
 }
 
+/* ===== نظام الذكاء المحسن ===== */
 function setupIntelligenceSelector() {
-    // إعداد محدد الذكاء في الشريط العلوي
-    const optionsTop = document.querySelectorAll('#intelligenceSelectorTop .intelligence-option');
-    optionsTop.forEach(option => {
-        const level = parseInt(option.dataset.level);
-        option.classList.toggle('active', level === USER_INTELLIGENCE_LEVEL);
-        
-        if (level === 100 && !canUseFullIntelligence()) {
-            option.setAttribute('disabled', 'true');
-            option.title = "يتطلب اشتراكًا مدفوعًا";
-        } else {
-            option.removeAttribute('disabled');
-            option.title = "";
-        }
-        
-        option.onclick = () => {
+    const trigger = $("#intelligenceTrigger");
+    const dropdown = $("#intelligenceDropdown");
+    const display = $("#intelligenceDisplay");
+    
+    // تحديث العرض الحالي
+    function updateDisplay() {
+        display.textContent = `ذكاء ${USER_INTELLIGENCE_LEVEL}%`;
+    }
+    
+    // تحديث الخيارات النشطة
+    function updateOptions() {
+        const options = dropdown.querySelectorAll('.intelligence-option');
+        options.forEach(option => {
+            const level = parseInt(option.dataset.level);
+            option.classList.toggle('active', level === USER_INTELLIGENCE_LEVEL);
+            
+            if (level === 100 && !canUseFullIntelligence()) {
+                option.setAttribute('disabled', 'true');
+                option.title = "يتطلب اشتراكًا مدفوعًا";
+            } else {
+                option.removeAttribute('disabled');
+                option.title = "";
+            }
+        });
+    }
+    
+    // النقر على الزناد
+    trigger.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    };
+    
+    // النقر على الخيارات
+    dropdown.querySelectorAll('.intelligence-option').forEach(option => {
+        option.onclick = (e) => {
+            e.stopPropagation();
+            const level = parseInt(option.dataset.level);
+            
             if (level === 100 && !canUseFullIntelligence()) {
                 toast("يتطلب اشتراكًا مدفوعًا لاستخدام الذكاء الكامل");
                 return;
             }
+            
             USER_INTELLIGENCE_LEVEL = level;
             saveLocal("USER_INTELLIGENCE_LEVEL", USER_INTELLIGENCE_LEVEL);
-            setupIntelligenceSelector();
+            updateDisplay();
+            updateOptions();
+            dropdown.classList.remove('show');
             toast(`تم تغيير مستوى الذكاء إلى ${level}%`);
         };
     });
-
-    // إعداد محدد الذكاء في الشريط الجانبي
-    const optionsSidebar = document.querySelectorAll('#intelligenceSelectorSidebar .intelligence-option-sidebar');
-    optionsSidebar.forEach(option => {
-        const level = parseInt(option.dataset.level);
-        option.classList.toggle('active', level === USER_INTELLIGENCE_LEVEL);
-        
-        if (level === 100 && !canUseFullIntelligence()) {
-            option.setAttribute('disabled', 'true');
-            option.title = "يتطلب اشتراكًا مدفوعًا";
-        } else {
-            option.removeAttribute('disabled');
-            option.title = "";
-        }
-        
-        option.onclick = () => {
-            if (level === 100 && !canUseFullIntelligence()) {
-                toast("يتطلب اشتراكًا مدفوعًا لاستخدام الذكاء الكامل");
-                return;
-            }
-            USER_INTELLIGENCE_LEVEL = level;
-            saveLocal("USER_INTELLIGENCE_LEVEL", USER_INTELLIGENCE_LEVEL);
-            setupIntelligenceSelector();
-            toast(`تم تغيير مستوى الذكاء إلى ${level}%`);
-            closeSidebar();
-        };
+    
+    // إغلاق القائمة عند النقر خارجها
+    document.addEventListener('click', () => {
+        dropdown.classList.remove('show');
     });
+    
+    // التهيئة الأولية
+    updateDisplay();
+    updateOptions();
 }
 
 function canUseFullIntelligence() {
@@ -903,6 +989,100 @@ function showPaywall() {
 
 $("#closePaywall").onclick=()=>$("#paywall").style.display="none";
 
+/* ===== سياسة الخصوصية وحذف الحساب ===== */
+$("#privacyLink").onclick = (e) => {
+    e.preventDefault();
+    openPage("#pagePrivacy");
+};
+
+$("#privacyBtn").onclick = () => {
+    openPage("#pagePrivacy");
+    closeSidebar();
+};
+
+$("#deleteAccountBtnSidebar").onclick = () => {
+    openPage("#pageDeleteAccount");
+    closeSidebar();
+};
+
+// إدارة حذف الحساب
+function setupDeleteAccount() {
+    const checkboxes = [
+        $("#confirmDelete1"),
+        $("#confirmDelete2"), 
+        $("#confirmDelete3")
+    ];
+    
+    const deleteBtn = $("#deleteAccountBtn");
+    
+    function updateDeleteButton() {
+        const allChecked = checkboxes.every(cb => cb.checked);
+        deleteBtn.disabled = !allChecked;
+    }
+    
+    checkboxes.forEach(cb => {
+        cb.onchange = updateDeleteButton;
+    });
+    
+    deleteBtn.onclick = async () => {
+        if (!deleteBtn.disabled) {
+            if (confirm("⚠️ هل أنت متأكد من حذف حسابك وبياناتك بشكل دائم؟ هذا الإجراء لا يمكن التراجع عنه!")) {
+                await deleteUserAccount();
+            }
+        }
+    };
+}
+
+async function deleteUserAccount() {
+    const deleteBtn = $("#deleteAccountBtn");
+    const deleteMsg = $("#deleteMsg");
+    
+    try {
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = "جاري حذف البيانات...";
+        deleteMsg.textContent = "جاري حذف حسابك وبياناتك...";
+        deleteMsg.style.color = "var(--muted)";
+        
+        // 1. حذف جميع المحادثات والرسائل
+        const chatsSnap = await db.collection("chats").where("uid", "==", me.uid).get();
+        const deletePromises = [];
+        
+        for (const chatDoc of chatsSnap.docs) {
+            // حذف جميع رسائل المحادثة
+            const messagesSnap = await chatDoc.ref.collection("messages").get();
+            messagesSnap.forEach(msgDoc => {
+                deletePromises.push(msgDoc.ref.delete());
+            });
+            // حذف المحادثة نفسها
+            deletePromises.push(chatDoc.ref.delete());
+        }
+        
+        // 2. حذف بيانات المستخدم
+        deletePromises.push(db.collection("users").doc(me.uid).delete());
+        
+        // تنفيذ جميع عمليات الحذف
+        await Promise.all(deletePromises);
+        
+        // 3. حذف الحساب من Authentication
+        await me.delete();
+        
+        deleteMsg.textContent = "✅ تم حذف حسابك وبياناتك بنجاح";
+        deleteMsg.style.color = "var(--ok)";
+        
+        toast("تم حذف حسابك وبياناتك بنجاح");
+        setTimeout(() => {
+            auth.signOut();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        deleteMsg.textContent = "❌ حدث خطأ أثناء حذف الحساب: " + error.message;
+        deleteMsg.style.color = "var(--err)";
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "حذف الحساب والبيانات بشكل دائم";
+    }
+}
+
 /* ===== إصلاح كامل لتسجيل الدخول بـ Google ===== */
 function mustAcceptTOS(){ return $("#tos").checked; }
 function showErr(t){ $("#authError").textContent=t; setTimeout(()=>$("#authError").textContent="",5000); }
@@ -1038,6 +1218,7 @@ function fastAfterAuth(note){
     try{
         applyTheme(); adjustMsgsPadding(); showApp();
         setupIntelligenceSelector();
+        setupDeleteAccount();
         if(note) toast(note);
         if(!initStarted){ 
             initStarted=true; 
@@ -1761,6 +1942,8 @@ function sysPrompt({wantsLong,isProblem}){
     let prompt = [
         "أنت مساعد دراسي ذكي جدًا متخصص في منهج السادس العلمي.",
         "يجب أن تكون إجاباتك دقيقة ومفصلة ومناسبة لجميع المستويات.",
+        "ركز فقط على المواد الدراسية ولا تتحدث عن مواضيع أخرى.",
+        "التزم بالمنهج الدراسي ولا تخرج عنه.",
         wantsLong ? "اكتب شرحًا تفصيليًا مع خطوات مرقمة وعناوين فرعية." : "أجب بوضوح وإيجاز مع الحفاظ على الدقة العلمية.",
         "استخدم الرموز الرياضية والكيميائية والفيزيائية بشكل صحيح باستخدام LaTeX: $$ .. $$ أو \\( .. \\)",
         "**الرموز الرياضية**: \\(\\alpha, \\beta, \\gamma, \\delta, \\Delta, \\pi, \\theta, \\lambda, \\mu, \\sigma, \\sum, \\prod, \\int, \\sqrt{}, \\frac{}{}, \\binom{}{}, \\times, \\div, \\pm, \\mp, \\leq, \\geq, \\neq, \\approx, \\equiv, \\propto, \\rightarrow, \\leftrightarrow, \\in, \\subset, \\cup, \\cap, \\forall, \\exists, \\therefore, \\because, \\angle, \\parallel, \\perp, \\circ, \\degree\\)",
@@ -1976,12 +2159,13 @@ function goBack(){
 }
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",goBack));
 
-// أزرار الاشتراك
+// أزرار الاشتراك - تم إزالة روابط Telegram الخارجية
 $("#subscriptionBtn").onclick = () => openPage("#pageSubscription");
 document.querySelectorAll(".buy-btn").forEach(btn => {
     btn.onclick = () => {
         const plan = btn.dataset.plan;
-        window.open("https://t.me/MSLM_ALMYALY", "_blank");
+        toast("سيتم دمج نظام الدفع مع متجر التطبيقات قريبًا");
+        // هنا سيتم دمج نظام الدفع مع Google Play Billing
     };
 });
 
