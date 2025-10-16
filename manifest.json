@@ -6,7 +6,7 @@
   "description": "تطبيق تعليمي ذكي لطلبة السادس الإعدادي",
   "start_url": "/mslm2/",
   "scope": "/mslm2/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#000000",
