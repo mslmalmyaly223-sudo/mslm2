@@ -2246,6 +2246,13 @@ function cleanup() {
 
 window.addEventListener('beforeunload', cleanup);
 window.addEventListener("load",()=>{ applyTheme(); adjustMsgsPadding(); });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/mslm2/sw.js')
+    .then(function(registration) {
+      console.log('SW registered');
+    });
+}
 </script>
 </body>
 </html>
