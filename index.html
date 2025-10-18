@@ -29,7 +29,7 @@
 <style>
 :root{--bg:#0c0d10;--panel:#13151a;--card:#0f1116;--stroke:#242833;--text:#e9ecf1;--muted:#9aa4b2;--brand:#4a6bff;--ok:#2ecc71;--err:#e74c3c;--user-dark:#2e333d;--bot-dark:#0f1320;--user-light:#3b57ff;--bot-light:#ffffff}
 :root.light{--bg:#f6f7fb;--panel:#ffffff;--card:#ffffff;--stroke:#dbe1ea;--text:#0b1220;--muted:#5b6473;--brand:#3b57ff;--ok:#1f9d5a;--err:#cf3434}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Tajawal",sans-serif;overflow:hidden}
 .hidden{display:none}
@@ -133,6 +133,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
     white-space: pre-wrap;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,"Tajawal",sans-serif;
     font-size: 14px;
+    position: relative;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .msg.user{margin-right:auto;background:var(--user-dark);color:#e9ecf1}
 .msg.bot{margin-left:auto;background:var(--bot-dark);border-color:#283047}
@@ -161,12 +164,68 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .send,.attach{width:52px;min-width:52px;border-radius:50%;border:1px solid var(--stroke)}
 .send{background:var(--brand);color:#fff;font-weight:900}
 .attach{background:#1d2330;color:#fff;font-size:22px;font-weight:900;line-height:48px}
-.attach-chip{display:flex;align-items:center;gap:10px;background:#161b26;border:1px solid var(--stroke);border-radius:14px;padding:8px 10px;max-width:65%}
+
+/* تحسينات جديدة لرفع الصور */
+.attachment-container{position:relative;margin-bottom:8px}
+.attachment-preview{position:relative;display:inline-block}
+.attachment-preview img{max-width:200px;border-radius:12px;border:1px solid var(--stroke)}
+.attach-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #161b26;
+    border: 1px solid var(--stroke);
+    border-radius: 14px;
+    padding: 8px 12px;
+    max-width: 65%;
+}
+
 .attach-chip .thumb{width:28px;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--stroke)}
 .attach-chip .thumb img{width:100%;height:100%;object-fit:cover}
 .attach-chip .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.attach-chip .status {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-inline-start: auto;
+    text-align: left;
+}
+
+.attach-chip .size {
+    font-size: 11px;
+    color: var(--muted);
+}
+
 .attach-chip .x{margin-inline-start:auto;cursor:pointer;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--stroke)}
 .attach-wrap{position:absolute;bottom:70px;right:14px}
+
+.attachment-status.analyzing {
+    background: #f39c12;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.attachment-status.processing {
+    background: #3498db;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.attachment-status.ready {
+    background: #27ae60;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+/* زر النسخ */
+.copy-btn{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;opacity:0;transition:opacity 0.2s}
+.msg:hover .copy-btn{opacity:1}
 
 /* Pages */
 .page{position:fixed;inset:0;background:var(--panel);display:none;z-index:40;padding:14px;border:1px solid var(--stroke);overflow:auto}
@@ -191,13 +250,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .cardStat .name{font-weight:800;font-size:14px;color:var(--muted);margin-bottom:8px}
 .cardStat .num{font-weight:900;font-size:26px}
 
-/* AUTH (Home with 3 buttons) */
+/* AUTH (Home with 2 buttons) */
 .auth{display:none;align-items:center;justify-content:center;position:fixed;inset:0}
-.authCard{width:92%;max-width:520px;background:var(--panel);border:1px solid var(--stroke);border-radius:16px;padding:16px;text-align:center}
-.authBtns{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.logoRow{display:flex;flex-direction:column;align-items:center;gap:8px}
-.brandName{font-weight:900;font-size:22px}
-.tosRow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:6px;justify-content:center}
+.authCard{width:92%;max-width:420px;background:var(--panel);border:1px solid var(--stroke);border-radius:16px;padding:20px;text-align:center}
+.authBtns{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.logoRow{display:flex;flex-direction:column;align-items:center;gap:12px}
+.brandName{font-weight:900;font-size:24px;background:linear-gradient(135deg,#4a6bff,#6d83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tosRow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:8px;justify-content:center}
 
 /* Paywall */
 .paywall{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:60}
@@ -283,12 +342,12 @@ a{color:#9eb6ff}
         <path d="M42 94h44" stroke="#9fb3ff" stroke-width="3" stroke-linecap="round"/>
       </svg>
       <div class="brandName">المساعد في السادس</div>
+      <div style="color:var(--muted);font-size:14px;margin-top:-8px">Sixth Assistant</div>
     </div>
 
     <div class="authBtns">
-      <button class="btn" id="btnGoGoogle">المتابعة باستخدام Google 🌐</button>
-      <button class="btn" id="btnGoPw">تسجيل الدخول 🔐</button>
-      <button class="btn" id="btnGoSignup">إنشاء حساب جديد 📝</button>
+      <button class="btn primary" id="btnGoSignup">📝 إنشاء حساب جديد</button>
+      <button class="btn" id="btnGoPw">🔐 تسجيل الدخول</button>
     </div>
 
     <label class="tosRow"><input type="checkbox" id="tos"> <span>أوافق على <a href="#" id="privacyLink">سياسة الخصوصية</a></span></label>
@@ -296,27 +355,10 @@ a{color:#9eb6ff}
   </div>
 </section>
 
-<!-- Google page -->
-<div class="page" id="pageGoogle">
-  <div class="head">
-    <h3 style="margin:0">تسجيل الدخول باستخدام Google</h3>
-    <button class="btn flat" data-back>رجوع</button>
-  </div>
-  <div class="block">
-    <div class="title">اختر حسابًا من جهازك</div>
-    <p style="color:var(--muted)">سيُفتح مُنتقي حسابات Google.</p>
-    <button class="btn primary" id="googleBtn">
-      <span id="gTxt">فتح مُنتقي حسابات Google</span>
-      <span id="gSpin" class="hidden">… جارٍ الفتح</span>
-    </button>
-    <div id="gErr" style="color:var(--err);margin-top:8px;font-size:13px"></div>
-  </div>
-</div>
-
 <!-- Password Login -->
 <div class="page" id="pageLoginPw">
   <div class="head">
-    <h3 style="margin:0">تسجيل الدخول باستخدام كلمة المرور</h3>
+    <h3 style="margin:0">🔐 تسجيل الدخول</h3>
     <button class="btn flat" data-back>رجوع</button>
   </div>
   <div class="block">
@@ -332,7 +374,7 @@ a{color:#9eb6ff}
 <!-- Signup -->
 <div class="page" id="pageSignup">
   <div class="head">
-    <h3 style="margin:0">إنشاء حساب</h3>
+    <h3 style="margin:0">📝 إنشاء حساب جديد</h3>
     <button class="btn flat" data-back>رجوع</button>
   </div>
   <div class="block">
@@ -435,10 +477,11 @@ a{color:#9eb6ff}
       
       <button class="btn" id="subscriptionBtn" title="الاشتراك المدفوع">💎 الاشتراك المدفوع</button>
       <button class="btn" id="themeToggleSidebar" title="تبديل السمة">ليلي</button>
-      <button class="btn" id="privacyBtn" title="سياسة الخصوصية">📄 سياسة الخصوصية</button>
-      <button class="btn" id="deleteAccountBtnSidebar" title="حذف الحساب" style="color:var(--err)">🗑️ حذف حسابي</button>
+      
+      <!-- زر الإعدادات الجديد -->
+      <button class="btn" id="settingsBtn" title="الإعدادات">⚙️ الإعدادات</button>
+      
       <button class="btn" id="adminBtn" title="لوحة التحكم" style="display:none">👑 لوحة التحكم</button>
-      <button class="btn" id="logout">🚪 تسجيل الخروج</button>
     </div>
   </aside>
 
@@ -474,6 +517,23 @@ a{color:#9eb6ff}
     </div>
   </main>
 </section>
+
+<!-- صفحة الإعدادات الجديدة -->
+<div class="page" id="pageSettings">
+  <div class="head">
+    <h3 style="margin:0">⚙️ الإعدادات</h3>
+    <button class="btn flat" data-back>رجوع</button>
+  </div>
+  
+  <div class="block">
+    <div class="title">إعدادات الحساب</div>
+    <div class="small" style="margin-bottom:12px" id="settingsUserEmail">—</div>
+    
+    <button class="btn" id="privacyBtn" style="width:100%;margin-bottom:8px">📄 سياسة الخصوصية</button>
+    <button class="btn" id="deleteAccountBtnSettings" style="width:100%;margin-bottom:8px;color:var(--err)">🗑️ حذف حسابي</button>
+    <button class="btn" id="logoutBtn" style="width:100%;color:var(--err)">🚪 تسجيل الخروج</button>
+  </div>
+</div>
 
 <!-- Subscription Plans Page -->
 <div class="page" id="pageSubscription">
@@ -680,7 +740,7 @@ const toast=(t)=>{const el=document.getElementById('toast');el.textContent=t;el.
 const ADMIN_EMAIL="mslmalmyaly223@gmail.com";
 const firebaseConfig={apiKey:"AIzaSyD915Zh1Gzl60Z9Y5SBlls1S4tedgzU6hE",authDomain:"student-market-5940e.firebaseapp.com",projectId:"student-market-5940e",storageBucket:"student-market-5940e.appspot.com"};
 const AI_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
-const AI_KEY = "sk-ff429bca45194b3c87dacda66d63bfb5"; // يجب نقل هذا للخادم في الإصدار النهائي
+const AI_KEY = "sk-ff429bca45194b3c87dacda66d63bfb5";
 
 let THEME=loadLocal("THEME","dark");
 let USER_INTELLIGENCE_LEVEL=loadLocal("USER_INTELLIGENCE_LEVEL",50);
@@ -701,12 +761,10 @@ function setupIntelligenceSelector() {
     const dropdown = $("#intelligenceDropdown");
     const display = $("#intelligenceDisplay");
     
-    // تحديث العرض الحالي
     function updateDisplay() {
         display.textContent = `ذكاء ${USER_INTELLIGENCE_LEVEL}%`;
     }
     
-    // تحديث الخيارات النشطة
     function updateOptions() {
         const options = dropdown.querySelectorAll('.intelligence-option');
         options.forEach(option => {
@@ -723,13 +781,11 @@ function setupIntelligenceSelector() {
         });
     }
     
-    // النقر على الزناد
     trigger.onclick = (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('show');
     };
     
-    // النقر على الخيارات
     dropdown.querySelectorAll('.intelligence-option').forEach(option => {
         option.onclick = (e) => {
             e.stopPropagation();
@@ -749,12 +805,10 @@ function setupIntelligenceSelector() {
         };
     });
     
-    // إغلاق القائمة عند النقر خارجها
     document.addEventListener('click', () => {
         dropdown.classList.remove('show');
     });
     
-    // التهيئة الأولية
     updateDisplay();
     updateOptions();
 }
@@ -813,7 +867,6 @@ function simulateBootProgress() {
         
         progressBar.style.width = progress + "%";
         
-        // تغيير النص بناءً على التقدم
         if (progress < 30) {
             bootText.textContent = messages[0];
         } else if (progress < 60) {
@@ -915,14 +968,12 @@ function watchUserProfileCountdown(){
 
 async function loadUserUsage() {
     try {
-        // حساب عدد المحادثات
         const chatsSnap = await db.collection("chats")
             .where("uid", "==", me.uid)
             .get();
         
         userUsage.chatCount = chatsSnap.size;
         
-        // حساب عدد الرسائل في المحادثة الحالية
         if (currentChatId) {
             const messagesSnap = await db.collection("chats")
                 .doc(currentChatId)
@@ -949,14 +1000,12 @@ function renderUsageBadge(){
             return;
         }
 
-        // التحقق من حدود الاستخدام
         const canCreateMoreChats = userUsage.chatCount < userUsage.maxChats;
         const canSendMoreMessages = userUsage.messageCount < userUsage.maxMessagesPerChat;
         
         canChat = p.subscribed === true || (canCreateMoreChats && canSendMoreMessages);
         
         if (p.subscribed) {
-            // مستخدم مدفوع
             const subEnd = p.subscriptionEnd?.toDate ? p.subscriptionEnd.toDate() : null;
             if (subEnd) {
                 const now = new Date();
@@ -972,7 +1021,6 @@ function renderUsageBadge(){
                 $("#subBadge").textContent = "مشترك 💎";
             }
         } else {
-            // مستخدم مجاني
             const remainingChats = userUsage.maxChats - userUsage.chatCount;
             const remainingMessages = userUsage.maxMessagesPerChat - userUsage.messageCount;
             
@@ -992,23 +1040,35 @@ function showPaywall() {
 
 $("#closePaywall").onclick=()=>$("#paywall").style.display="none";
 
-/* ===== سياسة الخصوصية وحذف الحساب ===== */
-$("#privacyLink").onclick = (e) => {
-    e.preventDefault();
-    openPage("#pagePrivacy");
+/* ===== زر الإعدادات الجديد ===== */
+$("#settingsBtn").onclick = () => {
+    openPage("#pageSettings");
+    closeSidebar();
 };
 
+// تحديث البريد الإلكتروني في صفحة الإعدادات
+function updateSettingsEmail() {
+    if (me && me.email) {
+        $("#settingsUserEmail").textContent = me.email;
+    }
+}
+
+// إعداد أزرار صفحة الإعدادات
 $("#privacyBtn").onclick = () => {
     openPage("#pagePrivacy");
-    closeSidebar();
 };
 
-$("#deleteAccountBtnSidebar").onclick = () => {
+$("#deleteAccountBtnSettings").onclick = () => {
     openPage("#pageDeleteAccount");
-    closeSidebar();
 };
 
-// إدارة حذف الحساب
+$("#logoutBtn").onclick = () => {
+    if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+        auth.signOut();
+    }
+};
+
+/* ===== إدارة حذف الحساب ===== */
 function setupDeleteAccount() {
     const checkboxes = [
         $("#confirmDelete1"),
@@ -1046,27 +1106,21 @@ async function deleteUserAccount() {
         deleteMsg.textContent = "جاري حذف حسابك وبياناتك...";
         deleteMsg.style.color = "var(--muted)";
         
-        // 1. حذف جميع المحادثات والرسائل
         const chatsSnap = await db.collection("chats").where("uid", "==", me.uid).get();
         const deletePromises = [];
         
         for (const chatDoc of chatsSnap.docs) {
-            // حذف جميع رسائل المحادثة
             const messagesSnap = await chatDoc.ref.collection("messages").get();
             messagesSnap.forEach(msgDoc => {
                 deletePromises.push(msgDoc.ref.delete());
             });
-            // حذف المحادثة نفسها
             deletePromises.push(chatDoc.ref.delete());
         }
         
-        // 2. حذف بيانات المستخدم
         deletePromises.push(db.collection("users").doc(me.uid).delete());
         
-        // تنفيذ جميع عمليات الحذف
         await Promise.all(deletePromises);
         
-        // 3. حذف الحساب من Authentication
         await me.delete();
         
         deleteMsg.textContent = "✅ تم حذف حسابك وبياناتك بنجاح";
@@ -1086,77 +1140,66 @@ async function deleteUserAccount() {
     }
 }
 
-/* ===== إصلاح كامل لتسجيل الدخول بـ Google ===== */
-function mustAcceptTOS(){ return $("#tos").checked; }
-function showErr(t){ $("#authError").textContent=t; setTimeout(()=>$("#authError").textContent="",5000); }
-$("#btnGoGoogle").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageGoogle"); };
-$("#btnGoPw").onclick   =()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageLoginPw"); };
-$("#btnGoSignup").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageSignup"); };
-
-$("#googleBtn").onclick=async ()=>{
-    const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
-    btn.disabled=true; t.classList.add("hidden"); s.classList.remove("hidden");
-    
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
+/* ===== نظام الدفع المباشر مع متجر التطبيقات ===== */
+document.querySelectorAll(".buy-btn").forEach(btn => {
+    btn.onclick = async () => {
+        const plan = btn.dataset.plan;
+        const planPrices = {
+            "5": { price: "$5", days: 10 },
+            "10": { price: "$10", days: 20 }, 
+            "15": { price: "$15", days: 30 }
+        };
         
-        provider.setCustomParameters({
-            prompt: 'select_account',
-            display: 'popup'
-        });
-
-        const isWebView = /Telegram|Twitter|Facebook|Line|KAKAOTALK|Instagram|Snapchat|WebView|FBAN|FBAV/i.test(navigator.userAgent);
+        const selectedPlan = planPrices[plan];
         
-        if (isWebView) {
-            await auth.signInWithRedirect(provider);
-            return;
-        } else {
-            try {
-                await auth.signInWithPopup(provider);
-            } catch (popupErr) {
-                console.log('Popup failed, trying redirect:', popupErr);
-                await auth.signInWithRedirect(provider);
-                return;
+        try {
+            if (window.Android && window.Android.purchaseSubscription) {
+                window.Android.purchaseSubscription(plan, selectedPlan.price, selectedPlan.days);
+            } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.purchaseSubscription) {
+                window.webkit.messageHandlers.purchaseSubscription.postMessage({
+                    plan: plan,
+                    price: selectedPlan.price,
+                    days: selectedPlan.days
+                });
+            } else {
+                const playStoreUrl = `https://play.google.com/store/apps/details?id=com.your.app&referrer=subscription_plan_${plan}`;
+                window.open(playStoreUrl, '_blank');
             }
+            
+            toast(`جاري فتح متجر التطبيقات للاشتراك ${selectedPlan.price}`);
+            
+        } catch (error) {
+            console.error('خطأ في فتح متجر التطبيقات:', error);
+            toast('خطأ في فتح متجر التطبيقات');
         }
-        
-    } catch (error) {
-        console.error('Google Auth Error:', error);
-        let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
-        
-        if (error.code === 'auth/unauthorized-domain') {
-            errorMessage = "النطاق غير مصرح به. يرجى فتح التطبيق في متصفح عادي.";
-        } else if (error.code === 'auth/popup-blocked') {
-            errorMessage = "تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.";
-        } else if (error.code === 'auth/popup-closed-by-user') {
-            errorMessage = "تم إغلاق نافذة التسجيل. يرجى المحاولة مرة أخرى.";
-        } else if (error.code === 'auth/network-request-failed') {
-            errorMessage = "خطأ في الشبكة. يرجى التحقق من اتصال الإنترنت.";
-        } else {
-            errorMessage = error.message || "تعذر تسجيل الدخول باستخدام Google";
-        }
-        
-        $("#gErr").textContent = errorMessage;
-        btn.disabled = false;
-        t.classList.remove("hidden");
-        s.classList.add("hidden");
+    };
+});
+
+// إضافة دالة لمعالجة نتيجة الشراء
+window.handlePurchaseResult = function(success, planId) {
+    if (success) {
+        toast('✅ تم تفعيل الاشتراك بنجاح!');
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+    } else {
+        toast('❌ فشلت عملية الشراء');
     }
 };
 
-// معالجة نتيجة Redirect
-auth.getRedirectResult().then((result) => {
-    if (result.user) {
-        console.log('Redirect login successful:', result.user.email);
-        fastAfterAuth("تم تسجيل الدخول بنجاح!");
-    }
-}).catch((error) => {
-    console.log('Redirect result error:', error);
-    if (error.code !== 'auth/unknown') {
-        $("#gErr").textContent = "فشل تسجيل الدخول: " + (error.message || "خطأ غير معروف");
-    }
-});
+/* ===== نظام تسجيل الدخول المحسن (بدون Google) ===== */
+function mustAcceptTOS(){ return $("#tos").checked; }
+function showErr(t){ $("#authError").textContent=t; setTimeout(()=>$("#authError").textContent="",5000); }
+
+// تحديث أزرار التسجيل
+$("#btnGoPw").onclick   =()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageLoginPw"); };
+$("#btnGoSignup").onclick=()=>{ if(!mustAcceptTOS()) return showErr("وافق على الشروط أولاً."); openPage("#pageSignup"); };
+
+// إضافة رابط سياسة الخصوصية
+$("#privacyLink").onclick = (e) => {
+    e.preventDefault();
+    openPage("#pagePrivacy");
+};
 
 /* Password Login */
 $("#loginBtn").onclick=async ()=>{
@@ -1200,12 +1243,10 @@ let initStarted=false, unsubProfile=null, unSubMsgs=null;
 let CHAT_CACHE = loadLocal("CHAT_CACHE", []);
 
 auth.onAuthStateChanged(async (u)=>{
-    const btn=$("#googleBtn"), t=$("#gTxt"), s=$("#gSpin");
-    if(btn){ btn.disabled=false; t?.classList.remove("hidden"); s?.classList.add("hidden"); }
-
     if(u){
         me=u;
         $("#userEmail").textContent=u.email||"";
+        $("#settingsUserEmail").textContent=u.email||"";
         $("#adminBtn").style.display=(me?.email===ADMIN_EMAIL)?"block":"none";
         
         document.querySelectorAll(".page").forEach(p=>p.style.display="none");
@@ -1222,6 +1263,7 @@ function fastAfterAuth(note){
         applyTheme(); adjustMsgsPadding(); showApp();
         setupIntelligenceSelector();
         setupDeleteAccount();
+        updateSettingsEmail();
         if(note) toast(note);
         if(!initStarted){ 
             initStarted=true; 
@@ -1232,34 +1274,53 @@ function fastAfterAuth(note){
 
 async function initApp(){
     try{
+        console.log('بدء تهيئة التطبيق...');
         await ensureUserDoc();
+        console.log('تم إنشاء مستند المستخدم');
+        
         unsubProfile = watchUserProfileCountdown();
+        console.log('تم ربط ملف المستخدم');
+        
         bindChatList();
+        console.log('تم ربط قائمة المحادثات');
+        
+        // تحميل المعرفة في الخلفية
         setTimeout(() => loadKnowledgeFromDB().catch(()=>{}), 500);
-        // إنشاء محادثة جديدة تلقائياً عند بدء التطبيق
+        
+        // إنشاء محادثة جديدة تلقائياً
         await newChat();
-    }catch(e){console.error('initApp error:', e)}
+        console.log('تم إنشاء محادثة جديدة');
+        
+    }catch(e){
+        console.error('خطأ في initApp:', e);
+        toast('حدث خطأ في تهيئة التطبيق');
+    }
 }
 
 /* إنشاء/تحديث مستند المستخدم */
 async function ensureUserDoc(){
-    const ref=db.collection("users").doc(me.uid);
-    const userDoc = await ref.get();
-    
-    if (!userDoc.exists) {
-        await ref.set({
-            email: me.email||null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            trialStart: firebase.firestore.FieldValue.serverTimestamp(),
-            subscribed: false,
-            subscriptionEnd: null,
-            blocked: false,
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    } else {
-        await ref.update({
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        });
+    try {
+        const ref=db.collection("users").doc(me.uid);
+        const userDoc = await ref.get();
+        
+        if (!userDoc.exists) {
+            await ref.set({
+                email: me.email||null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                trialStart: firebase.firestore.FieldValue.serverTimestamp(),
+                subscribed: false,
+                subscriptionEnd: null,
+                blocked: false,
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } else {
+            await ref.update({
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.error('Error in ensureUserDoc:', error);
+        throw error;
     }
 }
 
@@ -1338,68 +1399,35 @@ function setActiveChatItem(id){
     document.querySelectorAll("#chatList .item").forEach(x=>x.classList.toggle("active", x.dataset.id===id));
 }
 
-async function ensureFirstChat(){
-    const existing = await db.collection("chats").where("uid","==",me.uid).limit(1).get();
-    if(!existing.empty){
-        currentChatId = existing.docs[0].id;
-        loadChat(currentChatId);
-    }else{
-        await newChat();
-    }
-}
-
-// تحديث تلقائي لأسماء المحادثات
-async function updateChatTitle(chatId, firstMessage) {
-    if (!firstMessage || firstMessage.length < 3) return;
-    
-    const title = firstMessage.length > 30 ? firstMessage.substring(0, 30) + '...' : firstMessage;
-    
+async function newChat(){
     try {
-        await db.collection("chats").doc(chatId).update({
-            title: title,
+        cancelCurrentStream();
+        currentChatHistory = [];
+        
+        const ref=await db.collection("chats").add({
+            uid:me.uid, 
+            title:"محادثة جديدة",
             clientUpdated: Date.now(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        currentChatId=ref.id;
+        insertChatRowDom(ref.id, "محادثة جديدة");
+        const arr=[{id:ref.id, title:"محادثة جديدة"}, ...CHAT_CACHE.filter(x=>x.id!==ref.id)];
+        cacheSet(arr);
+        setActiveChatItem(ref.id);
+        loadChat(ref.id);
         
-        // تحديث الكاش المحلي
-        const updatedCache = CHAT_CACHE.map(chat => 
-            chat.id === chatId ? {...chat, title} : chat
-        );
-        cacheSet(updatedCache);
+        // تحديث إحصائيات المحادثات
+        userUsage.chatCount++;
+        renderUsageBadge();
         
-        // تحديث الواجهة
-        const chatItem = document.querySelector(`.item[data-id="${chatId}"] .item-title`);
-        if (chatItem) {
-            chatItem.textContent = title;
-        }
+        return ref.id;
     } catch (error) {
-        console.error('Error updating chat title:', error);
+        console.error('Error creating new chat:', error);
+        toast('❌ حدث خطأ في إنشاء المحادثة');
+        throw error;
     }
-}
-
-async function newChat(){
-    cancelCurrentStream();
-    currentChatHistory = [];
-    
-    const ref=await db.collection("chats").add({
-        uid:me.uid, 
-        title:"محادثة جديدة",
-        clientUpdated: Date.now(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    currentChatId=ref.id;
-    insertChatRowDom(ref.id, "محادثة جديدة");
-    const arr=[{id:ref.id, title:"محادثة جديدة"}, ...CHAT_CACHE.filter(x=>x.id!==ref.id)];
-    cacheSet(arr);
-    setActiveChatItem(ref.id);
-    loadChat(ref.id);
-    
-    // تحديث إحصائيات المحادثات
-    userUsage.chatCount++;
-    renderUsageBadge();
-    
-    return ref.id;
 }
 
 async function deleteChat(id){
@@ -1435,7 +1463,6 @@ function renderEmptyHero(){
     wrap.className="empty-hero";
     
     if (!canChat || (userUsage.chatCount >= userUsage.maxChats && !userProfileCache?.subscribed)) {
-        // عرض بانر الاشتراك بدلاً من الترحيب
         const banner = document.createElement("div");
         banner.className = "subscription-banner";
         banner.innerHTML = `
@@ -1480,17 +1507,14 @@ function watchMessages(chatId){
                     content: msg.text || ""
                 });
                 
-                // الحصول على أول رسالة من المستخدم لتحديث العنوان
                 if (msg.role === "user" && !firstUserMessage) {
                     firstUserMessage = msg.text;
                 }
             });
             
-            // تحديث إحصائيات الرسائل
             userUsage.messageCount = snap.size;
             renderUsageBadge();
             
-            // تحديث عنوان المحادثة إذا كانت جديدة
             if (firstUserMessage && snap.size === 1) {
                 updateChatTitle(chatId, firstUserMessage);
             }
@@ -1506,19 +1530,50 @@ function watchMessages(chatId){
 }
 
 async function loadChat(id){
-    cancelCurrentStream();
-    currentChatId=id; 
-    currentChatHistory = [];
-    setActiveChatItem(id);
-    msgs.innerHTML="";
-    if(unSubMsgs) unSubMsgs();
-    unSubMsgs=watchMessages(id);
-    
-    // تحديث إحصائيات الرسائل للمحادثة الجديدة
-    await loadUserUsage();
+    try {
+        cancelCurrentStream();
+        currentChatId=id; 
+        currentChatHistory = [];
+        setActiveChatItem(id);
+        msgs.innerHTML="";
+        if(unSubMsgs) unSubMsgs();
+        unSubMsgs=watchMessages(id);
+        
+        await loadUserUsage();
+    } catch (error) {
+        console.error('Error loading chat:', error);
+        toast('❌ حدث خطأ في تحميل المحادثة');
+    }
 }
 
-/* عرض رسالة محسنة */
+/* ===== تحديث تلقائي لأسماء المحادثات ===== */
+async function updateChatTitle(chatId, firstMessage) {
+    if (!firstMessage || firstMessage.length < 3) return;
+    
+    const title = firstMessage.length > 30 ? firstMessage.substring(0, 30) + '...' : firstMessage;
+    
+    try {
+        await db.collection("chats").doc(chatId).update({
+            title: title,
+            clientUpdated: Date.now(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        const updatedCache = CHAT_CACHE.map(chat => 
+            chat.id === chatId ? {...chat, title} : chat
+        );
+        cacheSet(updatedCache);
+        
+        const chatItem = document.querySelector(`.item[data-id="${chatId}"] .item-title`);
+        if (chatItem) {
+            chatItem.textContent = title;
+        }
+    } catch (error) {
+        console.error('Error updating chat title:', error);
+    }
+}
+
+/* ===== عرض رسالة محسنة مع زر النسخ ===== */
 function renderMsg(id, m){
     const isMath=/\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|hbar|partial|nabla|infty|cdot|pm|mp|times|div|leq|geq|neq|approx|equiv|propto|perp|parallel|angle|circ|degree|vec|hat|tilde|dot|ddot|prime|int|oint|sum|prod|lim|exp|log|ln|sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|sinh|cosh|tanh|coth|sech|csch|det|dim|gcd|hom|ker|lg|ln|log|max|min|Pr|sup)|\$\$|H_2O|CO_2|CH_4|NaCl|H_2SO_4|NaOH|HCl/i.test(m.text||"");
     const who=m.role==="user"?"user":"bot";
@@ -1528,13 +1583,30 @@ function renderMsg(id, m){
     el.className=`msg ${who}`+(isMath?" math":"");
     if(id) el.dataset.mid=id;
     el.dataset.role=m.role;
+    
+    if (who === "bot") {
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "copy-btn";
+        copyBtn.textContent = "نسخ الرسالة";
+        copyBtn.onclick = (e) => {
+            e.stopPropagation();
+            copyMessageText(m.text);
+        };
+        el.appendChild(copyBtn);
+    }
+    
     if(img){ 
+        const container = document.createElement("div");
+        container.className = "attachment-container";
+        
         const im=new Image(); 
         im.className="attachment"; 
         im.src=img; 
         im.style.maxWidth="200px";
         im.style.borderRadius="8px";
-        el.appendChild(im); 
+        container.appendChild(im);
+        
+        el.appendChild(container); 
     }
     const box=document.createElement("div"); 
     box.style.cssText = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif; line-height: 1.6; word-wrap: break-word;";
@@ -1544,6 +1616,21 @@ function renderMsg(id, m){
     if(isMath && window.MathJax) {
         MathJax.typesetPromise([el]).catch(()=>{});
     }
+}
+
+// دالة نسخ نص الرسالة
+function copyMessageText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        toast("تم نسخ الرسالة بنجاح");
+    }).catch(() => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        toast("تم نسخ الرسالة بنجاح");
+    });
 }
 
 /* حفظ رسالة */
@@ -1622,246 +1709,174 @@ async function loadKnowledgeFromDB(){
     }
 }
 
-/* ===== إصلاح أزرار لوحة التحكم ===== */
-$("#saveRule").onclick = async () => {
-    const ruleText = $("#trainRule").value.trim();
-    if (!ruleText) return alert("يرجى إدخال الأوامر أولاً");
+/* ===== نظام رفع الصور المحسن وإصلاح مشكلة الإرسال ===== */
+$("#imgFile").addEventListener("change", async (e) => {
+    const f = e.target.files?.[0]; 
+    if (!f) return;
     
-    try {
-        await db.collection("knowledge").add({
-            type: "rule",
-            text: ruleText,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            addedBy: me.email
-        });
-        
-        $("#ruleMsg").textContent = "✅ تم حفظ الأوامر بنجاح";
-        $("#trainRule").value = "";
-        
-        setTimeout(() => loadKnowledgeFromDB(), 1000);
-    } catch (e) {
-        $("#ruleMsg").textContent = "❌ خطأ في حفظ الأوامر: " + e.message;
+    const myTok = ++attachToken;
+    
+    // التحقق من حجم الصورة
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (f.size > maxSize) {
+        toast("حجم الصورة كبير جداً (الحد الأقصى 5MB)");
+        return;
     }
-};
 
-$("#saveInfo").onclick = async () => {
-    const infoText = $("#trainInfoText").value.trim();
-    if (!infoText) return alert("يرجى إدخال المعلومات أولاً");
+    // تحديث حالة الصورة مباشرة بنفس تصميم DeepSeek
+    attachedImage = {
+        name: (f.name || "image").replace(/\.\w+$/, "") + ".jpg", 
+        sizeKB: Math.round(f.size / 1024),
+        dataURL: "",
+        status: "جار التحميل...",
+        uploadProgress: 0
+    };
     
-    try {
-        await db.collection("knowledge").add({
-            type: "info",
-            text: infoText,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            addedBy: me.email
-        });
-        
-        $("#infoMsg").textContent = "✅ تم حفظ المعلومات بنجاح";
-        $("#trainInfoText").value = "";
-        
-        setTimeout(() => loadKnowledgeFromDB(), 1000);
-    } catch (e) {
-        $("#infoMsg").textContent = "❌ خطأ في حفظ المعلومات: " + e.message;
-    }
-};
-
-// معالجة PDF محسنة
-let selectedPdfFiles = [];
-$("#pickPdf").onclick = () => document.getElementById("pdfInput").click();
-
-document.getElementById("pdfInput").addEventListener("change", (e) => {
-    selectedPdfFiles = Array.from(e.target.files || []);
-    const list = document.getElementById("fileList");
-    list.innerHTML = selectedPdfFiles.map(f => `<div>📄 ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)</div>`).join("");
-});
-
-$("#processPdfs").onclick = async () => {
-    if (selectedPdfFiles.length === 0) return alert("يرجى اختيار ملفات PDF أولاً");
+    showAttachChip();
     
-    const processBtn = $("#processPdfs");
-    const originalText = processBtn.textContent;
-    processBtn.disabled = true;
-    processBtn.textContent = "جاري المعالجة...";
-    
-    const progressBar = $("#pdfBar");
-    const trainInfo = $("#trainInfo");
-    
-    try {
-        let processedCount = 0;
-        progressBar.style.width = "0%";
+    const r = new FileReader();
+    r.onload = () => { 
+        if (myTok !== attachToken) return; 
         
-        for (const file of selectedPdfFiles) {
-            trainInfo.textContent = `جاري معالجة: ${file.name}...`;
-            
-            try {
-                const textContent = await extractTextFromPDF(file);
-                
-                if (textContent && textContent.trim()) {
-                    const chunks = splitTextIntoChunks(textContent, 1500);
-                    
-                    for (const chunk of chunks) {
-                        if (chunk.trim()) {
-                            await db.collection("knowledge").add({
-                                type: "pdf",
-                                text: chunk,
-                                fileName: file.name,
-                                fileSize: file.size,
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                addedBy: me.email
-                            });
-                        }
-                    }
-                    
-                    processedCount++;
-                    progressBar.style.width = `${(processedCount / selectedPdfFiles.length) * 100}%`;
-                    trainInfo.textContent = `✅ تم معالجة ${file.name} (${processedCount}/${selectedPdfFiles.length})`;
-                } else {
-                    trainInfo.textContent = `⚠️ لم يتم استخراج نص من ${file.name}`;
-                }
-            } catch (fileError) {
-                trainInfo.textContent = `❌ خطأ في معالجة ${file.name}: ${fileError.message}`;
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        const dataURL = r.result;
+        attachedImage.dataURL = dataURL;
         
-        trainInfo.textContent = `✅ تم معالجة ${processedCount}/${selectedPdfFiles.length} ملف بنجاح`;
-        $("#fileList").innerHTML = "";
-        selectedPdfFiles = [];
+        // محاكاة تقدم التحميل مثل DeepSeek
+        simulateUploadProgress(myTok);
         
-        setTimeout(() => loadKnowledgeFromDB(), 1000);
-        
-    } catch (e) {
-        trainInfo.textContent = "❌ خطأ في معالجة الملفات: " + e.message;
-    } finally {
-        processBtn.disabled = false;
-        processBtn.textContent = originalText;
-    }
-};
-
-// دالة لتقسيم النص إلى أجزاء
-function splitTextIntoChunks(text, maxChunkSize) {
-    const chunks = [];
-    const sentences = text.split(/(?<=[.!?])\s+/);
-    let currentChunk = "";
-    
-    for (const sentence of sentences) {
-        if ((currentChunk + sentence).length > maxChunkSize && currentChunk) {
-            chunks.push(currentChunk.trim());
-            currentChunk = sentence;
-        } else {
-            currentChunk += (currentChunk ? " " : "") + sentence;
-        }
-    }
-    
-    if (currentChunk.trim()) {
-        chunks.push(currentChunk.trim());
-    }
-    
-    return chunks;
-}
-
-// دالة استخراج النص من PDF محسنة
-async function extractTextFromPDF(file) {
-    return new Promise((resolve, reject) => {
-        const fileReader = new FileReader();
-        
-        fileReader.onload = async function() {
-            try {
-                const typedarray = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                let fullText = '';
-                
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    try {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(' ');
-                        fullText += pageText + '\n\n';
-                    } catch (pageError) {
-                        console.error(`Error extracting page ${i}:`, pageError);
-                        continue;
-                    }
-                }
-                
-                resolve(fullText.trim());
-            } catch (error) {
-                reject(new Error(`فشل استخراج النص: ${error.message}`));
-            }
-        };
-        
-        fileReader.onerror = function() {
-            reject(new Error('فشل قراءة الملف'));
-        };
-        
-        fileReader.readAsArrayBuffer(file);
-    });
-}
-
-/* إدخال + مرفقات + إرسال */
-$("#send").onclick=onSend;
-$("#input").addEventListener("keydown",e=>{if(e.key==="Enter")onSend();});
-$("#attach").onclick=()=>$("#imgFile").click();
-$("#imgFile").addEventListener("change", async (e)=>{
-    const f=e.target.files?.[0]; if(!f) return;
-    const myTok=++attachToken;
-    const r=new FileReader();
-    r.onload=()=>{ 
-        if(myTok!==attachToken) return; 
-        const dataURL=r.result; 
-        attachedImage={
-            name:(f.name||"image").replace(/\.\w+$/,"")+".jpg", 
-            sizeKB:Math.round(f.size/1024), 
-            dataURL
-        }; 
-        showAttachChip(); 
         input.focus(); 
     };
     r.readAsDataURL(f);
-    
-    try{
-        if(ENABLE_OCR){
-            toast("جاري قراءة الصورة...");
-            const {data:{text}}=await Tesseract.recognize(f,'ara+eng');
-            if(myTok===attachToken && attachedImage) {
-                attachedImage.ocrText=(text||"").trim();
-                toast("تم قراءة الصورة بنجاح");
-            }
-        }
-    }catch(ocrError){
-        console.log('OCR Error:', ocrError);
-        if(myTok===attachToken && attachedImage) {
-            attachedImage.ocrText = "";
-        }
-    }
-    e.target.value="";
+    e.target.value = "";
 });
 
-function showAttachChip(){
-    if(!attachedImage){ 
+// محاكاة تقدم التحميل بنفس تصميم DeepSeek
+function simulateUploadProgress(token) {
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        if (token !== attachToken) {
+            clearInterval(progressInterval);
+            return;
+        }
+        
+        progress += 10;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(progressInterval);
+            
+            // بعد اكتمال التحميل، تبدأ عملية التحليل
+            if (token === attachToken && attachedImage) {
+                attachedImage.status = "جار التحليل...";
+                showAttachChip();
+                
+                // بدء عملية OCR بعد تحميل الصورة
+                setTimeout(() => {
+                    processImageOCR(token);
+                }, 500);
+            }
+        } else {
+            if (attachedImage) {
+                attachedImage.status = `جار التحميل... ${progress}%`;
+                showAttachChip();
+            }
+        }
+    }, 100);
+}
+
+// تحسين دالة عرض الصورة المرفوعة
+function showAttachChip() {
+    if (!attachedImage) { 
         attachWrap.classList.add("hidden"); 
-        attachWrap.innerHTML=""; 
+        attachWrap.innerHTML = ""; 
         return; 
     }
-    const {name,sizeKB,dataURL}=attachedImage;
-    attachWrap.innerHTML=`
+    
+    const { name, sizeKB, dataURL, status } = attachedImage;
+    
+    const statusClass = status.includes("جار التحميل") ? "processing" : 
+                       status.includes("جار التحليل") ? "analyzing" : 
+                       "ready";
+    
+    attachWrap.innerHTML = `
         <div class="attach-chip">
-            <div class="thumb"><img src="${dataURL}"></div>
-            <div class="name">${name} · ${sizeKB}KB</div>
+            <div class="thumb">
+                <img src="${dataURL}" alt="${name}">
+            </div>
+            <div class="name">${name}</div>
+            <div class="status">
+                <span class="attachment-status ${statusClass}">${status}</span>
+                ${status.includes("جار التحميل") ? "" : `<span class="size">${sizeKB} KB</span>`}
+            </div>
             <div class="x" id="removeAttach">✕</div>
         </div>`;
+    
     attachWrap.classList.remove("hidden");
-    $("#removeAttach").onclick=()=>{ 
-        attachedImage=null; 
+    
+    $("#removeAttach").onclick = () => { 
+        attachedImage = null; 
         ++attachToken; 
         showAttachChip(); 
         input.focus(); 
     };
 }
 
+// دالة مساعدة لتحويل DataURL إلى Blob
+function dataURLtoBlob(dataURL) {
+    const byteString = atob(dataURL.split(',')[1]);
+    const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+}
+
+// تحسين عملية OCR
+async function processImageOCR(token) {
+    if (!ENABLE_OCR) {
+        if (token === attachToken && attachedImage) {
+            attachedImage.status = "جاهز";
+            attachedImage.ocrText = "";
+            showAttachChip();
+        }
+        return;
+    }
+    
+    try {
+        if (token === attachToken && attachedImage) {
+            attachedImage.status = "جار القراءة...";
+            showAttachChip();
+            
+            const { data: { text } } = await Tesseract.recognize(
+                dataURLtoBlob(attachedImage.dataURL), 
+                'ara+eng'
+            );
+            
+            if (token === attachToken && attachedImage) {
+                attachedImage.ocrText = (text || "").trim();
+                attachedImage.status = "جاهز";
+                showAttachChip();
+                toast("تم قراءة الصورة بنجاح");
+            }
+        }
+    } catch (ocrError) {
+        console.log('OCR Error:', ocrError);
+        if (token === attachToken && attachedImage) {
+            attachedImage.ocrText = "";
+            attachedImage.status = "جاهز";
+            showAttachChip();
+            toast("تم تحميل الصورة بنجاح");
+        }
+    }
+}
+
+$("#attach").onclick=()=>$("#imgFile").click();
+
 function wantsLongExplain(t){ return /(اشرح|شرح|فسر|وضح|فسرلي|شرحلي|حل بالتفصيل|تفصيل|افهمني)/i.test(t||""); }
 function isProblemLike(t){ return /(مساله|معادلة|احسب|حل|جد|مثال|قانون|مول|تركيز|معايره|اتزان|حركه|مجال|كيمياء|فيزياء|رياضيات|علم|سؤال)/i.test(t||""); }
 
+/* ===== نظام الإرسال المحسن مع إصلاح مشكلة الصور ===== */
 async function onSend(){
     if(!canChat){ 
         showPaywall();
@@ -1875,53 +1890,173 @@ async function onSend(){
         return;
     }
     
-    const userTxt=$("#input").value.trim();
-    if(!userTxt && !attachedImage) return;
+    const userTxt = $("#input").value.trim();
+    if (!userTxt && !attachedImage) {
+        toast("يرجى كتابة رسالة أو إرفاق صورة");
+        return;
+    }
 
+    // إلغاء أي عملية إرسال سابقة
     cancelCurrentStream();
 
-    renderMsg(null,{role:"user",text:userTxt || "[صورة فقط]",imageDataURL:attachedImage?.dataURL || null});
-    if(!currentChatId) await newChat();
-    await db.collection("chats").doc(currentChatId).collection("messages")
-        .add({ role:"user", text:userTxt || "[صورة فقط]", imageDataURL:attachedImage?.dataURL||null, clientTs: Date.now(), ts:firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection("chats").doc(currentChatId).update({ clientUpdated: Date.now(), updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
+    // إخفاء النص فوراً من حقل الإدخال
+    $("#input").value = "";
 
-    let finalPrompt="";
-    if(attachedImage){
-        const ocr=attachedImage.ocrText && attachedImage.ocrText.trim()? attachedImage.ocrText.trim() : "";
-        finalPrompt=[
-            "هذه صورة مسألة/نص. حلّل الصورة بدقة:",
-            ocr?("— النص المستخرج (OCR):\n"+ocr):"",
-            userTxt?("— ملاحظتي/سؤالي:\n"+userTxt):"",
-            "رجاءً: اعرض الحل بخطوات مرقمة وبـ LaTeX داخل $$ .. $$ عند الحاجة."
-        ].filter(Boolean).join("\n\n");
-    }else{
-        finalPrompt=userTxt;
+    // تعطيل زر الإرسال مؤقتاً
+    const sendBtn = $("#send");
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = "⏳";
+
+    try {
+        // عرض رسالة المستخدم فوراً
+        renderMsg(null, { 
+            role: "user", 
+            text: userTxt || "[صورة فقط]", 
+            imageDataURL: attachedImage?.dataURL || null 
+        });
+        
+        if (!currentChatId) await newChat();
+        
+        // حفظ رسالة المستخدم في قاعدة البيانات
+        await db.collection("chats").doc(currentChatId).collection("messages")
+            .add({ 
+                role: "user", 
+                text: userTxt || "[صورة فقط]", 
+                imageDataURL: attachedImage?.dataURL || null, 
+                clientTs: Date.now(), 
+                ts: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            
+        await db.collection("chats").doc(currentChatId).update({ 
+            clientUpdated: Date.now(), 
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+
+        // إعداد النص النهائي للإرسال
+        let finalPrompt = "";
+        if (attachedImage) {
+            const ocr = attachedImage.ocrText && attachedImage.ocrText.trim() ? attachedImage.ocrText.trim() : "";
+            finalPrompt = [
+                "هذه صورة مسألة/نص. حلّل الصورة بدقة:",
+                ocr ? ("— النص المستخرج (OCR):\n" + ocr) : "",
+                userTxt ? ("— ملاحظتي/سؤالي:\n" + userTxt) : "",
+                "رجاءً: اعرض الحل بخطوات مرقمة وبـ LaTeX داخل $$ .. $$ عند الحاجة."
+            ].filter(Boolean).join("\n\n");
+        } else {
+            finalPrompt = userTxt;
+        }
+        
+        // تنظيف المرفقات بعد استخدامها مباشرة
+        attachedImage = null; 
+        ++attachToken; 
+        showAttachChip();
+
+        // تحديد نوع الرد
+        const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
+        const problem = isProblemLike(finalPrompt);
+
+        // تحميل المعرفة إذا لزم الأمر
+        if (!index) { 
+            try { 
+                await loadKnowledgeFromDB(); 
+            } catch(e) {} 
+        }
+
+        // البحث في المعرفة
+        const ctxPieces = retrieve(finalPrompt, 8);
+        const ctx = ctxPieces.join("\n---\n");
+
+        // إعداد البث
+        const reqId = Math.random().toString(36).slice(2);
+        const controller = new AbortController();
+        currentStream = { id: reqId, chatId: currentChatId, controller };
+
+        // بدء البث
+        startStreaming();
+        
+        try {
+            await streamAI(ctx, finalPrompt, { 
+                wantsLong, 
+                isProblem: problem, 
+                signal: controller.signal, 
+                reqId 
+            });
+        } catch (e) {
+            if (e.name === "AbortError") return;
+            
+            endStreaming(reqId);
+            renderMsg(null, { role: "bot", text: "تعذّر البث، سأرسل الرد دفعة واحدة…" });
+            await callAIOnce(ctx, finalPrompt, { wantsLong, isProblem: problem });
+        }
+        
+    } catch (error) {
+        console.error('Error in onSend:', error);
+        toast('❌ حدث خطأ في إرسال الرسالة');
+    } finally {
+        // إعادة تمكين زر الإرسال
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = "➤";
     }
-    $("#input").value="";
-    attachedImage=null; ++attachToken; showAttachChip();
+}
 
-    const wantsLong = wantsLongExplain(userTxt) || isProblemLike(finalPrompt);
-    const problem = isProblemLike(finalPrompt);
+// إضافة استماع فعال لزر الإرسال
+$("#send").onclick = onSend;
 
-    if(!index){ try{ await loadKnowledgeFromDB(); }catch{} }
-
-    const ctxPieces=retrieve(finalPrompt,8);
-    const ctx=ctxPieces.join("\n---\n");
-
-    const reqId=Math.random().toString(36).slice(2);
-    const controller=new AbortController();
-    currentStream={id:reqId,chatId:currentChatId,controller};
-
-    startStreaming();
-    try{
-        await streamAI(ctx, finalPrompt, {wantsLong,isProblem:problem,signal:controller.signal,reqId});
-    }catch(e){
-        if(e.name==="AbortError") return;
-        endStreaming(reqId);
-        renderMsg(null,{role:"bot",text:"تعذّر البث، سأرسل الرد دفعة واحدة…"});
-        await callAIOnce(ctx, finalPrompt, {wantsLong,isProblem:problem});
+// السماح بالإرسال بالضغط على Enter
+$("#input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        onSend();
     }
+});
+
+function startStreaming(){
+    isStreaming = true;
+    streamingEl = document.createElement("div");
+    streamingEl.className = "msg bot";
+    streamingEl.dataset.role = "bot";
+    streamingEl.textContent = "";
+    streamedText="";
+    msgs.appendChild(streamingEl);
+    msgs.scrollTo({top: msgs.scrollHeight + 1000, behavior: "smooth"});
+}
+
+function pushChunk(txt, reqId){
+    if(currentStream.id!==reqId) return;
+    if(!streamingEl) startStreaming();
+    streamingEl.textContent += txt;
+    streamedText += txt;
+    msgs.scrollTo({top: msgs.scrollHeight + 1000});
+}
+
+function endStreaming(reqId){
+    if(currentStream.id!==reqId) return;
+    if(!streamingEl){ isStreaming=false; streamedText=""; return; }
+    const cleaned = cleanAI(streamedText||"");
+    const html = cleaned.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const isMath = /\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right|alpha|beta|gamma|delta)|\$\$|H_2O|CO_2/i.test(cleaned);
+    const finalEl = document.createElement("div");
+    finalEl.className = `msg bot${isMath?" math":""}`;
+    finalEl.dataset.role="bot";
+    
+    // إضافة زر النسخ
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy-btn";
+    copyBtn.textContent = "نسخ الرسالة";
+    copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        copyMessageText(cleaned);
+    };
+    finalEl.appendChild(copyBtn);
+    
+    const box = document.createElement("div"); 
+    box.style.cssText = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif; line-height: 1.6;";
+    box.innerHTML = html; 
+    finalEl.appendChild(box);
+    streamingEl.replaceWith(finalEl);
+    if(isMath && window.MathJax) MathJax.typesetPromise([finalEl]).catch(()=>{});
+    streamingEl = null; isStreaming=false;
+    streamedText = cleaned;
 }
 
 /* تنظيف تكرارات الذكاء */
@@ -1970,44 +2105,6 @@ function sysPrompt({wantsLong,isProblem}){
     }
 
     return prompt;
-}
-
-function startStreaming(){
-    isStreaming = true;
-    streamingEl = document.createElement("div");
-    streamingEl.className = "msg bot";
-    streamingEl.dataset.role = "bot";
-    streamingEl.textContent = "";
-    streamedText="";
-    msgs.appendChild(streamingEl);
-    msgs.scrollTo({top: msgs.scrollHeight + 1000, behavior: "smooth"});
-}
-
-function pushChunk(txt, reqId){
-    if(currentStream.id!==reqId) return;
-    if(!streamingEl) startStreaming();
-    streamingEl.textContent += txt;
-    streamedText += txt;
-    msgs.scrollTo({top: msgs.scrollHeight + 1000});
-}
-
-function endStreaming(reqId){
-    if(currentStream.id!==reqId) return;
-    if(!streamingEl){ isStreaming=false; streamedText=""; return; }
-    const cleaned = cleanAI(streamedText||"");
-    const html = cleaned.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const isMath = /\\(frac|sqrt|sum|Delta|pi|times|div|rightarrow|left|right|alpha|beta|gamma|delta)|\$\$|H_2O|CO_2/i.test(cleaned);
-    const finalEl = document.createElement("div");
-    finalEl.className = `msg bot${isMath?" math":""}`;
-    finalEl.dataset.role="bot";
-    const box = document.createElement("div"); 
-    box.style.cssText = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif; line-height: 1.6;";
-    box.innerHTML = html; 
-    finalEl.appendChild(box);
-    streamingEl.replaceWith(finalEl);
-    if(isMath && window.MathJax) MathJax.typesetPromise([finalEl]).catch(()=>{});
-    streamingEl = null; isStreaming=false;
-    streamedText = cleaned;
 }
 
 async function streamAI(context, user, {wantsLong,isProblem,signal,reqId}){
@@ -2162,21 +2259,13 @@ function goBack(){
 }
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",goBack));
 
-// أزرار الاشتراك - تم إزالة روابط Telegram الخارجية
+// أزرار الاشتراك
 $("#subscriptionBtn").onclick = () => openPage("#pageSubscription");
-document.querySelectorAll(".buy-btn").forEach(btn => {
-    btn.onclick = () => {
-        const plan = btn.dataset.plan;
-        toast("سيتم دمج نظام الدفع مع متجر التطبيقات قريبًا");
-        // هنا سيتم دمج نظام الدفع مع Google Play Billing
-    };
-});
 
 $("#adminBtn").onclick=()=>{ if(me?.email!==ADMIN_EMAIL){ alert("ليس لديك صلاحية."); return; } openPage("#pageHub"); };
 $("#tileUsers").onclick=()=>{ $("#pageHub").style.display="none"; openPage("#pageUsers"); refreshUserStats(); };
 $("#tileSubs").onclick =()=>{ $("#pageHub").style.display="none"; openPage("#pageSubs"); };
 $("#tileTrain").onclick=()=>{ $("#pageHub").style.display="none"; openPage("#pageTrain"); };
-$("#logout").onclick=()=>auth.signOut();
 
 /* ===== اشتراكات: إضافة + إلغاء ===== */
 $("#addSubscription").onclick=async ()=>{
