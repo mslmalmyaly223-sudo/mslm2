@@ -14,17 +14,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 18
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: temurin
+          java-version: 17
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      # لو ماكو مجلد www ننقله
       - name: Prepare webDir (move root files into www if needed)
         run: |
           if [ ! -d "www" ]; then
@@ -39,52 +40,41 @@ jobs:
           ls -la www
 
       - name: Install Capacitor CLI (local)
-        run: |
-          npm init -y
-          npm i @capacitor/cli @capacitor/core
+        run: npm install @capacitor/cli@latest --save-dev
 
       - name: Init Capacitor project
-        run: npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www --npm-client npm
+        run: npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www --confirm
 
       - name: Add Android platform
-        run: npx cap add android
+        run: npx cap add android --confirm
 
       - name: Set SDK + version
-        shell: bash
         run: |
-          APP_GRADLE="android/app/build.gradle"
-          sed -i 's/compileSdkVersion[[:space:]]\+[0-9]\+/compileSdkVersion 35/' "$APP_GRADLE" || true
-          sed -i 's/targetSdkVersion[[:space:]]\+[0-9]\+/targetSdkVersion 35/' "$APP_GRADLE" || true
-          sed -i 's/versionCode[[:space:]]\+[0-9]\+/versionCode '"${VERSION_CODE}"'/' "$APP_GRADLE" || echo "versionCode ${VERSION_CODE}" >> "$APP_GRADLE"
-          sed -i 's/versionName[[:space:]]\+".*"/versionName "'"${VERSION_NAME}"'"/' "$APP_GRADLE" || echo 'versionName "'"${VERSION_NAME}"'"' >> "$APP_GRADLE"
-        env:
-          VERSION_CODE: ${{ secrets.VERSION_CODE }}
-          VERSION_NAME: ${{ secrets.VERSION_NAME }}
+          sed -i "s/versionCode = [0-9]*/versionCode = ${{ secrets.VERSION_CODE }}/" android/app/build.gradle
+          sed -i "s/versionName = \".*\"/versionName = \"1.0.${{ secrets.VERSION_CODE }}\"/" android/app/build.gradle
 
       - name: Build AAB (unsigned)
-        working-directory: android
-        run: ./gradlew :app:bundleRelease
+        run: cd android && ./gradlew bundleRelease
 
       - name: Restore keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload-key.jks
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
       - name: Sign the AAB
-        shell: bash
         run: |
-          AAB=android/app/build/outputs/bundle/release/app-release.aab
-          jarsigner -verbose \
-            -keystore upload-key.jks \
+          cd android/app/build/outputs/bundle/release
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore ../../../release.keystore \
             -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            -keypass "${{ secrets.KEY_ALIAS_PASSWORD }}" \
-            "$AAB" "${{ secrets.KEY_ALIAS }}"
-          mv "$AAB" android/app/build/outputs/bundle/release/app-release-signed.aab
+            app-release.aab upload
 
       - name: Verify signature
-        run: jarsigner -verify -verbose -certs android/app/build/outputs/bundle/release/app-release-signed.aab
+        run: |
+          cd android/app/build/outputs/bundle/release
+          jarsigner -verify upload.aab
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-signed-aab
-          path: android/app/build/outputs/bundle/release/app-release-signed.aab
-          if-no-files-found: error
+          name: my-app-aab
+          path: android/app/build/outputs/bundle/release/upload.aab
