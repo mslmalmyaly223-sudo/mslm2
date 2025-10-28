@@ -1,0 +1,103 @@
+name: Build AAB (Capacitor)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "www/**"
+      - "*.html"
+      - "*.js"
+      - "*.css"
+      - "manifest.json"
+      - "sw.js"
+      - ".github/workflows/build-capacitor.yml"
+
+jobs:
+  build-aab:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare webDir (move root files into www if needed)
+        shell: bash
+        run: |
+          if [ ! -d "www" ]; then
+            mkdir www
+            shopt -s extglob dotglob
+            mv !(www|.git|.github) www/ || true
+            shopt -u dotglob
+          fi
+          ls -la www
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Capacitor CLI
+        run: |
+          npm init -y
+          npm i @capacitor/cli @capacitor/core
+
+      - name: Init Capacitor project
+        run: npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www --npm-client npm
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Set SDK + version
+        shell: bash
+        run: |
+          APP_GRADLE="android/app/build.gradle"
+          sed -i 's/compileSdkVersion[[:space:]]\+[0-9]\+/compileSdkVersion 35/' "$APP_GRADLE" || true
+          sed -i 's/targetSdkVersion[[:space:]]\+[0-9]\+/targetSdkVersion 35/' "$APP_GRADLE" || true
+          sed -i 's/versionCode[[:space:]]\+[0-9]\+/versionCode '"${VERSION_CODE}"'/' "$APP_GRADLE"
+          sed -i 's/versionName[[:space:]]\+".*"/versionName "'"${VERSION_NAME}"'"/' "$APP_GRADLE"
+        env:
+          VERSION_CODE: ${{ secrets.VERSION_CODE }}
+          VERSION_NAME: ${{ secrets.VERSION_NAME }}
+
+      - name: Build AAB (unsigned)
+        working-directory: android
+        run: ./gradlew :app:bundleRelease
+
+      - name: Restore keystore
+        run: echo "$KEYSTORE_BASE64" | base64 -d > upload-key.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Sign the AAB
+        shell: bash
+        run: |
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          jarsigner -verbose \
+            -keystore upload-key.jks \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -keypass "$KEY_ALIAS_PASSWORD" \
+            "$AAB" "$KEY_ALIAS"
+          mv "$AAB" android/app/build/outputs/bundle/release/app-release-signed.aab
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS_PASSWORD: ${{ secrets.KEY_ALIAS_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+
+      - name: Verify signature
+        run: jarsigner -verify -verbose -certs android/app/build/outputs/bundle/release/app-release-signed.aab
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-signed-aab
+          path: android/app/build/outputs/bundle/release/app-release-signed.aab
+          if-no-files-found: error
