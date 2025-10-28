@@ -11,85 +11,68 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Setup Java
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
-      - name: Setup Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      # جهّز مجلد www إذا ما موجود
       - name: Prepare webDir (move root files into www if needed)
         run: |
           if [ ! -d "www" ]; then
             mkdir www
-            for f in * .*; do
-              case "$f" in
-                www|.git|.github|.|..) continue ;;
-              esac
-              mv "$f" www/ 2>/dev/null || true
-            done
+            cp -r ./* www/ || true
           fi
-          ls -la www
 
-      # ثبّت كل باكجات كاباسيتور (بضمنها @capacitor/android)
-      - name: Install Capacitor packages
-        run: |
-          npm init -y
-          npm i @capacitor/cli @capacitor/core @capacitor/android
+      - name: Install Capacitor CLI (local)
+        run: npm install @capacitor/cli --save-dev
 
       - name: Init Capacitor project (non-interactive)
-        run: |
-          export npm_config_yes=true
-          yes "" | npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www
+        run: npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www --skip-deps --yes
+
+      - name: Install Android Platform dependency
+        run: npm install @capacitor/android
 
       - name: Add Android platform (non-interactive)
-        run: |
-          yes "" | npx cap add android
+        run: npx cap add android --yes
 
       - name: Set SDK + version
-        shell: bash
         run: |
-          APP_GRADLE="android/app/build.gradle"
-          sed -i 's/compileSdkVersion[[:space:]]\+[0-9]\+/compileSdkVersion 35/' "$APP_GRADLE" || true
-          sed -i 's/targetSdkVersion[[:space:]]\+[0-9]\+/targetSdkVersion 35/' "$APP_GRADLE" || true
-          sed -i 's/versionCode[[:space:]]\+[0-9]\+/versionCode '"${VERSION_CODE}"'/' "$APP_GRADLE" || true
-          sed -i 's/versionName[[:space:]]\+".*"/versionName "'"${VERSION_NAME}"'"/' "$APP_GRADLE" || true
-        env:
-          VERSION_CODE: ${{ secrets.VERSION_CODE }}
-          VERSION_NAME: ${{ secrets.VERSION_NAME }}
+          sed -i 's/compileSdk = .*/compileSdk = 34/' android/variables.gradle
+          sed -i 's/minSdk = .*/minSdk = 21/' android/variables.gradle
+          sed -i 's/targetSdk = .*/targetSdk = 34/' android/variables.gradle
 
       - name: Build AAB (unsigned)
-        working-directory: android
-        run: ./gradlew :app:bundleRelease
+        run: cd android && ./gradlew bundleRelease
 
       - name: Restore keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload-key.jks
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
       - name: Sign the AAB
-        shell: bash
         run: |
-          AAB=android/app/build/outputs/bundle/release/app-release.aab
-          jarsigner -verbose \
-            -keystore upload-key.jks \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            -keypass "${{ secrets.KEY_ALIAS_PASSWORD }}" \
-            "$AAB" "${{ secrets.KEY_ALIAS }}"
-          mv "$AAB" android/app/build/outputs/bundle/release/app-release-signed.aab
+          cd android/app/build/outputs/bundle/release
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore ../../../release.keystore \
+            app-release.aab \
+            android \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}"
 
       - name: Verify signature
-        run: jarsigner -verify -verbose -certs android/app/build/outputs/bundle/release/app-release-signed.aab
+        run: |
+          cd android/app/build/outputs/bundle/release
+          jarsigner -verify -verbose -certs app-release.aab
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-signed-aab
-          path: android/app/build/outputs/bundle/release/app-release-signed.aab
-          if-no-files-found: error
+          name: Signed-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab
