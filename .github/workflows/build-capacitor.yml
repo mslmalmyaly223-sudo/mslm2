@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # لو ماكو مجلد www ننقله
+      # لو ماكو مجلد www ننقل جذور المشروع إليه
       - name: Prepare webDir (move root files into www if needed)
         run: |
           if [ ! -d "www" ]; then
@@ -40,41 +40,55 @@ jobs:
           ls -la www
 
       - name: Install Capacitor CLI (local)
-        run: npm install @capacitor/cli@latest --save-dev
+        run: |
+          npm init -y
+          npm i @capacitor/cli @capacitor/core
 
-      - name: Init Capacitor project
-        run: npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www --confirm
+      - name: Init Capacitor project (non-interactive)
+        run: |
+          export npm_config_yes=true
+          yes "" | npx cap init "سوق الطلاب" "com.msix.msilm2" --web-dir=www
 
-      - name: Add Android platform
-        run: npx cap add android --confirm
+      - name: Add Android platform (non-interactive)
+        run: |
+          yes "" | npx cap add android
 
       - name: Set SDK + version
+        shell: bash
         run: |
-          sed -i "s/versionCode = [0-9]*/versionCode = ${{ secrets.VERSION_CODE }}/" android/app/build.gradle
-          sed -i "s/versionName = \".*\"/versionName = \"1.0.${{ secrets.VERSION_CODE }}\"/" android/app/build.gradle
+          APP_GRADLE="android/app/build.gradle"
+          sed -i 's/compileSdkVersion[[:space:]]\+[0-9]\+/compileSdkVersion 35/' "$APP_GRADLE" || true
+          sed -i 's/targetSdkVersion[[:space:]]\+[0-9]\+/targetSdkVersion 35/' "$APP_GRADLE" || true
+          sed -i 's/versionCode[[:space:]]\+[0-9]\+/versionCode '"${VERSION_CODE}"'/' "$APP_GRADLE" || true
+          sed -i 's/versionName[[:space:]]\+".*"/versionName "'"${VERSION_NAME}"'"/' "$APP_GRADLE" || true
+        env:
+          VERSION_CODE: ${{ secrets.VERSION_CODE }}
+          VERSION_NAME: ${{ secrets.VERSION_NAME }}
 
       - name: Build AAB (unsigned)
-        run: cd android && ./gradlew bundleRelease
+        working-directory: android
+        run: ./gradlew :app:bundleRelease
 
       - name: Restore keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload-key.jks
 
       - name: Sign the AAB
+        shell: bash
         run: |
-          cd android/app/build/outputs/bundle/release
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-            -keystore ../../../release.keystore \
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          jarsigner -verbose \
+            -keystore upload-key.jks \
             -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            app-release.aab upload
+            -keypass "${{ secrets.KEY_ALIAS_PASSWORD }}" \
+            "$AAB" "${{ secrets.KEY_ALIAS }}"
+          mv "$AAB" android/app/build/outputs/bundle/release/app-release-signed.aab
 
       - name: Verify signature
-        run: |
-          cd android/app/build/outputs/bundle/release
-          jarsigner -verify upload.aab
+        run: jarsigner -verify -verbose -certs android/app/build/outputs/bundle/release/app-release-signed.aab
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-app-aab
-          path: android/app/build/outputs/bundle/release/upload.aab
+          name: app-release-signed-aab
+          path: android/app/build/outputs/bundle/release/app-release-signed.aab
+          if-no-files-found: error
