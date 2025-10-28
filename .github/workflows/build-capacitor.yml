@@ -25,7 +25,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # لو ماكو مجلد www ننقل جذور المشروع إليه
+      # جهّز مجلد www إذا ما موجود
       - name: Prepare webDir (move root files into www if needed)
         run: |
           if [ ! -d "www" ]; then
@@ -39,10 +39,11 @@ jobs:
           fi
           ls -la www
 
-      - name: Install Capacitor CLI (local)
+      # ثبّت كل باكجات كاباسيتور (بضمنها @capacitor/android)
+      - name: Install Capacitor packages
         run: |
           npm init -y
-          npm i @capacitor/cli @capacitor/core
+          npm i @capacitor/cli @capacitor/core @capacitor/android
 
       - name: Init Capacitor project (non-interactive)
         run: |
