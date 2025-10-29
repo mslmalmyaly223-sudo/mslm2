@@ -17,5 +17,7 @@
       "type": "image/png"
     }
   ],
-  "orientation": "natural"
+  "categories": [
+    "education"
+  ]
 }
