@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.muslim.sixthassistant",
-        "sha256_cert_fingerprints": ["BD:94:AC:99:A9:44:67:35:AC:8F:51:6D:E6:D4:57:5C:68:4E:27:DB:5D:43:E2:E9:2D:66:1C:01:90:0C:A1:6B"]
-      }
-    }]
