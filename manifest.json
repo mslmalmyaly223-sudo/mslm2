@@ -1,8 +1,8 @@
 {
   "name": "مساعد السادس",
-  "short_name": "المساعد في السادس",
+  "short_name": "Sixth Assistant",
   "start_url": "/mslm2/",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff",
   "icons": [
