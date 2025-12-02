@@ -28,6 +28,70 @@
             position: relative;
         }
         
+        /* خلفية متحركة تعليمية */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .animated-bg-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: floatElement 15s infinite linear;
+        }
+        
+        .math-symbol {
+            font-size: 3rem;
+            color: #667eea;
+        }
+        
+        .book-icon {
+            font-size: 2.5rem;
+            color: #4CAF50;
+        }
+        
+        .pencil-icon {
+            font-size: 2rem;
+            color: #FF9800;
+        }
+        
+        .ruler-icon {
+            font-size: 2.8rem;
+            color: #9C27B0;
+        }
+        
+        .calculator-icon {
+            font-size: 2.3rem;
+            color: #2196F3;
+        }
+        
+        .globe-icon {
+            font-size: 2.7rem;
+            color: #00BCD4;
+        }
+        
+        @keyframes floatElement {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
         .app-container {
             max-width: 100%;
             min-height: 100vh;
@@ -53,6 +117,8 @@
         .splash-content {
             text-align: center;
             color: white;
+            position: relative;
+            z-index: 2;
         }
         
         .school-name {
@@ -75,7 +141,7 @@
         .loading-progress {
             height: 100%;
             width: 0%;
-            background: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 4px;
             animation: loading 2s ease-in-out forwards;
         }
@@ -88,7 +154,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             z-index: 999;
             justify-content: center;
             align-items: center;
@@ -97,15 +163,17 @@
         }
         
         .auth-container {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             width: 90%;
             max-width: 400px;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             transform: scale(0.9);
-            animation: popIn 0.3s ease-out forwards;
+            animation: popIn 0.4s ease-out forwards;
             margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .auth-header {
@@ -130,7 +198,7 @@
             margin-bottom: 20px;
             border-bottom: 1px solid #eee;
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 5px;
         }
         
@@ -141,14 +209,13 @@
             cursor: pointer;
             color: #666;
             transition: all 0.3s;
-            border-radius: 8px;
-            font-weight: 500;
+            border-radius: 12px;
         }
         
         .auth-tab.active {
             color: #1e3c8b;
             background: white;
-            box-shadow: 0 2px 8px rgba(30, 60, 139, 0.2);
+            box-shadow: 0 4px 12px rgba(30, 60, 139, 0.25);
             font-weight: bold;
         }
         
@@ -166,9 +233,9 @@
         
         .form-input {
             width: 100%;
-            padding: 14px 15px;
+            padding: 14px 18px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 1rem;
             transition: all 0.3s;
             background: #f8f9fa;
@@ -178,7 +245,7 @@
             border-color: #1e3c8b;
             outline: none;
             background: white;
-            box-shadow: 0 0 0 3px rgba(30, 60, 139, 0.1);
+            box-shadow: 0 0 0 4px rgba(30, 60, 139, 0.15);
         }
         
         .form-row {
@@ -194,9 +261,9 @@
         
         .form-select {
             width: 100%;
-            padding: 14px 15px;
+            padding: 14px 18px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 1rem;
             background: #f8f9fa;
             cursor: pointer;
@@ -207,7 +274,7 @@
             border-color: #1e3c8b;
             outline: none;
             background: white;
-            box-shadow: 0 0 0 3px rgba(30, 60, 139, 0.1);
+            box-shadow: 0 0 0 4px rgba(30, 60, 139, 0.15);
         }
         
         .btn {
@@ -215,7 +282,7 @@
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
@@ -224,15 +291,15 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #1e3c8b, #152a57);
+            background: linear-gradient(135deg, #1e3c8b, #667eea);
             color: white;
-            box-shadow: 0 4px 15px rgba(30, 60, 139, 0.3);
+            box-shadow: 0 6px 20px rgba(30, 60, 139, 0.35);
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #152a57, #0c1a3a);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 60, 139, 0.4);
+            background: linear-gradient(135deg, #152a57, #5a67d8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(30, 60, 139, 0.5);
         }
         
         .btn-secondary {
@@ -244,30 +311,31 @@
         
         .btn-secondary:hover {
             background: #e9ecef;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
         
         .btn-success {
-            background: linear-gradient(135deg, #27ae60, #219653);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.35);
         }
         
         .btn-success:hover {
-            background: linear-gradient(135deg, #219653, #1e8449);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+            background: linear-gradient(135deg, #219653, #27ae60);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.5);
         }
         
         .btn-danger {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35);
         }
         
         .btn-danger:hover {
             background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.5);
         }
         
         .btn-small {
@@ -309,15 +377,13 @@
             margin: 0 auto;
         }
         
-        /* الشاشة الرئيسية - تم إزالة الهيدر العلوي */
+        /* الشاشة الرئيسية */
         .main-screen {
             display: none;
             min-height: 100vh;
             background: #f8f9fa;
             padding-bottom: 60px;
         }
-        
-        /* تم إزالة الهيدر العلوي بالكامل */
         
         /* شريط التنقل السفلي */
         .bottom-nav {
@@ -329,11 +395,11 @@
             display: flex;
             justify-content: space-around;
             padding: 8px 0;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 -6px 25px rgba(0,0,0,0.12);
             z-index: 100;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            height: 60px;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            height: 65px;
         }
         
         .nav-item {
@@ -343,157 +409,207 @@
             color: #666;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 5px 12px;
-            border-radius: 12px;
+            padding: 6px 12px;
+            border-radius: 15px;
             position: relative;
             flex: 1;
-            max-width: 80px;
+            max-width: 85px;
         }
         
         .nav-item.active {
             color: #1e3c8b;
-            transform: translateY(-5px);
+            transform: translateY(-8px);
         }
         
         .nav-item.active .nav-icon {
-            background: linear-gradient(135deg, #1e3c8b, #152a57);
-            box-shadow: 0 4px 12px rgba(30, 60, 139, 0.3);
+            background: linear-gradient(135deg, #1e3c8b, #667eea);
+            box-shadow: 0 6px 20px rgba(30, 60, 139, 0.35);
         }
         
         .nav-icon {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             margin-bottom: 3px;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 15px;
             background: #f8f9fa;
             transition: all 0.3s;
         }
         
         .nav-text {
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .notification-badge {
             position: absolute;
             top: 0;
-            right: 5px;
+            right: 8px;
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             font-size: 0.7rem;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 3px 8px rgba(231, 76, 60, 0.4);
         }
         
         /* محتوى الصفحات */
         .page {
             display: none;
             padding: 15px;
-            min-height: calc(100vh - 60px);
+            min-height: calc(100vh - 65px);
         }
         
         .page.active {
             display: block;
         }
         
-        /* صفحة الأخبار - تصميم جديد */
+        /* صفحة الأخبار - تصميم فيسبوك محسّن */
         .news-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         
         .news-card {
             background: white;
             border-radius: 20px;
-            padding: 0;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            transition: all 0.4s;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
             border: 1px solid #f0f0f0;
             position: relative;
-            overflow: hidden;
-        }
-        
-        .news-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 6px;
-            height: 100%;
-            background: linear-gradient(135deg, #1e3c8b, #667eea);
         }
         
         .news-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
         
-        .news-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 20px 15px;
-            background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .news-author {
-            font-weight: bold;
-            color: #1e3c8b;
-            font-size: 1.1rem;
+        .news-card-header {
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            border-bottom: 1px solid #f0f0f0;
         }
         
-        .author-avatar {
-            width: 35px;
-            height: 35px;
+        .news-author-avatar {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1e3c8b, #667eea);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
-        .news-date {
-            color: #888;
+        .news-author-info {
+            flex: 1;
+        }
+        
+        .news-author-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .news-post-time {
             font-size: 0.8rem;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .news-content {
+            padding: 16px;
             color: #333;
-            line-height: 1.7;
+            line-height: 1.6;
             font-size: 1.05rem;
-            padding: 20px;
-            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fcfcfc;
         }
         
-        .news-actions {
+        /* زر النقاط الثلاثة */
+        .news-options-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            color: #666;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .news-options-btn:hover {
+            background: #f8f9fa;
+            color: #1e3c8b;
+            transform: scale(1.1);
+        }
+        
+        /* قائمة التعديل/الحذف */
+        .news-options-menu {
+            position: absolute;
+            top: 50px;
+            left: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+            min-width: 150px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .news-option-item {
             padding: 15px 20px;
-            background: #fafbff;
-            border-top: 1px solid #f0f0f0;
-            gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .news-option-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-option-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .option-edit {
+            color: #1e3c8b;
+        }
+        
+        .option-delete {
+            color: #e74c3c;
         }
         
         .refresh-indicator {
@@ -501,12 +617,13 @@
             padding: 15px;
             color: #888;
             font-size: 0.9rem;
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: white;
+            border-radius: 15px;
             margin: 10px 0;
             border: 1px dashed #e9ecef;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         
         .refresh-indicator:active {
@@ -516,18 +633,18 @@
         
         .add-news-btn {
             position: fixed;
-            bottom: 70px;
+            bottom: 75px;
             right: 20px;
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #1e3c8b, #667eea);
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 25px rgba(30, 60, 139, 0.4);
+            font-size: 2.2rem;
+            box-shadow: 0 10px 30px rgba(30, 60, 139, 0.5);
             cursor: pointer;
             z-index: 99;
             transition: all 0.3s;
@@ -535,22 +652,22 @@
         
         .add-news-btn:hover {
             transform: scale(1.15) rotate(90deg);
-            box-shadow: 0 12px 30px rgba(30, 60, 139, 0.5);
+            box-shadow: 0 15px 35px rgba(30, 60, 139, 0.6);
         }
         
-        /* صفحة الدرجات - تصميم جديد */
+        /* صفحة الدرجات */
         .grades-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         
         .grade-card {
             background: white;
             border-radius: 20px;
             padding: 0;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            transition: all 0.4s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
             border: 1px solid #f0f0f0;
             position: relative;
             overflow: hidden;
@@ -567,15 +684,15 @@
         }
         
         .grade-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
         
         .grade-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 20px 15px;
+            padding: 18px 20px 15px;
             background: linear-gradient(135deg, #f0fff4, #e8f5e8);
             border-bottom: 1px solid #e9ecef;
         }
@@ -604,20 +721,20 @@
         
         .grade-content {
             color: #333;
-            line-height: 1.7;
+            line-height: 1.6;
             font-size: 1.05rem;
-            padding: 20px;
+            padding: 18px 20px;
             background: white;
         }
         
         .grade-percentage {
-            margin-top: 15px;
+            margin: 15px 20px;
             text-align: center;
             font-weight: bold;
             color: #1e3c8b;
             background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 15px;
             font-size: 1.1rem;
             box-shadow: 0 4px 12px rgba(30, 60, 139, 0.1);
         }
@@ -625,7 +742,7 @@
         /* أزرار إرسال الدرجات */
         .grade-action-buttons {
             position: fixed;
-            bottom: 70px;
+            bottom: 75px;
             right: 20px;
             display: flex;
             flex-direction: column;
@@ -634,58 +751,58 @@
         }
         
         .send-grades-btn {
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #1e3c8b, #667eea);
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 25px rgba(30, 60, 139, 0.4);
+            font-size: 2.2rem;
+            box-shadow: 0 10px 30px rgba(30, 60, 139, 0.5);
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .send-grades-btn:hover {
             transform: scale(1.15) rotate(90deg);
-            box-shadow: 0 12px 30px rgba(30, 60, 139, 0.5);
+            box-shadow: 0 15px 35px rgba(30, 60, 139, 0.6);
         }
         
         .send-semester-btn {
-            width: 65px;
-            height: 65px;
-            background: linear-gradient(135deg, #27ae60, #219653);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.5);
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .send-semester-btn:hover {
             transform: scale(1.15) rotate(-90deg);
-            box-shadow: 0 12px 30px rgba(39, 174, 96, 0.5);
+            box-shadow: 0 15px 35px rgba(39, 174, 96, 0.6);
         }
         
         /* صفحة التبليغات */
         .notifications-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         
         .notification-card {
             background: white;
             border-radius: 20px;
             padding: 0;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            transition: all 0.4s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
             border: 1px solid #f0f0f0;
             position: relative;
             overflow: hidden;
@@ -702,15 +819,15 @@
         }
         
         .notification-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
         
         .notification-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 20px 15px;
+            padding: 18px 20px 15px;
             background: linear-gradient(135deg, #fff8e1, #ffecb3);
             border-bottom: 1px solid #e9ecef;
         }
@@ -725,8 +842,8 @@
         }
         
         .sender-avatar {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: linear-gradient(135deg, #f39c12, #e67e22);
             display: flex;
@@ -734,7 +851,7 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
         .notification-date {
@@ -748,26 +865,26 @@
         
         .notification-content {
             color: #333;
-            line-height: 1.7;
+            line-height: 1.6;
             font-size: 1.05rem;
-            padding: 20px;
+            padding: 18px 20px;
             background: white;
         }
         
         .add-notification-btn {
             position: fixed;
-            bottom: 70px;
+            bottom: 75px;
             right: 20px;
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4);
+            font-size: 2.2rem;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.5);
             cursor: pointer;
             z-index: 99;
             transition: all 0.3s;
@@ -775,16 +892,16 @@
         
         .add-notification-btn:hover {
             transform: scale(1.15) rotate(90deg);
-            box-shadow: 0 12px 30px rgba(243, 156, 18, 0.5);
+            box-shadow: 0 15px 35px rgba(243, 156, 18, 0.6);
         }
         
-        /* صفحة الحساب - تحسين التصميم */
+        /* صفحة الحساب */
         .profile-section {
             background: white;
             border-radius: 25px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.1);
             text-align: center;
             border: 1px solid #f0f0f0;
             position: relative;
@@ -797,49 +914,49 @@
             top: 0;
             right: 0;
             width: 100%;
-            height: 5px;
+            height: 6px;
             background: linear-gradient(135deg, #1e3c8b, #667eea);
         }
         
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1e3c8b, #667eea);
-            margin: 0 auto 15px;
+            margin: 0 auto 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: bold;
-            box-shadow: 0 8px 25px rgba(30, 60, 139, 0.3);
-            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(30, 60, 139, 0.4);
+            border: 5px solid white;
             position: relative;
         }
         
         .profile-avatar::after {
             content: '';
             position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 18px;
-            height: 18px;
+            bottom: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
             background: #27ae60;
             border-radius: 50%;
-            border: 3px solid white;
+            border: 4px solid white;
         }
         
         .profile-name {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
         
         .name-text {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #333;
         }
@@ -849,12 +966,12 @@
             cursor: pointer;
             font-size: 1rem;
             background: #f8f9fa;
-            padding: 8px;
+            padding: 10px;
             border-radius: 50%;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -869,18 +986,18 @@
         .profile-details {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 20px;
         }
         
         .profile-detail {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
+            padding: 12px 18px;
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 12px;
-            font-size: 0.9rem;
+            border-radius: 15px;
+            font-size: 0.95rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         
@@ -898,7 +1015,7 @@
             background: white;
             border-radius: 25px;
             padding: 0;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.1);
             overflow: hidden;
             border: 1px solid #f0f0f0;
         }
@@ -906,7 +1023,7 @@
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 18px 20px;
+            padding: 20px;
             border-bottom: 1px solid #f8f9fa;
             cursor: pointer;
             transition: all 0.4s;
@@ -927,16 +1044,16 @@
         }
         
         .menu-icon {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             margin-left: 15px;
             color: #1e3c8b;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
-            border-radius: 12px;
+            border-radius: 15px;
             transition: all 0.4s;
             box-shadow: 0 4px 12px rgba(30, 60, 139, 0.1);
         }
@@ -945,12 +1062,12 @@
             flex: 1;
             color: #333;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
         }
         
         .menu-arrow {
             color: #888;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             transition: transform 0.4s;
         }
         
@@ -966,11 +1083,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
         
         .modal-content {
@@ -979,7 +1097,7 @@
             max-width: 500px;
             border-radius: 25px;
             padding: 25px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             transform: scale(0.9);
             animation: popIn 0.3s ease-out forwards;
             max-height: 90vh;
@@ -991,8 +1109,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 18px;
             border-bottom: 2px solid #e9ecef;
         }
         
@@ -1006,8 +1124,8 @@
             font-size: 1.8rem;
             color: #888;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1027,11 +1145,12 @@
             margin-bottom: 20px;
             border-radius: 15px;
             border: 1px solid #e9ecef;
+            background: #f8f9fa;
         }
         
         .student-item {
-            padding: 15px 18px;
-            border-bottom: 1px solid #f8f9fa;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -1053,12 +1172,12 @@
         .student-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         
         .student-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1e3c8b, #667eea);
             display: flex;
@@ -1066,7 +1185,7 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
             box-shadow: 0 4px 12px rgba(30, 60, 139, 0.2);
         }
         
@@ -1078,13 +1197,13 @@
         .student-name {
             font-weight: 600;
             color: #333;
-            font-size: 1rem;
+            font-size: 1.05rem;
         }
         
         .student-class {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #666;
-            margin-top: 3px;
+            margin-top: 5px;
             display: flex;
             gap: 10px;
         }
@@ -1098,8 +1217,8 @@
             background: #6c757d;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 14px 20px;
+            border-radius: 15px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
@@ -1108,7 +1227,7 @@
         
         .back-btn:hover {
             background: #5a6268;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
         
         /* الأنيميشن */
@@ -1167,12 +1286,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
         /* تقدم التحميل */
         .progress-container {
             margin: 20px 0;
@@ -1180,9 +1293,9 @@
         
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: #e9ecef;
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
             margin-top: 5px;
         }
@@ -1194,46 +1307,60 @@
             transition: width 0.3s ease;
         }
         
-        /* تحسينات للأداء */
-        .virtual-scroll {
-            will-change: transform;
-        }
-        
-        .will-change {
-            will-change: transform, opacity;
-        }
-        
         /* تصميم متجاوب إضافي */
         @media (max-width: 768px) {
             .profile-avatar {
-                width: 70px;
-                height: 70px;
-                font-size: 1.5rem;
+                width: 80px;
+                height: 80px;
+                font-size: 1.8rem;
             }
             
             .name-text {
-                font-size: 1.1rem;
-            }
-            
-            .menu-item {
-                padding: 15px 18px;
-            }
-            
-            .menu-icon {
-                width: 40px;
-                height: 40px;
                 font-size: 1.2rem;
             }
             
+            .menu-item {
+                padding: 18px;
+            }
+            
+            .menu-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            
             .menu-text {
-                font-size: 0.95rem;
+                font-size: 1rem;
+            }
+            
+            .school-name {
+                font-size: 2rem;
+            }
+            
+            .news-options-btn {
+                top: 12px;
+                left: 12px;
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            
+            .news-options-menu {
+                top: 45px;
+                left: 12px;
+                min-width: 130px;
+            }
+            
+            .news-option-item {
+                padding: 12px 15px;
+                font-size: 0.9rem;
             }
         }
         
         @media (max-width: 480px) {
             .auth-container {
                 width: 95%;
-                padding: 20px;
+                padding: 25px;
             }
             
             .modal-content {
@@ -1242,18 +1369,69 @@
             }
             
             .profile-avatar {
-                width: 65px;
-                height: 65px;
-                font-size: 1.3rem;
+                width: 75px;
+                height: 75px;
+                font-size: 1.6rem;
             }
             
             .menu-item {
-                padding: 14px 16px;
+                padding: 16px;
             }
+            
+            .school-name {
+                font-size: 1.8rem;
+            }
+            
+            .nav-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            
+            .nav-item {
+                max-width: 75px;
+            }
+            
+            .news-options-menu {
+                min-width: 120px;
+            }
+        }
+        
+        /* تحسينات خاصة */
+        .rank-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .rank-admin {
+            background: linear-gradient(135deg, #1e3c8b, #667eea);
+            color: white;
+        }
+        
+        .rank-manager {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+        }
+        
+        .rank-teacher {
+            background: linear-gradient(135deg, #2196F3, #03A9F4);
+            color: white;
+        }
+        
+        .rank-user {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
         }
     </style>
 </head>
 <body>
+    <!-- خلفية متحركة -->
+    <div class="animated-background" id="animatedBackground"></div>
+    
     <div class="app-container">
         <!-- شاشة البداية مع الأنيميشن -->
         <div class="splash-screen" id="splashScreen">
@@ -1370,7 +1548,7 @@
                     <div class="refresh-indicator" id="gradesRefresh">▼</div>
                 </div>
                 <div class="grade-action-buttons" id="gradeActionButtons" style="display: none;">
-                    <div class="send-semester-btn" id="sendSemesterBtn" title="إرسال المعدل الفصلي">Σ</div>
+                    <div class="send-semester-btn" id="sendSemesterBtn" title="إرسال معدل فصلي">+</div>
                     <div class="send-grades-btn" id="sendGradesBtn" title="إرسال درجات عادية">+</div>
                 </div>
             </div>
@@ -1399,10 +1577,14 @@
                             <span class="detail-value" id="profileEmail">mslmalmyaly223@gmail.com</span>
                         </div>
                         <div class="profile-detail">
+                            <span class="detail-label">الرتبة:</span>
+                            <span class="detail-value" id="profileRank">غير محدد</span>
+                        </div>
+                        <div class="profile-detail" id="profileGradeRow" style="display: none;">
                             <span class="detail-label">الصف:</span>
                             <span class="detail-value" id="profileGrade">غير محدد</span>
                         </div>
-                        <div class="profile-detail">
+                        <div class="profile-detail" id="profileClassRow" style="display: none;">
                             <span class="detail-label">الشعبة:</span>
                             <span class="detail-value" id="profileClass">غير محدد</span>
                         </div>
@@ -1480,6 +1662,23 @@
                 </div>
                 
                 <button class="btn btn-primary" id="publishNewsBtn">نشر الخبر</button>
+            </div>
+        </div>
+        
+        <!-- نافذة تعديل خبر -->
+        <div class="modal" id="editNewsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">تعديل الخبر</div>
+                    <div class="close-modal" id="closeEditNewsModal">×</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">نص الخبر</label>
+                    <textarea class="form-input" id="editNewsText" rows="5" placeholder="اكتب خبرك هنا..."></textarea>
+                </div>
+                
+                <button class="btn btn-primary" id="updateNewsBtn">تحديث الخبر</button>
             </div>
         </div>
         
@@ -1851,18 +2050,18 @@
                 </div>
                 
                 <div class="form-group">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 2.5rem; color: #1e3c8b; font-weight: bold;" id="totalUsers">0</div>
+                    <div style="text-align: center; padding: 25px;">
+                        <div style="font-size: 2.8rem; color: #1e3c8b; font-weight: bold;" id="totalUsers">0</div>
                         <div style="color: #666; margin-top: 10px;">إجمالي المستخدمين</div>
                     </div>
                     
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 2.5rem; color: #27ae60; font-weight: bold;" id="activeUsers">0</div>
-                        <div style="color: #666; margin-top: 10px;">المستخدمين النشطين اليوم</div>
+                    <div style="text-align: center; padding: 25px;">
+                        <div style="font-size: 2.8rem; color: #27ae60; font-weight: bold;" id="activeNowUsers">0</div>
+                        <div style="color: #666; margin-top: 10px;">المستخدمين النشطين الآن</div>
                     </div>
                     
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 2.5rem; color: #e67e22; font-weight: bold;" id="todayUsers">0</div>
+                    <div style="text-align: center; padding: 25px;">
+                        <div style="font-size: 2.8rem; color: #e67e22; font-weight: bold;" id="todayUsers">0</div>
                         <div style="color: #666; margin-top: 10px;">المستخدمين المسجلين اليوم</div>
                     </div>
                 </div>
@@ -2018,6 +2217,9 @@
         let newsLoaded = false;
         let gradesLoaded = false;
         let notificationsLoaded = false;
+        let activeUsers = new Set();
+        let newsToEdit = null;
+        let editNewsId = null;
         
         // إعدادات التطبيق
         const APP_SETTINGS = {
@@ -2061,8 +2263,11 @@
         const profileName = document.getElementById('profileName');
         const profileId = document.getElementById('profileId');
         const profileEmail = document.getElementById('profileEmail');
+        const profileRank = document.getElementById('profileRank');
         const profileGrade = document.getElementById('profileGrade');
         const profileClass = document.getElementById('profileClass');
+        const profileGradeRow = document.getElementById('profileGradeRow');
+        const profileClassRow = document.getElementById('profileClassRow');
         const profileAvatar = document.getElementById('profileAvatar');
         const editNameBtn = document.getElementById('editNameBtn');
         const newsBadge = document.getElementById('newsBadge');
@@ -2071,38 +2276,42 @@
         const newsRefresh = document.getElementById('newsRefresh');
         const gradesRefresh = document.getElementById('gradesRefresh');
         const notificationsRefresh = document.getElementById('notificationsRefresh');
+        const animatedBackground = document.getElementById('animatedBackground');
         
-        // النوافذ المنبثقة
-        const addNewsModal = document.getElementById('addNewsModal');
-        const sendGradesModal = document.getElementById('sendGradesModal');
-        const sendSemesterModal = document.getElementById('sendSemesterModal');
-        const selectStudentsModal = document.getElementById('selectStudentsModal');
-        const selectSemesterStudentsModal = document.getElementById('selectSemesterStudentsModal');
-        const enterGradeModal = document.getElementById('enterGradeModal');
-        const enterSemesterModal = document.getElementById('enterSemesterModal');
-        const sendNotificationModal = document.getElementById('sendNotificationModal');
-        const selectNotificationStudentsModal = document.getElementById('selectNotificationStudentsModal');
-        const writeNotificationModal = document.getElementById('writeNotificationModal');
-        const statsModal = document.getElementById('statsModal');
-        const promoteModal = document.getElementById('promoteModal');
-        const manageStudentsModal = document.getElementById('manageStudentsModal');
-        const selectManageStudentsModal = document.getElementById('selectManageStudentsModal');
+        // إنشاء خلفية متحركة
+        function createAnimatedBackground() {
+            const symbols = ['📚', '✏️', '📐', '🧮', '🌍', '🔬', '🧪', '📝', '📖', '🎓', '🏫', '🧠'];
+            
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.className = 'animated-bg-element';
+                
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                element.innerHTML = randomSymbol;
+                
+                if (randomSymbol === '📚' || randomSymbol === '📖') {
+                    element.classList.add('book-icon');
+                } else if (randomSymbol === '✏️' || randomSymbol === '📝') {
+                    element.classList.add('pencil-icon');
+                } else if (randomSymbol === '📐') {
+                    element.classList.add('ruler-icon');
+                } else if (randomSymbol === '🧮') {
+                    element.classList.add('calculator-icon');
+                } else if (randomSymbol === '🌍') {
+                    element.classList.add('globe-icon');
+                } else {
+                    element.classList.add('math-symbol');
+                }
+                
+                element.style.right = Math.random() * 100 + 'vw';
+                element.style.animationDelay = Math.random() * 15 + 's';
+                element.style.animationDuration = (15 + Math.random() * 10) + 's';
+                
+                animatedBackground.appendChild(element);
+            }
+        }
         
-        // أزرار الإغلاق
-        document.getElementById('closeNewsModal').addEventListener('click', () => addNewsModal.style.display = 'none');
-        document.getElementById('closeGradesModal').addEventListener('click', () => sendGradesModal.style.display = 'none');
-        document.getElementById('closeSemesterModal').addEventListener('click', () => sendSemesterModal.style.display = 'none');
-        document.getElementById('closeStudentsModal').addEventListener('click', () => selectStudentsModal.style.display = 'none');
-        document.getElementById('closeSemesterStudentsModal').addEventListener('click', () => selectSemesterStudentsModal.style.display = 'none');
-        document.getElementById('closeGradeModal').addEventListener('click', () => enterGradeModal.style.display = 'none');
-        document.getElementById('closeSemesterGradeModal').addEventListener('click', () => enterSemesterModal.style.display = 'none');
-        document.getElementById('closeNotificationModal').addEventListener('click', () => sendNotificationModal.style.display = 'none');
-        document.getElementById('closeNotificationStudentsModal').addEventListener('click', () => selectNotificationStudentsModal.style.display = 'none');
-        document.getElementById('closeWriteNotificationModal').addEventListener('click', () => writeNotificationModal.style.display = 'none');
-        document.getElementById('closeStatsModal').addEventListener('click', () => statsModal.style.display = 'none');
-        document.getElementById('closePromoteModal').addEventListener('click', () => promoteModal.style.display = 'none');
-        document.getElementById('closeManageStudentsModal').addEventListener('click', () => manageStudentsModal.style.display = 'none');
-        document.getElementById('closeSelectManageStudentsModal').addEventListener('click', () => selectManageStudentsModal.style.display = 'none');
+        window.addEventListener('load', createAnimatedBackground);
         
         // أحداث التبويب
         loginTab.addEventListener('click', () => {
@@ -2185,6 +2394,7 @@
                     
                     // تحديد الدور بناءً على البريد الإلكتروني
                     let role = 'user';
+                    let promoteCount = 0;
                     if (email === 'mslmalmyaly223@gmail.com') {
                         role = 'admin';
                     }
@@ -2197,8 +2407,11 @@
                         grade: grade,
                         class: classVal,
                         role: role,
+                        promoteCount: promoteCount,
                         createdAt: new Date().toISOString(),
-                        lastLogin: new Date().toISOString()
+                        lastLogin: new Date().toISOString(),
+                        isActive: true,
+                        lastActive: new Date().toISOString()
                     });
                 })
                 .then(() => {
@@ -2216,11 +2429,9 @@
             item.addEventListener('click', () => {
                 const pageId = item.getAttribute('data-page');
                 
-                // تحديث حالة التنشيط في شريط التنقل
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
                 
-                // إظهار الصفحة المحددة وإخفاء الآخرين
                 pages.forEach(page => page.classList.remove('active'));
                 document.getElementById(pageId).classList.add('active');
                 
@@ -2284,9 +2495,30 @@
                         profileName.textContent = userData.name;
                         profileId.textContent = userData.userId || 'غير متوفر';
                         profileEmail.textContent = userData.email;
-                        profileGrade.textContent = userData.grade || 'غير محدد';
-                        profileClass.textContent = userData.class || 'غير محدد';
                         profileAvatar.textContent = userData.name.charAt(0);
+                        
+                        // تحديد الرتبة بناءً على promoteCount
+                        let rank = 'طالب';
+                        if (userData.role === 'admin' || userData.email === 'mslmalmyaly223@gmail.com') {
+                            rank = 'المالك';
+                            profileGradeRow.style.display = 'none';
+                            profileClassRow.style.display = 'none';
+                        } else if (userData.role === 'supervisor') {
+                            if (userData.promoteCount && userData.promoteCount > 1) {
+                                rank = 'مدير';
+                            } else {
+                                rank = 'مدرس';
+                            }
+                            profileGradeRow.style.display = 'none';
+                            profileClassRow.style.display = 'none';
+                        } else {
+                            // طالب عادي
+                            profileGrade.textContent = userData.grade || 'غير محدد';
+                            profileClass.textContent = userData.class || 'غير محدد';
+                            profileGradeRow.style.display = 'flex';
+                            profileClassRow.style.display = 'flex';
+                        }
+                        profileRank.textContent = rank;
                     }
                 })
                 .catch(error => {
@@ -2317,7 +2549,6 @@
                 id: newsId
             };
             
-            // التحقق من عدم وجود خبر بنفس المعرف
             database.ref('news/' + newsId).once('value')
                 .then(snapshot => {
                     if (!snapshot.exists()) {
@@ -2336,6 +2567,185 @@
                     alert('خطأ في نشر الخبر: ' + error.message);
                 });
         });
+        
+        // تحميل الأخبار - تصميم فيسبوك محسّن بدون أزرار لايك وتعليق ومشاركة
+        function loadNews() {
+            if (newsLoaded) return;
+            newsLoaded = true;
+            
+            const newsContainer = document.getElementById('newsContainer');
+            newsContainer.innerHTML = '<div class="refresh-indicator" id="newsRefresh">▼</div>';
+            
+            database.ref('news').orderByChild('timestamp').limitToLast(APP_SETTINGS.newsLimit).once('value')
+                .then(snapshot => {
+                    const news = [];
+                    const seenIds = new Set();
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const newsItem = {
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        };
+                        
+                        if (!seenIds.has(newsItem.id)) {
+                            seenIds.add(newsItem.id);
+                            news.push(newsItem);
+                        }
+                    });
+                    
+                    news.reverse();
+                    
+                    if (news.length === 0) {
+                        const noNews = document.createElement('div');
+                        noNews.className = 'news-card';
+                        noNews.textContent = 'لا توجد أخبار حتى الآن';
+                        noNews.style.textAlign = 'center';
+                        noNews.style.padding = '30px';
+                        noNews.style.color = '#666';
+                        newsContainer.appendChild(noNews);
+                        newsLoaded = false;
+                        return;
+                    }
+                    
+                    news.forEach(item => {
+                        const newsCard = document.createElement('div');
+                        newsCard.className = 'news-card fade-in';
+                        
+                        const timeAgo = getTimeAgo(item.timestamp);
+                        
+                        // إنشاء محتوى المنشور
+                        newsCard.innerHTML = `
+                            <div class="news-card-header">
+                                <div class="news-author-avatar">${item.author.charAt(0)}</div>
+                                <div class="news-author-info">
+                                    <div class="news-author-name">${item.author}</div>
+                                    <div class="news-post-time">
+                                        <span>🕒</span>
+                                        <span>${timeAgo}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="news-content">${item.text}</div>
+                        `;
+                        
+                        // إضافة زر النقاط الثلاثة للمالك والمشرفين فقط
+                        if (isAdmin || isSupervisor) {
+                            const optionsBtn = document.createElement('div');
+                            optionsBtn.className = 'news-options-btn';
+                            optionsBtn.innerHTML = '⋮';
+                            optionsBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                showNewsOptionsMenu(item, optionsBtn, newsCard);
+                            });
+                            newsCard.appendChild(optionsBtn);
+                        }
+                        
+                        newsContainer.appendChild(newsCard);
+                    });
+                    
+                    updateNewsBadge(news);
+                    
+                    newsLoaded = false;
+                })
+                .catch(error => {
+                    console.error('Error loading news:', error);
+                    newsLoaded = false;
+                });
+        }
+        
+        // إظهار قائمة خيارات المنشور (تعديل/حذف)
+        function showNewsOptionsMenu(newsItem, button, newsCard) {
+            // إغلاق أي قائمة مفتوحة سابقاً
+            const existingMenu = document.querySelector('.news-options-menu');
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+            
+            // إنشاء قائمة الخيارات
+            const optionsMenu = document.createElement('div');
+            optionsMenu.className = 'news-options-menu';
+            optionsMenu.style.display = 'block';
+            
+            // إضافة خيار التعديل
+            const editOption = document.createElement('div');
+            editOption.className = 'news-option-item option-edit';
+            editOption.innerHTML = '<span>✏️</span> <span>تعديل الخبر</span>';
+            editOption.addEventListener('click', () => {
+                editNewsItem(newsItem);
+                optionsMenu.remove();
+            });
+            optionsMenu.appendChild(editOption);
+            
+            // إضافة خيار الحذف
+            const deleteOption = document.createElement('div');
+            deleteOption.className = 'news-option-item option-delete';
+            deleteOption.innerHTML = '<span>🗑️</span> <span>حذف الخبر</span>';
+            deleteOption.addEventListener('click', () => {
+                if (confirm('هل أنت متأكد من حذف هذا الخبر؟')) {
+                    deleteNewsItem(newsItem);
+                }
+                optionsMenu.remove();
+            });
+            optionsMenu.appendChild(deleteOption);
+            
+            // إضافة القائمة إلى المنشور
+            newsCard.appendChild(optionsMenu);
+            
+            // إغلاق القائمة عند النقر خارجها
+            const closeMenu = (e) => {
+                if (!newsCard.contains(e.target)) {
+                    optionsMenu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeMenu);
+            }, 100);
+        }
+        
+        // تعديل خبر
+        function editNewsItem(newsItem) {
+            editNewsId = newsItem.id;
+            document.getElementById('editNewsText').value = newsItem.text;
+            editNewsModal.style.display = 'flex';
+        }
+        
+        // تحديث الخبر بعد التعديل
+        document.getElementById('updateNewsBtn').addEventListener('click', () => {
+            const updatedText = document.getElementById('editNewsText').value.trim();
+            
+            if (!updatedText) {
+                alert('يرجى كتابة نص الخبر');
+                return;
+            }
+            
+            database.ref('news/' + editNewsId).update({
+                text: updatedText,
+                editedAt: new Date().toISOString(),
+                editedBy: currentUser.uid
+            })
+            .then(() => {
+                alert('تم تحديث الخبر بنجاح');
+                editNewsModal.style.display = 'none';
+                loadNews();
+            })
+            .catch((error) => {
+                alert('خطأ في تحديث الخبر: ' + error.message);
+            });
+        });
+        
+        // حذف خبر
+        function deleteNewsItem(newsItem) {
+            database.ref('news/' + newsItem.id).remove()
+                .then(() => {
+                    alert('تم حذف الخبر بنجاح');
+                    loadNews();
+                })
+                .catch((error) => {
+                    alert('خطأ في حذف الخبر: ' + error.message);
+                });
+        }
         
         // إرسال الدرجات العادية
         sendGradesBtn.addEventListener('click', () => {
@@ -2360,7 +2770,6 @@
                 return;
             }
             
-            // حفظ بيانات الصف والشعبة والمادة
             currentGradeData = {
                 subject: subject,
                 examType: examType,
@@ -2384,7 +2793,6 @@
                 return;
             }
             
-            // حفظ بيانات الصف والشعبة والمادة
             currentSemesterData = {
                 subject: subject,
                 semesterType: semesterType,
@@ -2395,14 +2803,15 @@
             loadStudentsForSemester(gradeLevel, gradeClass);
         });
         
-        // تحميل الطلاب للدرجات العادية
+        // تحميل الطلاب للدرجات العادية - تخطي المشرفين والمدراء
         function loadStudentsForGrades(gradeLevel, gradeClass) {
             database.ref('users').once('value')
                 .then(snapshot => {
                     const students = [];
                     snapshot.forEach(childSnapshot => {
                         const user = childSnapshot.val();
-                        if (user.grade === gradeLevel && user.class === gradeClass && (user.role === 'user' || !user.role)) {
+                        // تضمين فقط المستخدمين العاديين (ليسوا مشرفين ولا مدراء)
+                        if (user.grade === gradeLevel && user.class === gradeClass && user.role === 'user') {
                             students.push({
                                 id: childSnapshot.key,
                                 name: user.name,
@@ -2418,11 +2827,9 @@
                         return;
                     }
                     
-                    // حفظ قائمة الطلاب للمعالجة الدفعية
                     allStudentsList = students;
                     currentStudentIndex = 0;
                     
-                    // عرض قائمة الطلاب
                     const studentsList = document.getElementById('studentsList');
                     const batchProgress = document.getElementById('batchProgress');
                     
@@ -2432,7 +2839,6 @@
                         document.getElementById('progressText').textContent = `0/${students.length}`;
                         document.getElementById('progressFill').style.width = '0%';
                         
-                        // بدء العملية الدفعية
                         startBatchGradeProcess();
                     } else {
                         document.getElementById('studentsModalTitle').textContent = 'اختر الطالب';
@@ -2448,14 +2854,14 @@
                 });
         }
         
-        // تحميل الطلاب للمعدل الفصلي
+        // تحميل الطلاب للمعدل الفصلي - تخطي المشرفين والمدراء
         function loadStudentsForSemester(gradeLevel, gradeClass) {
             database.ref('users').once('value')
                 .then(snapshot => {
                     const students = [];
                     snapshot.forEach(childSnapshot => {
                         const user = childSnapshot.val();
-                        if (user.grade === gradeLevel && user.class === gradeClass && (user.role === 'user' || !user.role)) {
+                        if (user.grade === gradeLevel && user.class === gradeClass && user.role === 'user') {
                             students.push({
                                 id: childSnapshot.key,
                                 name: user.name,
@@ -2471,11 +2877,9 @@
                         return;
                     }
                     
-                    // حفظ قائمة الطلاب للمعالجة الدفعية
                     allStudentsList = students;
                     currentStudentIndex = 0;
                     
-                    // عرض قائمة الطلاب
                     const studentsList = document.getElementById('semesterStudentsList');
                     const batchProgress = document.getElementById('semesterBatchProgress');
                     
@@ -2484,7 +2888,6 @@
                     document.getElementById('semesterProgressText').textContent = `0/${students.length}`;
                     document.getElementById('semesterProgressFill').style.width = '0%';
                     
-                    // بدء العملية الدفعية للمعدل الفصلي
                     startBatchSemesterProcess();
                     
                     sendSemesterModal.style.display = 'none';
@@ -2495,7 +2898,7 @@
                 });
         }
         
-        // عرض قائمة الطلاب بتحسينات التصميم
+        // عرض قائمة الطلاب
         function displayStudentsList(students, container, type) {
             container.innerHTML = '';
             
@@ -2553,17 +2956,14 @@
             const student = allStudentsList[currentStudentIndex];
             selectedStudent = student;
             
-            // تحديث شريط التقدم
             document.getElementById('progressText').textContent = `${currentStudentIndex + 1}/${allStudentsList.length}`;
             document.getElementById('progressFill').style.width = `${((currentStudentIndex + 1) / allStudentsList.length) * 100}%`;
             
             document.getElementById('studentNameLabel').textContent = `الدرجة للطالب: ${student.name} (${currentStudentIndex + 1}/${allStudentsList.length})`;
             
-            // مسح الحقول السابقة
             document.getElementById('studentGrade').value = '';
             document.getElementById('gradeOutOf').value = '';
             
-            // الانتقال إلى نافذة إدخال الدرجة
             selectStudentsModal.style.display = 'none';
             enterGradeModal.style.display = 'flex';
         }
@@ -2579,18 +2979,15 @@
             const student = allStudentsList[currentStudentIndex];
             selectedStudent = student;
             
-            // تحديث شريط التقدم
             document.getElementById('semesterProgressText').textContent = `${currentStudentIndex + 1}/${allStudentsList.length}`;
             document.getElementById('semesterProgressFill').style.width = `${((currentStudentIndex + 1) / allStudentsList.length) * 100}%`;
             
             document.getElementById('semesterStudentNameLabel').textContent = `المعدل الفصلي للطالب: ${student.name} (${currentStudentIndex + 1}/${allStudentsList.length})`;
             
-            // مسح الحقول السابقة
             document.getElementById('firstMonthGrade').value = '';
             document.getElementById('secondMonthGrade').value = '';
             document.getElementById('finalSemesterGrade').value = '';
             
-            // الانتقال إلى نافذة إدخال المعدل الفصلي
             selectSemesterStudentsModal.style.display = 'none';
             enterSemesterModal.style.display = 'flex';
         }
@@ -2603,46 +3000,10 @@
             const firstGrade = parseFloat(document.getElementById('firstMonthGrade').value) || 0;
             const secondGrade = parseFloat(document.getElementById('secondMonthGrade').value) || 0;
             
-            // جمع الدرجتين وتقسيمهما على 2
             const finalGrade = (firstGrade + secondGrade) / 2;
             
-            // عرض النتيجة مع تقريب لرقمين عشريين
             document.getElementById('finalSemesterGrade').value = finalGrade.toFixed(2);
         }
-        
-        // العودة إلى قائمة الطلاب للدرجات العادية
-        document.getElementById('backToStudentsBtn').addEventListener('click', () => {
-            if (currentGradeData.sendMethod === 'batch') {
-                // في حالة الإرسال الدفعي، نعود ونبدأ من جديد
-                currentStudentIndex = 0;
-                selectStudentsModal.style.display = 'flex';
-                enterGradeModal.style.display = 'none';
-                startBatchGradeProcess();
-            } else {
-                enterGradeModal.style.display = 'none';
-                selectStudentsModal.style.display = 'flex';
-            }
-        });
-        
-        // العودة إلى قائمة الطلاب للمعدل الفصلي
-        document.getElementById('backToSemesterStudentsBtn').addEventListener('click', () => {
-            currentStudentIndex = 0;
-            selectSemesterStudentsModal.style.display = 'flex';
-            enterSemesterModal.style.display = 'none';
-            startBatchSemesterProcess();
-        });
-        
-        // العودة إلى إدخال بيانات الصف للدرجات العادية
-        document.getElementById('backToGradesBtn').addEventListener('click', () => {
-            selectStudentsModal.style.display = 'none';
-            sendGradesModal.style.display = 'flex';
-        });
-        
-        // العودة إلى إدخال بيانات الصف للمعدل الفصلي
-        document.getElementById('backToSemesterBtn').addEventListener('click', () => {
-            selectSemesterStudentsModal.style.display = 'none';
-            sendSemesterModal.style.display = 'flex';
-        });
         
         // إرسال الدرجة العادية للطالب
         document.getElementById('sendGradeBtn').addEventListener('click', () => {
@@ -2685,7 +3046,6 @@
             database.ref('grades/' + gradeId).set(gradeData)
                 .then(() => {
                     if (currentGradeData.sendMethod === 'batch') {
-                        // في حالة الإرسال الدفعي، ننتقل للطالب التالي
                         currentStudentIndex++;
                         if (currentStudentIndex < allStudentsList.length) {
                             startBatchGradeProcess();
@@ -2693,7 +3053,7 @@
                             alert('تم إرسال الدرجات لجميع الطلاب بنجاح!');
                             enterGradeModal.style.display = 'none';
                             sendGradesModal.style.display = 'none';
-                            loadGrades(); // تحديث صفحة الدرجات
+                            loadGrades();
                         }
                     } else {
                         alert('تم إرسال الدرجة بنجاح');
@@ -2701,7 +3061,7 @@
                         document.getElementById('gradeOutOf').value = '';
                         enterGradeModal.style.display = 'none';
                         sendGradesModal.style.display = 'none';
-                        loadGrades(); // تحديث صفحة الدرجات
+                        loadGrades();
                     }
                 })
                 .catch((error) => {
@@ -2738,20 +3098,6 @@
             
             database.ref('semester_grades/' + gradeId).set(gradeData)
                 .then(() => {
-                    // إرسال إشعار للطالب بالمعدل الفصلي
-                    const notificationId = generateRandomId(10);
-                    const notificationData = {
-                        studentId: selectedStudent.id,
-                        studentName: selectedStudent.name,
-                        message: `مرحبا عزيزي ${selectedStudent.name}، هذا معدلك في ${currentSemesterData.semesterType} لمادة ${currentSemesterData.subject}: ${finalGrade.toFixed(2)}`,
-                        sender: profileName.textContent,
-                        timestamp: new Date().toISOString(),
-                        type: 'semester_grade'
-                    };
-                    
-                    return database.ref('notifications/' + notificationId).set(notificationData);
-                })
-                .then(() => {
                     currentStudentIndex++;
                     if (currentStudentIndex < allStudentsList.length) {
                         startBatchSemesterProcess();
@@ -2759,7 +3105,7 @@
                         alert('تم إرسال المعدل الفصلي لجميع الطلاب بنجاح!');
                         enterSemesterModal.style.display = 'none';
                         sendSemesterModal.style.display = 'none';
-                        loadGrades(); // تحديث صفحة الدرجات
+                        loadGrades();
                     }
                 })
                 .catch((error) => {
@@ -2790,14 +3136,14 @@
             loadStudentsForNotification(gradeLevel, gradeClass);
         });
         
-        // تحميل الطلاب للتبليغ
+        // تحميل الطلاب للتبليغ - تخطي المشرفين والمدراء
         function loadStudentsForNotification(gradeLevel, gradeClass) {
             database.ref('users').once('value')
                 .then(snapshot => {
                     const students = [];
                     snapshot.forEach(childSnapshot => {
                         const user = childSnapshot.val();
-                        if (user.grade === gradeLevel && user.class === gradeClass && (user.role === 'user' || !user.role)) {
+                        if (user.grade === gradeLevel && user.class === gradeClass && user.role === 'user') {
                             students.push({
                                 id: childSnapshot.key,
                                 name: user.name,
@@ -2813,7 +3159,6 @@
                         return;
                     }
                     
-                    // عرض قائمة الطلاب
                     const studentsList = document.getElementById('notificationStudentsList');
                     displayStudentsList(students, studentsList, 'notification');
                     
@@ -2824,18 +3169,6 @@
                     alert('خطأ في جلب بيانات الطلاب: ' + error.message);
                 });
         }
-        
-        // العودة إلى إدخال بيانات الصف للتبليغ
-        document.getElementById('backToNotificationBtn').addEventListener('click', () => {
-            selectNotificationStudentsModal.style.display = 'none';
-            sendNotificationModal.style.display = 'flex';
-        });
-        
-        // العودة إلى قائمة الطلاب للتبليغ
-        document.getElementById('backToNotificationStudentsBtn').addEventListener('click', () => {
-            writeNotificationModal.style.display = 'none';
-            selectNotificationStudentsModal.style.display = 'flex';
-        });
         
         // إرسال رسالة التبليغ
         document.getElementById('sendNotificationBtn').addEventListener('click', () => {
@@ -2864,7 +3197,7 @@
                     document.getElementById('notificationMessage').value = '';
                     writeNotificationModal.style.display = 'none';
                     sendNotificationModal.style.display = 'none';
-                    loadNotifications(); // تحديث صفحة التبليغات
+                    loadNotifications();
                 })
                 .catch((error) => {
                     alert('خطأ في إرسال التبليغ: ' + error.message);
@@ -2883,31 +3216,31 @@
                     const totalUsers = snapshot.numChildren();
                     document.getElementById('totalUsers').textContent = totalUsers;
                     
-                    // حساب المستخدمين النشطين اليوم
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const todayStr = today.toISOString();
+                    const now = new Date();
+                    const activeThreshold = new Date(now.getTime() - 5 * 60000);
                     
-                    let activeUsers = 0;
+                    let activeNowUsers = 0;
                     let todayUsers = 0;
                     
                     snapshot.forEach(childSnapshot => {
                         const user = childSnapshot.val();
-                        if (user.lastLogin) {
-                            const lastLogin = new Date(user.lastLogin);
-                            if (lastLogin >= today) {
-                                activeUsers++;
+                        if (user.lastActive) {
+                            const lastActive = new Date(user.lastActive);
+                            if (lastActive >= activeThreshold) {
+                                activeNowUsers++;
                             }
                         }
                         if (user.createdAt) {
                             const createdAt = new Date(user.createdAt);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
                             if (createdAt >= today) {
                                 todayUsers++;
                             }
                         }
                     });
                     
-                    document.getElementById('activeUsers').textContent = activeUsers;
+                    document.getElementById('activeNowUsers').textContent = activeNowUsers;
                     document.getElementById('todayUsers').textContent = todayUsers;
                     
                     statsModal.style.display = 'flex';
@@ -2922,7 +3255,7 @@
             promoteModal.style.display = 'flex';
         });
         
-        // حفظ المشرف الجديد
+        // حفظ المشرف الجديد - مع حذفه من قائمة الشعبة والصف (فقط للمشرفين الجدد، ليس المالك)
         document.getElementById('savePromoteBtn').addEventListener('click', () => {
             const email = document.getElementById('promoteEmail').value.trim();
             
@@ -2940,25 +3273,45 @@
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const userKey = Object.keys(snapshot.val())[0];
-                        return database.ref('users/' + userKey + '/role').set('supervisor');
+                        const userData = snapshot.val()[userKey];
+                        
+                        // التأكد من أن المستخدم ليس المالك
+                        if (userData.email === 'mslmalmyaly223@gmail.com') {
+                            alert('لا يمكن تعديل صلاحيات المالك');
+                            return Promise.reject('Cannot modify owner');
+                        }
+                        
+                        let promoteCount = userData.promoteCount || 0;
+                        promoteCount++;
+                        
+                        let role = 'supervisor';
+                        
+                        // تحديث بيانات المستخدم: تغيير الدور وحذف الصف والشعبة (فقط للمشرفين الجدد)
+                        return database.ref('users/' + userKey).update({
+                            role: role,
+                            promoteCount: promoteCount,
+                            grade: null,
+                            class: null,
+                            lastPromoted: new Date().toISOString()
+                        });
                     } else {
                         alert('لا يوجد مستخدم بهذا البريد الإلكتروني');
                         return Promise.reject('User not found');
                     }
                 })
                 .then(() => {
-                    alert('تم رفع المستخدم إلى مشرف بنجاح');
+                    alert('تم رفع المستخدم إلى مشرف بنجاح وتم حذفه من قائمة الصف والشعبة');
                     document.getElementById('promoteEmail').value = '';
                     promoteModal.style.display = 'none';
                 })
                 .catch(error => {
-                    if (error !== 'User not found') {
+                    if (error !== 'User not found' && error !== 'Cannot modify owner') {
                         alert('خطأ في رفع المشرف: ' + error.message);
                     }
                 });
         });
         
-        // إدارة الطلاب (نقل وحذف)
+        // إدارة الطلاب (نقل وحذف) - تظهر فقط للمالك والمشرفين
         manageStudentsBtn.addEventListener('click', () => {
             manageStudentsModal.style.display = 'flex';
         });
@@ -2983,14 +3336,14 @@
             loadStudentsForManagement(gradeLevel, gradeClass);
         });
         
-        // تحميل الطلاب للإدارة
+        // تحميل الطلاب للإدارة - تخطي المشرفين والمدراء
         function loadStudentsForManagement(gradeLevel, gradeClass) {
             database.ref('users').once('value')
                 .then(snapshot => {
                     const students = [];
                     snapshot.forEach(childSnapshot => {
                         const user = childSnapshot.val();
-                        if (user.grade === gradeLevel && user.class === gradeClass && (user.role === 'user' || !user.role)) {
+                        if (user.grade === gradeLevel && user.class === gradeClass && user.role === 'user') {
                             students.push({
                                 id: childSnapshot.key,
                                 name: user.name,
@@ -3006,7 +3359,6 @@
                         return;
                     }
                     
-                    // عرض قائمة الطلاب
                     const studentsList = document.getElementById('manageStudentsList');
                     document.getElementById('manageStudentsModalTitle').textContent = 'اختر الطالب';
                     displayStudentsList(students, studentsList, 'manage');
@@ -3073,12 +3425,6 @@
             }
         });
         
-        // العودة إلى إدارة الطلاب
-        document.getElementById('backToManageBtn').addEventListener('click', () => {
-            selectManageStudentsModal.style.display = 'none';
-            manageStudentsModal.style.display = 'flex';
-        });
-        
         // تسجيل الخروج
         logoutBtn.addEventListener('click', () => {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
@@ -3101,7 +3447,6 @@
             const newName = prompt('أدخل اسمك الجديد:', profileName.textContent);
             
             if (newName && newName.trim() !== '') {
-                // التحقق من الاسم الثلاثي (فقط للمستخدمين العاديين)
                 if (!isAdmin && !isSupervisor) {
                     const nameParts = newName.trim().split(' ');
                     if (nameParts.length < 3) {
@@ -3153,98 +3498,7 @@
             }, 1000);
         });
         
-        // تحميل الأخبار
-        function loadNews() {
-            if (newsLoaded) return;
-            newsLoaded = true;
-            
-            const newsContainer = document.getElementById('newsContainer');
-            newsContainer.innerHTML = '<div class="refresh-indicator" id="newsRefresh">▼</div>';
-            
-            database.ref('news').orderByChild('timestamp').limitToLast(APP_SETTINGS.newsLimit).once('value')
-                .then(snapshot => {
-                    const news = [];
-                    const seenIds = new Set();
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const newsItem = {
-                            id: childSnapshot.key,
-                            ...childSnapshot.val()
-                        };
-                        
-                        if (!seenIds.has(newsItem.id)) {
-                            seenIds.add(newsItem.id);
-                            news.push(newsItem);
-                        }
-                    });
-                    
-                    // عكس الترتيب لعرض الأحدث أولاً
-                    news.reverse();
-                    
-                    if (news.length === 0) {
-                        const noNews = document.createElement('div');
-                        noNews.className = 'news-card';
-                        noNews.textContent = 'لا توجد أخبار حتى الآن';
-                        noNews.style.textAlign = 'center';
-                        noNews.style.padding = '30px';
-                        noNews.style.color = '#666';
-                        newsContainer.appendChild(noNews);
-                        newsLoaded = false;
-                        return;
-                    }
-                    
-                    news.forEach(item => {
-                        const newsCard = document.createElement('div');
-                        newsCard.className = 'news-card fade-in';
-                        newsCard.innerHTML = `
-                            <div class="news-header">
-                                <div class="news-author">
-                                    <div class="author-avatar">${item.author.charAt(0)}</div>
-                                    ${item.author}
-                                </div>
-                                <div class="news-date">${formatDate(item.timestamp)}</div>
-                            </div>
-                            <div class="news-content">${item.text}</div>
-                            ${(isAdmin || isSupervisor) ? `
-                            <div class="news-actions">
-                                <button class="btn btn-small btn-secondary edit-news-btn" data-id="${item.id}">تعديل</button>
-                                <button class="btn btn-small btn-danger delete-news-btn" data-id="${item.id}">حذف</button>
-                            </div>
-                            ` : ''}
-                        `;
-                        
-                        newsContainer.appendChild(newsCard);
-                    });
-                    
-                    // تحديث الفقاعة (فقط الأخبار الجديدة بعد آخر زيارة)
-                    updateNewsBadge(news);
-                    
-                    // إضافة أحداث لأزرار التعديل والحذف
-                    if (isAdmin || isSupervisor) {
-                        document.querySelectorAll('.edit-news-btn').forEach(btn => {
-                            btn.addEventListener('click', (e) => {
-                                const newsId = e.target.getAttribute('data-id');
-                                editNews(newsId);
-                            });
-                        });
-                        
-                        document.querySelectorAll('.delete-news-btn').forEach(btn => {
-                            btn.addEventListener('click', (e) => {
-                                const newsId = e.target.getAttribute('data-id');
-                                deleteNews(newsId);
-                            });
-                        });
-                    }
-                    
-                    newsLoaded = false;
-                })
-                .catch(error => {
-                    console.error('Error loading news:', error);
-                    newsLoaded = false;
-                });
-        }
-        
-        // تحميل الدرجات
+        // تحميل الدرجات - تضمين الدرجات الشهرية والفصلية فقط
         function loadGrades() {
             if (gradesLoaded) return;
             gradesLoaded = true;
@@ -3257,7 +3511,6 @@
                 return;
             }
             
-            // جلب الدرجات العادية والمعدلات الفصلية
             Promise.all([
                 database.ref('grades').orderByChild('timestamp').limitToLast(APP_SETTINGS.gradeLimit).once('value'),
                 database.ref('semester_grades').orderByChild('timestamp').limitToLast(APP_SETTINGS.gradeLimit).once('value')
@@ -3266,7 +3519,6 @@
                 const grades = [];
                 const seenIds = new Set();
                 
-                // معالجة الدرجات العادية
                 gradesSnapshot.forEach(childSnapshot => {
                     const grade = childSnapshot.val();
                     if (grade.studentId === currentUser.uid) {
@@ -3282,7 +3534,6 @@
                     }
                 });
                 
-                // معالجة المعدلات الفصلية
                 semesterSnapshot.forEach(childSnapshot => {
                     const grade = childSnapshot.val();
                     if (grade.studentId === currentUser.uid) {
@@ -3298,7 +3549,6 @@
                     }
                 });
                 
-                // عكس الترتيب لعرض الأحدث أولاً
                 grades.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
                 if (grades.length === 0) {
@@ -3316,13 +3566,12 @@
                 grades.forEach(item => {
                     let percentage = 0;
                     let message = '';
+                    let emoji = item.isSemester ? '📈' : '📚';
                     
                     if (item.isSemester) {
-                        // معدل فصلي
                         percentage = Math.round(item.finalGrade);
                         message = `مرحبا ${item.studentName}، هذا معدلك في ${item.examType} لمادة ${item.subject}: ${item.finalGrade.toFixed(2)}`;
                     } else {
-                        // درجة عادية
                         percentage = Math.round((item.grade / item.outOf) * 100);
                         message = `مرحبا ${item.studentName}، هذه نتيجتك في ${item.examType} لمادة ${item.subject}: درجتك ${item.grade} من ${item.outOf}`;
                     }
@@ -3332,7 +3581,7 @@
                     gradeCard.innerHTML = `
                         <div class="grade-header">
                             <div class="grade-subject">
-                                <div class="subject-icon">${item.isSemester ? '📈' : '📚'}</div>
+                                <div class="subject-icon">${emoji}</div>
                                 ${item.subject}
                             </div>
                             <div class="grade-date">${formatDate(item.timestamp)}</div>
@@ -3346,7 +3595,6 @@
                     gradesContainer.appendChild(gradeCard);
                 });
                 
-                // تحديث الفقاعة (فقط الدرجات الجديدة بعد آخر زيارة)
                 updateGradesBadge(grades);
                 
                 gradesLoaded = false;
@@ -3357,7 +3605,7 @@
             });
         }
         
-        // تحميل التبليغات
+        // تحميل التبليغات - فقط التبليغات وليس الدرجات الفصلية
         function loadNotifications() {
             if (notificationsLoaded) return;
             notificationsLoaded = true;
@@ -3377,7 +3625,7 @@
                     
                     snapshot.forEach(childSnapshot => {
                         const notification = childSnapshot.val();
-                        if (notification.studentId === currentUser.uid) {
+                        if (notification.studentId === currentUser.uid && notification.type !== 'semester_grade') {
                             const notifKey = `${notification.studentId}-${notification.message}-${notification.timestamp}`;
                             if (!seenIds.has(notifKey)) {
                                 seenIds.add(notifKey);
@@ -3389,7 +3637,6 @@
                         }
                     });
                     
-                    // عكس الترتيب لعرض الأحدث أولاً
                     notifications.reverse();
                     
                     if (notifications.length === 0) {
@@ -3421,7 +3668,6 @@
                         notificationsContainer.appendChild(notificationCard);
                     });
                     
-                    // تحديث الفقاعة (فقط التبليغات الجديدة بعد آخر زيارة)
                     updateNotificationsBadge(notifications);
                     
                     notificationsLoaded = false;
@@ -3510,41 +3756,7 @@
             }
         }
         
-        // تعديل الخبر
-        function editNews(newsId) {
-            database.ref('news/' + newsId).once('value')
-                .then(snapshot => {
-                    const news = snapshot.val();
-                    const newText = prompt('عدل نص الخبر:', news.text);
-                    
-                    if (newText && newText.trim() !== '') {
-                        return database.ref('news/' + newsId + '/text').set(newText.trim());
-                    }
-                })
-                .then(() => {
-                    alert('تم تعديل الخبر بنجاح');
-                    loadNews();
-                })
-                .catch(error => {
-                    alert('خطأ في تعديل الخبر: ' + error.message);
-                });
-        }
-        
-        // حذف الخبر
-        function deleteNews(newsId) {
-            if (confirm('هل أنت متأكد من حذف هذا الخبر؟')) {
-                database.ref('news/' + newsId).remove()
-                    .then(() => {
-                        alert('تم حذف الخبر بنجاح');
-                        loadNews();
-                    })
-                    .catch(error => {
-                        alert('خطأ في حذف الخبر: ' + error.message);
-                    });
-            }
-        }
-        
-        // التحقق من دور المستخدم
+        // التحقق من دور المستخدم - تم إصلاحه للمالك والمشرفين
         function checkUserRole() {
             database.ref('users/' + currentUser.uid).once('value')
                 .then(snapshot => {
@@ -3554,30 +3766,68 @@
                         profileName.textContent = userData.name;
                         profileId.textContent = userData.userId;
                         profileEmail.textContent = userData.email;
-                        profileGrade.textContent = userData.grade;
-                        profileClass.textContent = userData.class;
                         profileAvatar.textContent = userData.name.charAt(0);
                         
+                        // تحديد الرتبة بناءً على البريد الإلكتروني أولاً ثم promoteCount
                         if (userData.email === 'mslmalmyaly223@gmail.com') {
+                            // المالك
                             isAdmin = true;
                             isSupervisor = true;
+                            profileRank.textContent = 'المالك';
+                            // إظهار جميع ميزات المالك
                             promoteBtn.style.display = 'flex';
                             manageStudentsBtn.style.display = 'flex';
-                        } else if (userData.role === 'supervisor' || userData.role === 'admin') {
+                            profileGradeRow.style.display = 'none';
+                            profileClassRow.style.display = 'none';
+                            
+                            // تأكد من أن الدور مضبوط كـ admin في قاعدة البيانات
+                            if (userData.role !== 'admin') {
+                                database.ref('users/' + currentUser.uid + '/role').set('admin')
+                                    .catch(error => console.error('Error setting admin role:', error));
+                            }
+                        } else if (userData.role === 'admin') {
+                            // مديرين آخرين
+                            isAdmin = true;
+                            isSupervisor = true;
+                            profileRank.textContent = 'مدير النظام';
+                            promoteBtn.style.display = 'flex';
+                            manageStudentsBtn.style.display = 'flex';
+                            profileGradeRow.style.display = 'none';
+                            profileClassRow.style.display = 'none';
+                        } else if (userData.role === 'supervisor') {
+                            // مشرفين
                             isAdmin = false;
                             isSupervisor = true;
+                            // تحديد إذا كان مدير أو مدرس بناءً على promoteCount
+                            if (userData.promoteCount && userData.promoteCount > 1) {
+                                profileRank.textContent = 'مدير';
+                            } else {
+                                profileRank.textContent = 'مدرس';
+                            }
                             promoteBtn.style.display = 'none';
-                            manageStudentsBtn.style.display = 'none';
+                            manageStudentsBtn.style.display = 'flex';
+                            profileGradeRow.style.display = 'none';
+                            profileClassRow.style.display = 'none';
                         } else {
+                            // طالب عادي
                             isAdmin = false;
                             isSupervisor = false;
+                            profileRank.textContent = 'طالب';
                             promoteBtn.style.display = 'none';
                             manageStudentsBtn.style.display = 'none';
+                            // الطلاب العاديين يظهر لهم الصف والشعبة
+                            profileGrade.textContent = userData.grade || 'غير محدد';
+                            profileClass.textContent = userData.class || 'غير محدد';
+                            profileGradeRow.style.display = 'flex';
+                            profileClassRow.style.display = 'flex';
                         }
                         
-                        // تحديث وقت آخر تسجيل دخول
-                        database.ref('users/' + currentUser.uid + '/lastLogin').set(new Date().toISOString())
-                            .catch(error => console.error('Error updating last login:', error));
+                        const now = new Date().toISOString();
+                        database.ref('users/' + currentUser.uid).update({
+                            lastLogin: now,
+                            lastActive: now,
+                            isActive: true
+                        }).catch(error => console.error('Error updating last login:', error));
                         
                         showMainScreen();
                     } else {
@@ -3600,9 +3850,17 @@
                 grade: 'غير محدد',
                 class: 'غير محدد',
                 role: 'user',
+                promoteCount: 0,
                 createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString()
+                lastLogin: new Date().toISOString(),
+                isActive: true,
+                lastActive: new Date().toISOString()
             };
+            
+            // إذا كان البريد هو بريد المالك، ضع الدور كـ admin
+            if (currentUser.email === 'mslmalmyaly223@gmail.com') {
+                userData.role = 'admin';
+            }
             
             database.ref('users/' + currentUser.uid).set(userData)
                 .then(() => {
@@ -3613,10 +3871,23 @@
                     profileClass.textContent = userData.class;
                     profileAvatar.textContent = userData.name.charAt(0);
                     
-                    isAdmin = false;
-                    isSupervisor = false;
-                    promoteBtn.style.display = 'none';
-                    manageStudentsBtn.style.display = 'none';
+                    if (userData.role === 'admin') {
+                        isAdmin = true;
+                        isSupervisor = true;
+                        profileRank.textContent = 'المالك';
+                        promoteBtn.style.display = 'flex';
+                        manageStudentsBtn.style.display = 'flex';
+                        profileGradeRow.style.display = 'none';
+                        profileClassRow.style.display = 'none';
+                    } else {
+                        isAdmin = false;
+                        isSupervisor = false;
+                        profileRank.textContent = 'طالب';
+                        promoteBtn.style.display = 'none';
+                        manageStudentsBtn.style.display = 'none';
+                        profileGradeRow.style.display = 'flex';
+                        profileClassRow.style.display = 'flex';
+                    }
                     
                     showMainScreen();
                 })
@@ -3633,7 +3904,6 @@
             loginLoading.style.display = 'none';
             registerLoading.style.display = 'none';
             
-            // تحميل المحتوى الأولي
             loadNews();
             loadGrades();
             loadNotifications();
@@ -3661,6 +3931,157 @@
             });
         }
         
+        // حساب الوقت المنقضي (مثل فيسبوك)
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            
+            if (diffSec < 60) {
+                return 'الآن';
+            } else if (diffMin < 60) {
+                return `قبل ${diffMin} دقيقة`;
+            } else if (diffHour < 24) {
+                return `قبل ${diffHour} ساعة`;
+            } else if (diffDay < 7) {
+                return `قبل ${diffDay} يوم`;
+            } else {
+                return formatDate(dateString);
+            }
+        }
+        
+        // إضافة جميع أحداث إغلاق النوافذ والعودة
+        function setupModalEvents() {
+            // نافذة إضافة خبر
+            document.getElementById('closeNewsModal').addEventListener('click', () => {
+                document.getElementById('addNewsModal').style.display = 'none';
+            });
+            
+            // نافذة تعديل خبر
+            document.getElementById('closeEditNewsModal').addEventListener('click', () => {
+                document.getElementById('editNewsModal').style.display = 'none';
+            });
+            
+            // نافذة إرسال الدرجات العادية
+            document.getElementById('closeGradesModal').addEventListener('click', () => {
+                document.getElementById('sendGradesModal').style.display = 'none';
+            });
+            
+            // نافذة إرسال المعدل الفصلي
+            document.getElementById('closeSemesterModal').addEventListener('click', () => {
+                document.getElementById('sendSemesterModal').style.display = 'none';
+            });
+            
+            // نافذة اختيار الطلاب للدرجات العادية
+            document.getElementById('closeStudentsModal').addEventListener('click', () => {
+                document.getElementById('selectStudentsModal').style.display = 'none';
+            });
+            
+            // نافذة اختيار الطلاب للمعدل الفصلي
+            document.getElementById('closeSemesterStudentsModal').addEventListener('click', () => {
+                document.getElementById('selectSemesterStudentsModal').style.display = 'none';
+            });
+            
+            // نافذة إدخال الدرجة العادية
+            document.getElementById('closeGradeModal').addEventListener('click', () => {
+                document.getElementById('enterGradeModal').style.display = 'none';
+            });
+            
+            // نافذة إدخال المعدل الفصلي
+            document.getElementById('closeSemesterGradeModal').addEventListener('click', () => {
+                document.getElementById('enterSemesterModal').style.display = 'none';
+            });
+            
+            // نافذة إرسال التبليغ
+            document.getElementById('closeNotificationModal').addEventListener('click', () => {
+                document.getElementById('sendNotificationModal').style.display = 'none';
+            });
+            
+            // نافذة اختيار الطالب للتبليغ
+            document.getElementById('closeNotificationStudentsModal').addEventListener('click', () => {
+                document.getElementById('selectNotificationStudentsModal').style.display = 'none';
+            });
+            
+            // نافذة كتابة رسالة التبليغ
+            document.getElementById('closeWriteNotificationModal').addEventListener('click', () => {
+                document.getElementById('writeNotificationModal').style.display = 'none';
+            });
+            
+            // نافذة الإحصائيات
+            document.getElementById('closeStatsModal').addEventListener('click', () => {
+                document.getElementById('statsModal').style.display = 'none';
+            });
+            
+            // نافذة رفع المشرفين
+            document.getElementById('closePromoteModal').addEventListener('click', () => {
+                document.getElementById('promoteModal').style.display = 'none';
+            });
+            
+            // نافذة نقل وحذف الطلاب
+            document.getElementById('closeManageStudentsModal').addEventListener('click', () => {
+                document.getElementById('manageStudentsModal').style.display = 'none';
+            });
+            
+            // نافذة اختيار الطالب للنقل/الحذف
+            document.getElementById('closeSelectManageStudentsModal').addEventListener('click', () => {
+                document.getElementById('selectManageStudentsModal').style.display = 'none';
+            });
+            
+            // العودة إلى قائمة الطلاب للدرجات العادية
+            document.getElementById('backToStudentsBtn').addEventListener('click', () => {
+                document.getElementById('enterGradeModal').style.display = 'none';
+                if (currentGradeData.sendMethod === 'batch') {
+                    currentStudentIndex = 0;
+                    document.getElementById('selectStudentsModal').style.display = 'flex';
+                    startBatchGradeProcess();
+                } else {
+                    document.getElementById('selectStudentsModal').style.display = 'flex';
+                }
+            });
+            
+            // العودة إلى قائمة الطلاب للمعدل الفصلي
+            document.getElementById('backToSemesterStudentsBtn').addEventListener('click', () => {
+                document.getElementById('enterSemesterModal').style.display = 'none';
+                currentStudentIndex = 0;
+                document.getElementById('selectSemesterStudentsModal').style.display = 'flex';
+                startBatchSemesterProcess();
+            });
+            
+            // العودة إلى إدخال بيانات الصف للدرجات العادية
+            document.getElementById('backToGradesBtn').addEventListener('click', () => {
+                document.getElementById('selectStudentsModal').style.display = 'none';
+                document.getElementById('sendGradesModal').style.display = 'flex';
+            });
+            
+            // العودة إلى إدخال بيانات الصف للمعدل الفصلي
+            document.getElementById('backToSemesterBtn').addEventListener('click', () => {
+                document.getElementById('selectSemesterStudentsModal').style.display = 'none';
+                document.getElementById('sendSemesterModal').style.display = 'flex';
+            });
+            
+            // العودة إلى إدخال بيانات الصف للتبليغ
+            document.getElementById('backToNotificationBtn').addEventListener('click', () => {
+                document.getElementById('selectNotificationStudentsModal').style.display = 'none';
+                document.getElementById('sendNotificationModal').style.display = 'flex';
+            });
+            
+            // العودة إلى قائمة الطلاب للتبليغ
+            document.getElementById('backToNotificationStudentsBtn').addEventListener('click', () => {
+                document.getElementById('writeNotificationModal').style.display = 'none';
+                document.getElementById('selectNotificationStudentsModal').style.display = 'flex';
+            });
+            
+            // العودة إلى إدارة الطلاب
+            document.getElementById('backToManageBtn').addEventListener('click', () => {
+                document.getElementById('selectManageStudentsModal').style.display = 'none';
+                document.getElementById('manageStudentsModal').style.display = 'flex';
+            });
+        }
+        
         // الاستماع لتغير حالة المصادقة
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -3674,6 +4095,14 @@
             }
         });
         
+        // تحديث النشاط كل دقيقة
+        setInterval(() => {
+            if (currentUser) {
+                database.ref('users/' + currentUser.uid + '/lastActive').set(new Date().toISOString())
+                    .catch(error => console.error('Error updating activity:', error));
+            }
+        }, 60000);
+        
         // منع التكبير والتصغير والنسخ
         document.addEventListener('contextmenu', (e) => e.preventDefault());
         document.addEventListener('touchstart', (e) => {
@@ -3683,24 +4112,11 @@
         document.addEventListener('gesturechange', (e) => e.preventDefault());
         document.addEventListener('gestureend', (e) => e.preventDefault());
         
-        // تمكين التمرير في شاشة المصادقة
-        authScreen.addEventListener('touchmove', (e) => {
-            e.stopPropagation();
-        });
-        
-        authScreen.addEventListener('scroll', (e) => {
-            e.stopPropagation();
-        });
-        
-        // منع التمرير في الجسم الرئيسي عند وجود النافذة المنبثقة
-        document.addEventListener('touchmove', (e) => {
-            if (authScreen.style.display === 'flex') {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
         // تهيئة التطبيق
         window.addEventListener('load', () => {
+            // إعداد أحداث النوافذ
+            setupModalEvents();
+            
             setTimeout(() => {
                 splashScreen.style.display = 'none';
                 auth.onAuthStateChanged((user) => {
@@ -3712,6 +4128,16 @@
                     }
                 });
             }, 3000);
+        });
+        
+        // إغلاق النوافذ عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (modal.style.display === 'flex' && e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
