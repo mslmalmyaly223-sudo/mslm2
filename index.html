@@ -64,8 +64,9 @@
             display: none;
             height: 100%;
             overflow-y: auto;
-            padding-bottom: 80px; /* مساحة لعدم تغطية الشريط السفلي */
+            padding-bottom: 110px !important; 
         }
+        
         .tab-content.active {
             display: block;
             animation: fadeIn 0.3s ease;
@@ -236,24 +237,106 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        /* Loader - تم تحويله لـ absolute */
+        /* شاشة التحميل الاحترافية (Splash Screen) */
         #global-loader {
-            position: absolute; inset: 0; background: white; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: absolute; 
+            inset: 0; 
+            /* خلفية متدرجة ناعمة تفتح النفس */
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); 
+            z-index: 9999;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
         }
-        .spinner {
-            border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--primary);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+        
+        .loader-logo {
+            width: 85px; 
+            height: 85px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 24px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            margin-bottom: 24px;
+            /* شكل مائل يعطي طابع عصري مع حركة الطفو */
+            transform: rotate(45deg); 
+            animation: float 3s ease-in-out infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .loader-logo i { 
+            font-size: 38px; 
+            color: white; 
+            /* تعديل دوران الأيقونة حتى تبين مستقيمة بداخل المربع المائل */
+            transform: rotate(-45deg); 
+        }
+        
+        .loader-text { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: #1e293b; 
+            margin-bottom: 8px; 
+        }
+        
+        .loader-subtext { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #64748b; 
+            margin-bottom: 40px; 
+            /* أنميشن نبض للنص */
+            animation: pulseText 1.5s infinite; 
+        }
+        
+        /* شريط التحميل الاحترافي */
+        .loading-bar-container {
+            width: 220px; 
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .loading-bar-progress {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            border-radius: 10px;
+            width: 50%;
+            /* أنميشن شريط يتحرك يمين ويسار بسلاسة */
+            animation: slideBar 1.5s ease-in-out infinite alternate;
+        }
+
+        /* تأثيرات الحركة (Keyframes) */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(45deg); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
+            50% { transform: translateY(-15px) rotate(45deg); box-shadow: 0 20px 30px rgba(37, 99, 235, 0.2); }
+            100% { transform: translateY(0px) rotate(45deg); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
+        }
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes slideBar {
+            0% { right: -50%; width: 50%; }
+            100% { right: 100%; width: 50%; }
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
 
     <div id="global-loader">
-        <div class="spinner mb-4"></div>
-        <div class="text-gray-500 font-bold">جاري تحميل اعدادية المربد المركزية...</div>
+        <div class="loader-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h1 class="loader-text">اعدادية المربد المركزية</h1>
+        <p class="loader-subtext">جاري تهيئة النظام...</p>
+        
+        <div class="loading-bar-container">
+            <div class="loading-bar-progress"></div>
+        </div>
     </div>
     <div id="toast-container"></div>
 
@@ -408,15 +491,24 @@
 
         <nav class="bottom-nav">
             <div class="nav-item active" onclick="switchMainTab('posts', this)">
-                <i class="fas fa-newspaper"></i>
+                <div class="relative">
+                    <i class="fas fa-newspaper"></i>
+                    <span id="badge-posts" class="hidden absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"></span>
+                </div>
                 <span>المنشورات</span>
             </div>
             <div class="nav-item" onclick="switchMainTab('grades', this)">
-                <i class="fas fa-chart-bar"></i>
+                <div class="relative">
+                    <i class="fas fa-chart-bar"></i>
+                    <span id="badge-grades" class="hidden absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"></span>
+                </div>
                 <span>الدرجات</span>
             </div>
             <div class="nav-item" onclick="switchMainTab('notifs', this)">
-                <i class="fas fa-bell"></i>
+                <div class="relative">
+                    <i class="fas fa-bell"></i>
+                    <span id="badge-notifs" class="hidden absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"></span>
+                </div>
                 <span>التبليغات</span>
             </div>
             <div class="nav-item" onclick="switchMainTab('profile', this)">
@@ -434,11 +526,44 @@
             <textarea id="post-content" class="input-style min-h-[100px] resize-none" placeholder="اكتب الخبر أو الاعلان هنا..."></textarea>
             <input type="file" id="post-image-file" class="input-style" accept="image/*">
             <div class="flex gap-2 mt-4">
-                <button class="btn-primary flex-1" onclick="submitPost()">نشر</button>
-                <button class="p-3 bg-gray-200 text-gray-700 rounded-xl font-bold" onclick="closeModal('modal-add-post')">الغاء</button>
+                <button class="btn-primary flex-1" onclick="sendNotification()">إرسال</button>
+                <button class="p-3 bg-gray-200 rounded-xl" onclick="closeModal('modal-notif-send')">الغاء</button>
             </div>
         </div>
     </div>
+
+    <div id="modal-universal-student" class="modal" style="z-index: 150;">
+        <div class="modal-content p-6">
+            <h3 class="font-bold text-lg mb-4 text-blue-600">اختر الطالب</h3>
+            <div id="universal-student-list" class="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto mb-4 p-1"></div>
+            
+            <button class="w-full p-3 bg-gray-200 rounded-xl font-bold text-gray-700" onclick="closeModal('modal-universal-student')">الغاء</button>
+        </div>
+    </div>
+    
+    <!-- Modal: إجبار المدرس المنزل على تغيير بياناته -->
+    <div id="modal-force-name" class="hidden absolute inset-0 bg-gray-50 z-[9999] flex-col items-center justify-center p-6 text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg">
+            <i class="fas fa-user-edit text-3xl text-red-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">تحديث بياناتك مطلوب</h2>
+        <p class="text-gray-500 mb-6 text-sm">تم تغيير مستوى حسابك. يرجى إدخال اسمك الثلاثي واختيار صفك وشعبتك للتمكن من استخدام التطبيق.</p>
+        
+        <div class="w-full max-w-sm">
+            <input type="text" id="force-name-input" class="input-style w-full mb-3 text-center text-lg font-bold" placeholder="الاسم الثلاثي الحقيقي">
+            
+            <select id="force-grade" class="input-style mb-3 text-center" onchange="updateForceSections()">
+                <option value="">اختر الصف...</option>
+            </select>
+            
+            <select id="force-section" class="input-style mb-4 text-center">
+                <option value="">اختر الشعبة...</option>
+            </select>
+            
+            <button class="btn-primary w-full shadow-lg" onclick="submitForcedName()">حفظ ومتابعة</button>
+        </div>
+    </div>
+
 
     <!-- Page: My Info (مع تعديل المساحة السفلية pb-24) -->
     <div id="modal-my-info" class="hidden absolute inset-0 pb-24 bg-gray-50 z-[60] flex-col overflow-y-auto">
@@ -538,15 +663,24 @@
         </div>
     </div>
 
-    <div id="modal-admin-promote" class="modal">
-        <div class="modal-content p-6">
-            <h3 class="font-bold text-lg mb-4">ترقية طالب إلى مدرس</h3>
-            <p class="text-xs text-gray-500 mb-4">أدخل البريد الإلكتروني للطالب ليتم تحويل حسابه إلى مدرس.</p>
-            <input type="email" id="promote-email" class="input-style" placeholder="بريد الطالب...">
-            <div class="flex gap-2">
-                <button class="btn-primary flex-1" onclick="promoteTeacher()">ترقية</button>
-                <button class="p-3 bg-gray-200 rounded-xl" onclick="closeModal('modal-admin-promote')">الغاء</button>
+    <div id="page-admin-teachers" class="hidden absolute inset-0 pb-24 bg-gray-50 z-[60] flex-col overflow-y-auto">
+        <div class="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-10">
+            <h3 class="font-bold text-lg text-green-600 flex items-center gap-2">
+                <i class="fas fa-user-tie"></i> إدارة الكادر
+            </h3>
+            <button class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-600" onclick="document.getElementById('page-admin-teachers').classList.add('hidden'); document.getElementById('page-admin-teachers').classList.remove('flex'); document.getElementById('modal-admin').classList.add('flex'); document.getElementById('modal-admin').classList.remove('hidden');">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="mb-6 bg-white p-4 rounded-2xl shadow-sm border border-green-100 flex gap-2">
+                <input type="email" id="promote-email-input" class="input-style !mb-0 flex-1" placeholder="ابحث ببريد الطالب لرفعه...">
+                <button class="bg-green-600 text-white px-4 rounded-xl font-bold shadow-md hover:bg-green-700" onclick="promoteTeacherAction()"><i class="fas fa-search ml-1"></i> ترقية</button>
             </div>
+            
+            <div class="text-sm font-bold text-gray-500 mb-3 border-b pb-2">قائمة المدرسين المرفوعين:</div>
+            <div id="teachers-list-container" class="space-y-3">
+                </div>
         </div>
     </div>
 
@@ -559,7 +693,13 @@
             </select>
             <select id="del-grade" class="input-style" onchange="updateAdminSections('del')"><option value="">اختر الصف...</option></select>
             <select id="del-section" class="input-style" onchange="updateAdminStudents('del')"><option value="">اختر الشعبة...</option></select>
-            <select id="del-student" class="input-style"><option value="">اختر الطالب...</option></select>
+            
+            <div id="del-student-container" class="w-full mt-2">
+                <button id="btn-del-student" class="input-style text-right flex justify-between items-center text-gray-500 bg-white w-full" onclick="openUniversalStudentSelector('del')">
+                    <span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>
+                </button>
+                <input type="hidden" id="del-student-val">
+            </div>
             
             <div class="flex gap-2 mt-4">
                 <button class="btn-primary flex-1 bg-red-600" style="background: #dc2626;" onclick="executeDelete()">حذف</button>
@@ -574,7 +714,11 @@
             <div class="bg-gray-50 p-2 rounded-lg mb-2 text-sm font-bold">من:</div>
             <select id="move-grade-from" class="input-style" onchange="updateAdminSections('move-from')"><option value="">الصف الحالي...</option></select>
             <select id="move-section-from" class="input-style" onchange="updateAdminStudents('move-from')"><option value="">الشعبة الحالية...</option></select>
-            <select id="move-student" class="input-style"><option value="">الطالب...</option></select>
+            
+            <button id="btn-move-student" class="input-style text-right flex justify-between items-center text-gray-500 bg-white mt-2" onclick="openUniversalStudentSelector('move')">
+                <span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>
+            </button>
+            <input type="hidden" id="move-student-val">
             
             <div class="bg-gray-50 p-2 rounded-lg mb-2 text-sm font-bold mt-2">إلى:</div>
             <select id="move-grade-to" class="input-style" onchange="updateAdminSections('move-to')"><option value="">الصف الجديد...</option></select>
@@ -598,8 +742,6 @@
                 <option value="">نوع الدرجة...</option>
                 <option value="الشهر الاول">الشهر الاول</option>
                 <option value="الشهر الثاني">الشهر الثاني</option>
-                <option value="نصف السنة">نصف السنة</option>
-                <option value="النهائي">النهائي</option>
             </select>
             <div class="flex gap-2 mt-4">
                 <button class="btn-primary flex-1" onclick="nextGradeStep()">التالي</button>
@@ -632,10 +774,18 @@
             <h3 class="font-bold text-lg mb-2 text-blue-600" id="grade-student-name">اسم الطالب</h3>
             <p class="text-sm text-gray-500 mb-4" id="grade-context-info">المادة - الشهر</p>
             
-            <div class="flex items-center justify-center gap-4 mb-6" dir="ltr">
-                <input type="number" id="grade-score" class="input-style text-center text-xl font-bold !mb-0 w-24" placeholder="الدرجة">
-                <span class="text-xl font-bold text-gray-400">/</span>
-                <input type="number" id="grade-max" class="input-style text-center text-xl font-bold !mb-0 w-24" placeholder="من">
+            <div class="flex items-center justify-center gap-3 mb-6" dir="rtl">
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-blue-600 font-bold mb-1">درجة الطالب</span>
+                    <input type="number" id="grade-score" class="input-style text-center text-xl font-bold !mb-0 w-24" placeholder="الدرجة">
+                </div>
+                
+                <span class="text-lg font-bold text-gray-400 mt-5">من</span>
+                
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-gray-500 font-bold mb-1">الدرجة الكلية</span>
+                    <input type="number" id="grade-max" class="input-style text-center text-xl font-bold !mb-0 w-24" placeholder="الكلية">
+                </div>
             </div>
 
             <div class="flex gap-2">
@@ -651,7 +801,12 @@
             <h3 class="font-bold text-lg mb-4">إرسال تبليغ</h3>
             <select id="n-grade" class="input-style" onchange="updateNotifSections()"><option value="">اختر الصف...</option></select>
             <select id="n-section" class="input-style" onchange="updateNotifStudents()"><option value="">اختر الشعبة...</option></select>
-            <select id="n-student" class="input-style"><option value="">اختر الطالب...</option></select>
+            
+            <button id="btn-n-student" class="input-style text-right flex justify-between items-center text-gray-500 bg-white mt-2" onclick="openUniversalStudentSelector('notif')">
+                <span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>
+            </button>
+            <input type="hidden" id="n-student-val">
+
             <textarea id="n-msg" class="input-style min-h-[100px] mt-2 resize-none" placeholder="اكتب التبليغ أو الانذار هنا..."></textarea>
             
             <div class="flex gap-2 mt-4">
@@ -742,42 +897,64 @@
         };
 
         window.switchMainTab = (tabId, element) => {
-            // Update nav styles
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            // Update content
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
 
-            // Titles map
-            const titles = {
-                'posts': 'المنشورات',
-                'grades': 'الدرجات',
-                'notifs': 'التبليغات',
-                'profile': 'حسابي'
-            };
+            const titles = { 'posts': 'المنشورات', 'grades': 'الدرجات', 'notifs': 'التبليغات', 'profile': 'حسابي' };
             document.getElementById('header-title').innerText = titles[tabId];
+
+            // مسح الفقاعات وتحديث ذاكرة المشاهدة فوراً عند الدخول للقسم
+            if(tabId === 'grades') {
+                const badge = document.getElementById('badge-grades');
+                if(badge) {
+                    badge.classList.add('hidden');
+                    badge.innerText = '0';
+                    localStorage.setItem(`seen_grades_${currentUser.uid}`, badge.dataset.total || '0');
+                }
+            } else if(tabId === 'notifs') {
+                const badge = document.getElementById('badge-notifs');
+                if(badge) {
+                    badge.classList.add('hidden');
+                    badge.innerText = '0';
+                    localStorage.setItem(`seen_notifs_${currentUser.uid}`, badge.dataset.total || '0');
+                }
+            } else if(tabId === 'posts') {
+                const badge = document.getElementById('badge-posts');
+                if(badge) {
+                    badge.classList.add('hidden');
+                    badge.innerText = '0';
+                    // حفظ الوقت الحالي كآخر مرة تم فيها رؤية المنشورات
+                    localStorage.setItem(`seen_posts_time_${currentUser.uid}`, Date.now());
+                }
+            }
         };
 
         async function loadSchoolStructure() {
+            showLoader(); // إضافة مؤشر التحميل لضمان عدم حدوث تعليق أثناء جلب البيانات
             try {
-                // تمت إضافة المقطع 'settings' لجعل المسار 6 (زوجي)
+                // مسار قاعدة البيانات الأساسي لجلب هيكلية المدرسة
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'schoolStructure');
                 const docSnap = await getDoc(docRef);
+                
                 if (docSnap.exists()) {
                     schoolStructure = docSnap.data().grades || {};
                 } else {
                     schoolStructure = {};
-                    // Create empty structure if owner
+                    // إنشاء ملف هيكلية فارغ تلقائياً إذا كان المستخدم هو المالك
                     if(currentUser && currentUser.email === OWNER_EMAIL) {
                         await setDoc(docRef, { grades: {} }, { merge: true });
                     }
                 }
+                // تحديث القوائم المنسدلة في واجهة إنشاء الحساب وغيرها
                 populateStructureDropdowns();
             } catch (e) {
                 console.error("Error loading structure:", e);
+                showToast("حدث خطأ أثناء تحميل الهيكلية");
             }
+            hideLoader(); // إخفاء مؤشر التحميل بعد الانتهاء
         }
 
         function populateStructureDropdowns() {
@@ -864,6 +1041,35 @@
             window.location.reload();
         };
 
+        // دالة جديدة وخفيفة لمراقبة إشعارات المنشورات بدون التأثير على نظام السحب الأصلي
+        function watchNewPostsCount() {
+            const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
+            // نراقب آخر 15 منشور فقط للحفاظ على استهلاك الـ Firebase
+            const q = query(postsRef, orderBy('timestamp', 'desc'), limit(15));
+            onSnapshot(q, (snapshot) => {
+                const lastSeenTime = parseInt(localStorage.getItem(`seen_posts_time_${currentUser.uid}`)) || 0;
+                let unreadCount = 0;
+                
+                snapshot.forEach(doc => {
+                    if (doc.data().timestamp > lastSeenTime) {
+                        unreadCount++;
+                    }
+                });
+                
+                const badge = document.getElementById('badge-posts');
+                if(badge) {
+                    const activeTab = document.querySelector('.nav-item.active span').innerText;
+                    if(unreadCount > 0 && activeTab !== 'المنشورات') {
+                        badge.innerText = unreadCount;
+                        badge.classList.remove('hidden');
+                    } else if (activeTab === 'المنشورات') {
+                        // إذا كانت الشاشة مفتوحة على المنشورات، حدث الوقت لكي لا تظهر الفقاعة
+                        localStorage.setItem(`seen_posts_time_${currentUser.uid}`, Date.now());
+                    }
+                }
+            });
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -876,12 +1082,28 @@
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                     } else {
-                        // Fallback if document missing
                         userData = { role: user.email === OWNER_EMAIL ? 'owner' : 'student', name: 'مستخدم', email: user.email };
+                    }
+                    
+                    // -- نظام الإجبار لتغيير الاسم والصف للطالب المُنزل --
+                    if (userData.role === 'student' && (!userData.name || userData.name.trim().split(' ').length < 3 || userData.grade === 'N/A' || userData.section === 'N/A')) {
+                        
+                        // جلب الصفوف المتوفرة ووضعها في النافذة
+                        const fGrade = document.getElementById('force-grade');
+                        fGrade.innerHTML = '<option value="">اختر الصف...</option>';
+                        Object.keys(schoolStructure).forEach(g => {
+                            fGrade.innerHTML += `<option value="${g}">${g}</option>`;
+                        });
+                        
+                        document.getElementById('modal-force-name').classList.remove('hidden');
+                        document.getElementById('modal-force-name').classList.add('flex');
+                        hideLoader();
+                        return; // إيقاف تحميل التطبيق حتى يكمل بياناته
                     }
                     
                     setupUIForRole();
                     loadInitialPosts();
+                    watchNewPostsCount(); // تشغيل مراقب إشعارات المنشورات
                     loadGrades();
                     loadNotifications();
 
@@ -896,7 +1118,7 @@
                 userData = null;
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
-                loadSchoolStructure(); // Load structure for signup
+                loadSchoolStructure();
             }
             hideLoader();
         });
@@ -1041,6 +1263,9 @@
             }
         };
 
+        // تعريف الكائن المفقود لحل مشكلة الصفنة (ضعه خارج الدالة)
+        window.gradingState = { grade: '', section: '', subject: '', term: '', mode: '', students: [], currentIndex: 0 };
+
         window.nextGradeStep = () => {
             const g = document.getElementById('g-grade').value;
             const sec = document.getElementById('g-section').value;
@@ -1049,34 +1274,42 @@
 
             if(!g || !sec || !sub || !term) return showToast('يرجى ملء جميع الحقول');
             
-            gradingState.grade = g;
-            gradingState.section = sec;
-            gradingState.subject = sub;
-            gradingState.term = term;
+            window.gradingState.grade = g;
+            window.gradingState.section = sec;
+            window.gradingState.subject = sub;
+            window.gradingState.term = term;
             
-            // Filter students in memory
-            gradingState.students = allUsers.filter(u => u.role === 'student' && u.grade === g && u.section === sec)
-                                           .sort((a,b) => a.name.localeCompare(b.name, 'ar')); // Sort Arabic alphabetical
+            try {
+                window.gradingState.students = allUsers.filter(u => u.role === 'student' && u.grade === g && u.section === sec);
 
-            if(gradingState.students.length === 0) return showToast('لا يوجد طلاب في هذه الشعبة');
+                if(window.gradingState.students.length === 0) {
+                    return showToast('لا يوجد طلاب مسجلين في هذه الشعبة حالياً!');
+                }
 
-            closeModal('modal-grade-step1');
-            openModal('modal-grade-step2');
+                closeModal('modal-grade-step1');
+                openModal('modal-grade-step2');
+            } catch (e) {
+                console.error(e);
+                showToast('حدث خطأ: ' + e.message);
+            }
         };
 
         window.selectGradeMode = (mode) => {
-            gradingState.mode = mode;
-            gradingState.currentIndex = 0;
+            window.gradingState.mode = mode;
+            window.gradingState.currentIndex = 0;
             closeModal('modal-grade-step2');
 
             if(mode === 'single') {
                 const list = document.getElementById('single-student-list');
+                list.className = "grid grid-cols-3 gap-2 max-h-60 overflow-y-auto mb-4 p-1";
                 list.innerHTML = '';
-                gradingState.students.forEach((s, idx) => {
-                    list.innerHTML += `<div class="p-3 bg-gray-50 border rounded-xl mb-2 flex justify-between items-center cursor-pointer hover:bg-gray-100" onclick="startGradingStudent(${idx})">
-                        <span class="font-bold">${s.name}</span>
-                        <i class="fas fa-chevron-left text-gray-400"></i>
-                    </div>`;
+                window.gradingState.students.forEach((s, idx) => {
+                    // نفس تصميم النافذة الموحدة بالترتيب
+                    list.innerHTML += `
+                    <button class="p-2 bg-white border-2 border-blue-100 rounded-xl flex flex-col items-center justify-center cursor-pointer shadow-sm active:bg-blue-100 hover:border-blue-400 transition-all text-center h-full" onclick="startGradingStudent(${idx})">
+                        <i class="fas fa-user-graduate text-blue-400 mb-2 text-lg"></i>
+                        <span class="font-bold text-gray-800 text-[10px] leading-tight w-full break-words" style="word-spacing: -1px;">${s.name || 'بدون اسم'}</span>
+                    </button>`;
                 });
                 openModal('modal-grade-single-select');
             } else {
@@ -1124,14 +1357,21 @@
 
             const student = gradingState.students[gradingState.currentIndex];
             
-            // Logic for encouragement
+            // Logic for encouragement (رسالة احترافية رسمية بدون ايموجيات)
             let percentage = (score / max) * 100;
             let msg = '';
-            if(percentage >= 75) msg = 'احسنت يابطل استمر';
-            else if (percentage >= 50) msg = 'جيد، يمكنك تقديم الافضل، شد حيلك!';
-            else msg = 'تحتاج الى مضاعفة جهدك، لا تستسلم!';
+            
+            if(percentage >= 90) {
+                msg = 'أداء استثنائي وممتاز. إدارة المدرسة تثمن جهودك العالية وتتمنى لك دوام التفوق والنجاح المتواصل.';
+            } else if(percentage >= 75) {
+                msg = 'أداء جيد جداً. لقد بذلت جهداً واضحاً ومقدراً، ونطمح لرؤيتك في مراتب أعلى في الاختبارات القادمة.';
+            } else if (percentage >= 50) {
+                msg = 'لقد اجتزت الاختبار، لكننا نؤمن أن قدراتك تؤهلك لتحقيق نتائج أفضل بكثير. ننتظر منك المزيد من الجهد والمثابرة.';
+            } else {
+                msg = 'لم يحالفك الحظ هذه المرة. نتمنى أن يكون هذا دافعاً لك لمضاعفة جهودك ومراجعة دروسك بتركيز أكبر للتعويض لاحقاً.';
+            }
 
-            const finalMessage = `مرحبا ${student.name} لقد اكتملت نتيجتك في مادة ${gradingState.subject} في ${gradingState.term} درجتك هيه ${score} من ${max} (${msg})`;
+            const finalMessage = `عزيزي الطالب ${student.name}،\nتم إصدار نتيجتك رسمياً في مادة (${gradingState.subject}) لاختبار (${gradingState.term}).\n\nالدرجة الحاصل عليها: ${score} من ${max}\n\nالتقييم: ${msg}`;
 
             // Save grade to student's private collection
             try {
@@ -1168,7 +1408,6 @@
             closeModal('modal-grade-input');
         };
 
-        // Loading Grades for current user
         function loadGrades() {
             const gradesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'grades');
             onSnapshot(gradesRef, (snapshot) => {
@@ -1176,6 +1415,24 @@
                 snapshot.forEach(doc => grades.push(doc.data()));
                 grades.sort((a,b) => b.timestamp - a.timestamp);
                 
+                // --- نظام الفقاعة الفورية للدرجات ---
+                const totalGrades = grades.length;
+                const seenGrades = parseInt(localStorage.getItem(`seen_grades_${currentUser.uid}`)) || 0;
+                const unreadGrades = totalGrades - seenGrades;
+                
+                const badge = document.getElementById('badge-grades');
+                if(badge) {
+                    badge.dataset.total = totalGrades; // حفظ المجموع
+                    const activeTab = document.querySelector('.nav-item.active span').innerText;
+                    if(unreadGrades > 0 && activeTab !== 'الدرجات') {
+                        badge.innerText = unreadGrades;
+                        badge.classList.remove('hidden');
+                    } else if (activeTab === 'الدرجات') {
+                        localStorage.setItem(`seen_grades_${currentUser.uid}`, totalGrades);
+                    }
+                }
+                // -------------------------------------
+
                 const container = document.getElementById('grades-container');
                 container.innerHTML = '';
                 
@@ -1185,11 +1442,19 @@
                 }
 
                 grades.forEach(g => {
-                    let colorClass = (g.score / g.max) >= 0.5 ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500';
+                    let colorClass = (g.score / g.max) >= 0.5 ? 'border-r-4 border-green-500' : 'border-r-4 border-red-500';
+                    let scoreColor = (g.score / g.max) >= 0.5 ? 'text-green-600' : 'text-red-600';
                     container.innerHTML += `
                         <div class="bg-white p-4 rounded-xl shadow-sm mb-3 ${colorClass}">
-                            <div class="font-bold text-sm text-gray-800 mb-2">${g.subject} - ${g.term}</div>
-                            <p class="text-sm text-gray-600 leading-relaxed">${g.message}</p>
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="font-bold text-sm text-gray-800">${g.subject} <br><span class="text-xs text-gray-400 font-normal">${g.term}</span></div>
+                                <div class="bg-gray-50 px-3 py-1 rounded-lg flex items-center gap-2 border" dir="rtl">
+                                    <span class="text-xl font-bold ${scoreColor}">${g.score}</span>
+                                    <span class="text-gray-400 text-xs font-bold">من</span>
+                                    <span class="text-lg font-bold text-gray-600">${g.max}</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed border-t pt-2">${g.message}</p>
                         </div>
                     `;
                 });
@@ -1206,19 +1471,15 @@
         };
 
         window.updateNotifStudents = () => {
-            const g = document.getElementById('n-grade').value;
-            const sec = document.getElementById('n-section').value;
-            const stuSelect = document.getElementById('n-student');
-            stuSelect.innerHTML = '<option value="">اختر الطالب...</option>';
-            
-            const filtered = allUsers.filter(u => u.role === 'student' && u.grade === g && u.section === sec);
-            filtered.forEach(u => {
-                stuSelect.innerHTML += `<option value="${u.uid}">${u.name}</option>`;
-            });
+            const btn = document.getElementById('btn-n-student');
+            if(btn) {
+                btn.innerHTML = '<span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                document.getElementById('n-student-val').value = '';
+            }
         };
 
-        window.sendNotification = async () => {
-            const uid = document.getElementById('n-student').value;
+window.sendNotification = async () => {
+            const uid = document.getElementById('n-student-val').value;
             const msg = document.getElementById('n-msg').value.trim();
             if(!uid || !msg) return showToast('يرجى اختيار طالب وكتابة الرسالة');
 
@@ -1233,6 +1494,10 @@
                 showToast('تم إرسال التبليغ بنجاح');
                 closeModal('modal-notif-send');
                 document.getElementById('n-msg').value = '';
+                // تصفير زر الاختيار
+                const btn = document.getElementById('btn-n-student');
+                if(btn) btn.innerHTML = '<span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                document.getElementById('n-student-val').value = '';
             } catch(e) {
                 showToast('خطأ في الارسال');
             }
@@ -1246,6 +1511,24 @@
                 snapshot.forEach(doc => notifs.push(doc.data()));
                 notifs.sort((a,b) => b.timestamp - a.timestamp);
                 
+                // --- نظام الفقاعة الفورية للتبليغات ---
+                const totalNotifs = notifs.length;
+                const seenNotifs = parseInt(localStorage.getItem(`seen_notifs_${currentUser.uid}`)) || 0;
+                const unreadNotifs = totalNotifs - seenNotifs;
+                
+                const badge = document.getElementById('badge-notifs');
+                if(badge) {
+                    badge.dataset.total = totalNotifs;
+                    const activeTab = document.querySelector('.nav-item.active span').innerText;
+                    if(unreadNotifs > 0 && activeTab !== 'التبليغات') {
+                        badge.innerText = unreadNotifs;
+                        badge.classList.remove('hidden');
+                    } else if (activeTab === 'التبليغات') {
+                        localStorage.setItem(`seen_notifs_${currentUser.uid}`, totalNotifs);
+                    }
+                }
+                // ---------------------------------------
+
                 const container = document.getElementById('notifs-container');
                 container.innerHTML = '';
                 
@@ -1311,28 +1594,55 @@
         };
         
         window.uploadAvatar = async () => {
-            // حظر الرفع نهائياً للطلاب
-            if (userData.role === 'student') {
-                return showToast('عذراً، رفع الصور متاح للإدارة والمدرسين فقط.');
-            }
-
+            if (userData.role === 'student') return showToast('عذراً، رفع الصور متاح للإدارة والمدرسين فقط.');
+            
             const fileInput = document.getElementById('avatar-input');
             const file = fileInput ? fileInput.files[0] : null;
             if (!file) return;
 
             showLoader();
-            const getBase64 = (file) => {
+            
+            // ضاغط الصور الذكي لتجنب تجاوز مساحة الفايربيس (1MB)
+            const compressImage = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = error => reject(error);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const MAX_WIDTH = 400; // أقصى عرض لتقليل الحجم
+                            const MAX_HEIGHT = 400;
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height *= MAX_WIDTH / width;
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width *= MAX_HEIGHT / height;
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // ضغط الصورة بجودة 70% كـ JPEG لضمان حجم أقل من 200 كيلوبايت
+                            resolve(canvas.toDataURL('image/jpeg', 0.7));
+                        };
+                        img.onerror = (e) => reject(e);
+                    };
                 });
             };
 
             try {
-                // تم إزالة شرط الحجم (بدون حد أقصى) للمدرسين والمدير
-                const base64Str = await getBase64(file);
+                const base64Str = await compressImage(file);
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUser.uid);
                 
                 await setDoc(docRef, { avatar: base64Str }, { merge: true });
@@ -1344,9 +1654,7 @@
                 img.classList.remove('hidden');
                 
                 showToast('تم تحديث صورة الحساب بنجاح');
-            } catch (e) {
-                showToast('خطأ في رفع الصورة: ' + e.message);
-            }
+            } catch (e) { showToast('خطأ في رفع الصورة: ' + e.message); }
             hideLoader();
         };
 
@@ -1455,7 +1763,10 @@
                 setTimeout(() => openModal('modal-admin-move'), 300);
             }
             else if(action === 'promote') {
-                setTimeout(() => openModal('modal-admin-promote'), 300);
+                // التعديل صار هنا: يفتح الصفحة الحرة الخاصة بإدارة المدرسين
+                document.getElementById('page-admin-teachers').classList.remove('hidden');
+                document.getElementById('page-admin-teachers').classList.add('flex');
+                renderTeachersList();
             }
         };
 
@@ -1761,30 +2072,73 @@
             hideLoader();
         }
 
-        window.promoteTeacher = async () => {
-            const email = document.getElementById('promote-email').value.trim();
-            if(!email) return;
+        window.renderTeachersList = () => {
+            const container = document.getElementById('teachers-list-container');
+            container.innerHTML = '';
+            const teachers = allUsers.filter(u => u.role === 'teacher');
+            if(teachers.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 mt-6 font-bold">لا يوجد مدرسين حالياً</div>';
+                return;
+            }
+            teachers.forEach(t => {
+                container.innerHTML += `
+                <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center font-bold">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">${t.name}</div>
+                            <div class="text-xs text-gray-500">${t.email}</div>
+                        </div>
+                    </div>
+                    <button onclick="demoteTeacher('${t.uid}', '${t.name}')" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors" title="إزالة وحذف">
+                        <i class="fas fa-user-minus"></i>
+                    </button>
+                </div>`;
+            });
+        };
+
+        window.promoteTeacherAction = async () => {
+            const email = document.getElementById('promote-email-input').value.trim();
+            if(!email) return showToast('يرجى كتابة البريد الإلكتروني');
             
             const userToPromote = allUsers.find(u => u.email === email);
-            if(!userToPromote) return showToast('لم يتم العثور على طالب بهذا البريد');
-            
-            if(userToPromote.role === 'teacher' || userToPromote.role === 'owner') return showToast('هذا المستخدم ضمن الكادر بالفعل');
+            if(!userToPromote) return showToast('لم يتم العثور على حساب بهذا البريد');
+            if(userToPromote.role === 'teacher' || userToPromote.role === 'owner') return showToast('هذا المستخدم كادر بالفعل');
 
             showLoader();
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userToPromote.uid);
-                // تحديث الرتبة وإزالة الطالب من قوائم الصفوف بشكل نهائي
-                await updateDoc(docRef, { 
-                    role: 'teacher',
-                    grade: 'N/A',
-                    section: 'N/A'
-                });
-                showToast('تم الترقية إلى مدرس وإزالته من قوائم الطلاب بنجاح');
-                closeModal('modal-admin-promote');
-                fetchAllUsersForStaff(); // refresh cache
-            } catch(e) {
-                showToast('خطأ في الترقية: ' + e.message);
-            }
+                await updateDoc(docRef, { role: 'teacher', grade: 'N/A', section: 'N/A' });
+                showToast('تمت الترقية إلى مدرس بنجاح');
+                document.getElementById('promote-email-input').value = '';
+                
+                userToPromote.role = 'teacher';
+                renderTeachersList();
+            } catch(e) { showToast('خطأ: ' + e.message); }
+            hideLoader();
+        };
+
+        window.demoteTeacher = async (uid, name) => {
+            if(!confirm(`هل أنت متأكد من سحب صلاحية المدرس من (${name}) وإرجاعه كطالب؟`)) return;
+            showLoader();
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', uid);
+                // تصفير كامل: ارجاعه طالب، مسح الصورة، مسح الاسم، وتصفير الصف والشعبة
+                await updateDoc(docRef, { role: 'student', avatar: '', name: '', grade: 'N/A', section: 'N/A' });
+                showToast('تم سحب الصلاحية وتصفير الحساب بنجاح');
+                
+                const userObj = allUsers.find(u => u.uid === uid);
+                if(userObj) {
+                    userObj.role = 'student';
+                    userObj.avatar = '';
+                    userObj.name = '';
+                    userObj.grade = 'N/A';
+                    userObj.section = 'N/A';
+                }
+                renderTeachersList();
+            } catch(e) { showToast('خطأ: ' + e.message); }
             hideLoader();
         };
 
@@ -1818,28 +2172,29 @@
         };
 
         window.updateAdminStudents = (mode) => {
-            let grade, sec, stuSelect;
             if(mode === 'del') {
-                grade = document.getElementById('del-grade').value;
-                sec = document.getElementById('del-section').value;
-                stuSelect = document.getElementById('del-student');
+                const btn = document.getElementById('btn-del-student');
+                if(btn) {
+                    btn.innerHTML = '<span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                    document.getElementById('del-student-val').value = '';
+                }
             } else {
-                grade = document.getElementById('move-grade-from').value;
-                sec = document.getElementById('move-section-from').value;
-                stuSelect = document.getElementById('move-student');
+                const btn = document.getElementById('btn-move-student');
+                if(btn) {
+                    btn.innerHTML = '<span>الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                    document.getElementById('move-student-val').value = '';
+                }
             }
-            
-            stuSelect.innerHTML = '<option value="">اختر الطالب...</option>';
-            const filtered = allUsers.filter(u => u.role === 'student' && u.grade === grade && u.section === sec);
-            filtered.forEach(u => stuSelect.innerHTML += `<option value="${u.uid}">${u.name}</option>`);
         };
 
-        // Admin: Delete
+
         window.toggleDeleteType = () => {
             const type = document.getElementById('del-type').value;
-            const stuSelect = document.getElementById('del-student');
-            if(type === 'all') stuSelect.style.display = 'none';
-            else stuSelect.style.display = 'block';
+            const stuSelectContainer = document.getElementById('del-student-container');
+            if(stuSelectContainer) {
+                if(type === 'all') stuSelectContainer.style.display = 'none';
+                else stuSelectContainer.style.display = 'block';
+            }
         };
 
         window.executeDelete = async () => {
@@ -1852,42 +2207,183 @@
             showLoader();
             try {
                 if(type === 'single') {
-                    const uid = document.getElementById('del-student').value;
-                    if(!uid) { hideLoader(); return showToast('يرجى اختيار طالب'); }
+                    const uid = document.getElementById('del-student-val').value;
+                    if(!uid) { hideLoader(); return showToast('يرجى اختيار طالب من القائمة'); }
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', uid));
+                    
+                    // التحديث الذكي: مسح الطالب المحذوف فوراً من الذاكرة المحلية حتى يختفي من القوائم
+                    allUsers = allUsers.filter(u => u.uid !== uid);
+                    
                 } else {
                     const filtered = allUsers.filter(u => u.role === 'student' && u.grade === grade && u.section === sec);
-                    for(let u of filtered) {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', u.uid));
-                    }
+                    for(let u of filtered) { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', u.uid)); }
+                    
+                    // التحديث الذكي: مسح جميع طلاب الشعبة المحذوفة فوراً من الذاكرة المحلية
+                    allUsers = allUsers.filter(u => !(u.role === 'student' && u.grade === grade && u.section === sec));
                 }
                 showToast('تم الحذف بنجاح');
                 closeModal('modal-admin-delete');
-                fetchAllUsersForStaff();
-            } catch(e) {
-                showToast('خطأ في الحذف');
-            }
+                
+                // تصفير الزر
+                const btn = document.getElementById('btn-del-student');
+                if(btn) btn.innerHTML = '<span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                document.getElementById('del-student-val').value = '';
+                
+            } catch(e) { showToast('خطأ في الحذف: ' + e.message); }
             hideLoader();
         };
 
-        // Admin: Move
         window.executeMove = async () => {
-            const uid = document.getElementById('move-student').value;
+            const uid = document.getElementById('move-student-val').value;
             const newGrade = document.getElementById('move-grade-to').value;
             const newSec = document.getElementById('move-section-to').value;
 
-            if(!uid || !newGrade || !newSec) return showToast('يرجى إكمال جميع الحقول');
+            if(!uid || !newGrade || !newSec) return showToast('يرجى إكمال جميع الحقول واختيار طالب');
 
             showLoader();
             try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', uid);
-                await updateDoc(docRef, { grade: newGrade, section: newSec });
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', uid), { grade: newGrade, section: newSec });
                 showToast('تم نقل الطالب بنجاح');
                 closeModal('modal-admin-move');
-                fetchAllUsersForStaff();
-            } catch(e) {
-                showToast('خطأ في النقل');
+                
+                // تصفير زر الاختيار
+                const btn = document.getElementById('btn-move-student');
+                if(btn) btn.innerHTML = '<span>اختر الطالب...</span> <i class="fas fa-user-graduate text-blue-400"></i>';
+                document.getElementById('move-student-val').value = '';
+                
+                // التحديث الذكي: تغيير صف وشعبة الطالب المنقول بالذاكرة المحلية فوراً
+                const userObj = allUsers.find(u => u.uid === uid);
+                if(userObj) {
+                    userObj.grade = newGrade;
+                    userObj.section = newSec;
+                }
+                
+            } catch(e) { showToast('خطأ في النقل'); }
+            hideLoader();
+        };
+        
+        document.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                setTimeout(() => {
+                    e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300); // تأخير بسيط لانتظار ظهور الكيبورد
             }
+        }, true);
+
+        window.addEventListener('resize', () => {
+            if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                window.setTimeout(() => {
+                    document.activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 0);
+            }
+        });
+        
+        // دالة فتح نافذة الطلاب الموحدة
+        window.openUniversalStudentSelector = (context) => {
+            let grade, sec;
+            if(context === 'notif') {
+                grade = document.getElementById('n-grade').value;
+                sec = document.getElementById('n-section').value;
+            } else if(context === 'del') {
+                grade = document.getElementById('del-grade').value;
+                sec = document.getElementById('del-section').value;
+            } else if(context === 'move') {
+                grade = document.getElementById('move-grade-from').value;
+                sec = document.getElementById('move-section-from').value;
+            }
+
+            if(!grade || !sec) return showToast('يرجى اختيار الصف والشعبة أولاً');
+
+            const filtered = allUsers.filter(u => u.role === 'student' && u.grade === grade && u.section === sec);
+            const list = document.getElementById('universal-student-list');
+            list.innerHTML = '';
+
+            if(filtered.length === 0) {
+                list.innerHTML = '<div class="col-span-3 text-center text-gray-400 font-bold mt-4 mb-4">لا يوجد طلاب في هذه الشعبة</div>';
+            } else {
+                filtered.forEach(u => {
+                    // تم تصغير الخط text-[10px] وكسر الكلمات break-words لترتيب الاسم الثلاثي
+                    list.innerHTML += `
+                    <button class="p-2 bg-white border-2 border-blue-100 rounded-xl flex flex-col items-center justify-center cursor-pointer shadow-sm active:bg-blue-100 hover:border-blue-400 transition-all text-center h-full" onclick="selectUniversalStudent('${context}', '${u.uid}', \`${u.name}\`)">
+                        <i class="fas fa-user-graduate text-blue-400 mb-2 text-lg"></i>
+                        <span class="font-bold text-gray-800 text-[10px] leading-tight w-full break-words" style="word-spacing: -1px;">${u.name}</span>
+                    </button>`;
+                });
+            }
+            openModal('modal-universal-student');
+        };
+
+        // دالة اختيار الطالب من النافذة الموحدة
+        window.selectUniversalStudent = (context, uid, name) => {
+            if(context === 'notif') {
+                document.getElementById('btn-n-student').innerHTML = `<span class="font-bold text-blue-600 truncate">${name}</span> <i class="fas fa-check-circle text-green-500"></i>`;
+                document.getElementById('n-student-val').value = uid;
+            } else if(context === 'del') {
+                document.getElementById('btn-del-student').innerHTML = `<span class="font-bold text-red-600 truncate">${name}</span> <i class="fas fa-check-circle text-red-500"></i>`;
+                document.getElementById('del-student-val').value = uid;
+            } else if(context === 'move') {
+                document.getElementById('btn-move-student').innerHTML = `<span class="font-bold text-blue-600 truncate">${name}</span> <i class="fas fa-check-circle text-green-500"></i>`;
+                document.getElementById('move-student-val').value = uid;
+            }
+            closeModal('modal-universal-student');
+        };
+        
+        // دالة جديدة لتحديث شعب الصف المختار في نافذة الإجبار
+        window.updateForceSections = () => {
+            const grade = document.getElementById('force-grade').value;
+            const fSection = document.getElementById('force-section');
+            fSection.innerHTML = '<option value="">اختر الشعبة...</option>';
+            if(grade && schoolStructure[grade] && schoolStructure[grade].sections) {
+                schoolStructure[grade].sections.forEach(sec => {
+                    fSection.innerHTML += `<option value="${sec}">${sec}</option>`;
+                });
+            }
+        };
+
+// دالة حفظ البيانات الجديدة (الاسم والصف والشعبة)
+        window.submitForcedName = async () => {
+            const valName = document.getElementById('force-name-input').value.trim();
+            const valGrade = document.getElementById('force-grade').value;
+            const valSec = document.getElementById('force-section').value;
+            
+            if(valName.split(' ').length < 3) return showToast('يجب إدخال اسم ثلاثي حقيقي وكامل');
+            if(!valGrade || !valSec) return showToast('يرجى اختيار الصف والشعبة');
+            
+            showLoader();
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUser.uid);
+                
+                // التعديل الجوهري: استخدام setDoc لبناء الملف من جديد إذا كان محذوفاً وإضافة المعلومات الأساسية
+                await setDoc(docRef, { 
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    role: 'student',
+                    name: valName, 
+                    grade: valGrade, 
+                    section: valSec 
+                }, { merge: true });
+                
+                // تحديث الذاكرة المحلية
+                userData.name = valName;
+                userData.grade = valGrade;
+                userData.section = valSec;
+                
+                // إخفاء نافذة الإجبار
+                document.getElementById('modal-force-name').classList.add('hidden');
+                document.getElementById('modal-force-name').classList.remove('flex');
+                
+                // إكمال تشغيل التطبيق الطبيعي
+                setupUIForRole();
+                loadInitialPosts();
+                watchNewPostsCount();
+                loadGrades();
+                loadNotifications();
+
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                showToast('تم إنشاء ملفك وتحديث بياناتك بنجاح. أهلاً بك!');
+            } catch(e) { showToast('خطأ: ' + e.message); }
             hideLoader();
         };
 
